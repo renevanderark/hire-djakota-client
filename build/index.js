@@ -794,9 +794,11 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -901,6 +903,9 @@ var DjakotaClient = (function (_React$Component) {
 				this.resizeDelay--;
 				window.setTimeout(this.onResize.bind(this), 10);
 			} else {
+				this.imagePos.x = 0;
+				this.imagePos.y = 0;
+
 				var node = _react2["default"].findDOMNode(this);
 				this.setState({
 					width: node.clientWidth,
@@ -910,16 +915,22 @@ var DjakotaClient = (function (_React$Component) {
 			}
 		}
 	}, {
-		key: "afterResize",
-		value: function afterResize() {
+		key: "loadImage",
+		value: function loadImage() {
+			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: "widthFill" } : arguments[0];
+
 			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
-			this.api.loadImage({
+			this.api.loadImage(_extends({
 				viewport: { w: this.state.width, h: this.state.height },
 				position: this.imagePos,
-				scaleMode: "heightFill",
 				onTile: this.renderTile.bind(this),
 				onScale: this.setScale.bind(this)
-			});
+			}, opts));
+		}
+	}, {
+		key: "afterResize",
+		value: function afterResize() {
+			this.loadImage();
 		}
 	}, {
 		key: "setScale",
@@ -930,7 +941,7 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "renderTile",
 		value: function renderTile(tileIm, tile) {
-			this.frameBuffer.push([tileIm, tile.pos.x * this.scale, tile.pos.y * this.scale, tileIm.width * this.scale, tileIm.height * this.scale]);
+			this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
 		}
 	}, {
 		key: "onMouseDown",
@@ -952,14 +963,9 @@ var DjakotaClient = (function (_React$Component) {
 					this.mousePos.x = ev.clientX;
 					this.mousePos.y = ev.clientY;
 
-					this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
-					this.api.loadImage({
-						viewport: { w: this.state.width, h: this.state.height },
-						position: this.imagePos,
-						scale: this.scale,
-						level: this.level,
-						onTile: this.renderTile.bind(this)
-					});
+					this.frameBuffer = [];
+					this.loadImage({ scale: this.scale, level: this.level });
+
 					break;
 				case MOUSE_UP:
 				default:
@@ -969,24 +975,19 @@ var DjakotaClient = (function (_React$Component) {
 		key: "onMouseUp",
 		value: function onMouseUp(ev) {
 			this.mouseState = MOUSE_UP;
+			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
 		key: "zoom",
 		value: function zoom(s, l) {
-			console.log(s, l);
 			this.setScale(s, l);
-			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
-			this.api.loadImage({
-				viewport: { w: this.state.width, h: this.state.height },
-				position: this.imagePos,
-				scale: this.scale,
-				level: this.level,
-				onTile: this.renderTile.bind(this)
-			});
+			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
 		key: "onWheel",
 		value: function onWheel(ev) {
+			this.imagePos.x = 0;
+			this.imagePos.y = 0;
 			if (ev.nativeEvent.deltaY < 0) {
 				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
 			} else if (ev.nativeEvent.deltaY > 0) {

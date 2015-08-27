@@ -71,6 +71,9 @@ class DjakotaClient extends React.Component {
 			this.resizeDelay--;
 			window.setTimeout(this.onResize.bind(this), 10);
 		} else {
+			this.imagePos.x = 0;
+			this.imagePos.y = 0;
+
 			let node = React.findDOMNode(this);
 			this.setState({
 				width: node.clientWidth,
@@ -80,15 +83,19 @@ class DjakotaClient extends React.Component {
 		}
 	}
 
-	afterResize() {
+	loadImage(opts = {scaleMode: "widthFill"}) {
 		this.frameClearBuffer.push([0,0,this.state.width, this.state.height]);
 		this.api.loadImage({
 			viewport: {w: this.state.width, h: this.state.height},
 			position: this.imagePos,
-			scaleMode: "heightFill",
 			onTile: this.renderTile.bind(this),
-			onScale: this.setScale.bind(this)
-		});
+			onScale: this.setScale.bind(this),
+			...opts
+		});		
+	}
+
+	afterResize() {
+		this.loadImage();
 	}
 
 	setScale(s, l) {
@@ -99,10 +106,10 @@ class DjakotaClient extends React.Component {
 	renderTile(tileIm, tile) {
 		this.frameBuffer.push([
 			tileIm, 
-			tile.pos.x * this.scale, 
-			tile.pos.y * this.scale, 
-			tileIm.width * this.scale, 
-			tileIm.height * this.scale
+			parseInt(Math.floor(tile.pos.x * this.scale)), 
+			parseInt(Math.floor(tile.pos.y * this.scale)), 
+			parseInt(Math.ceil(tileIm.width * this.scale)), 
+			parseInt(Math.ceil(tileIm.height * this.scale))
 		]);
 
 
@@ -125,14 +132,9 @@ class DjakotaClient extends React.Component {
 				this.mousePos.x = ev.clientX;
 				this.mousePos.y = ev.clientY;
 
-				this.frameClearBuffer.push([0,0,this.state.width, this.state.height]);
-				this.api.loadImage({
-					viewport: {w: this.state.width, h: this.state.height},
-					position: this.imagePos,
-					scale: this.scale,
-					level: this.level,
-					onTile: this.renderTile.bind(this),
-				});
+				this.frameBuffer = [];
+				this.loadImage({scale: this.scale, level: this.level});
+
 				break;
 			case MOUSE_UP:
 			default:
@@ -141,22 +143,18 @@ class DjakotaClient extends React.Component {
 
 	onMouseUp(ev) {
 		this.mouseState = MOUSE_UP;
+		this.loadImage({scale: this.scale, level: this.level});
+
 	}
 
 	zoom(s, l) {
-		console.log(s, l)
 		this.setScale(s, l);
-		this.frameClearBuffer.push([0,0,this.state.width, this.state.height]);
-		this.api.loadImage({
-			viewport: {w: this.state.width, h: this.state.height},
-			position: this.imagePos,
-			scale: this.scale,
-			level: this.level,
-			onTile: this.renderTile.bind(this),
-		});
+		this.loadImage({scale: this.scale, level: this.level});
 	}
 
 	onWheel(ev) {
+		this.imagePos.x = 0;
+		this.imagePos.y = 0;
 		if(ev.nativeEvent.deltaY < 0) {
 			this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
 		} else if(ev.nativeEvent.deltaY > 0) {
