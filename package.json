@@ -1,0 +1,36 @@
+{
+  "name": "hire-djakota-client",
+  "version": "0.0.0",
+  "description": "Hire djakota client",
+  "main": "build/index.js",
+  "scripts": {
+    "start": "scripts/watch.sh",
+    "bump": "hi-bump"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HuygensING/hire-djakota-client.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HuygensING/hire-djakota-client/issues"
+  },
+  "homepage": "https://github.com/HuygensING/hire-djakota-client#readme",
+  "devDependencies": {
+    "babel": "^5.8.21",
+    "babelify": "^6.1.3",
+    "brfs": "^1.4.1",
+    "derequire": "^2.0.0",
+    "hi-bump": "^1.1.1",
+    "insert-css": "^0.2.0",
+    "react": "^0.13.3",
+    "watchify": "^3.3.1"
+  },
+  "peerDependencies": {
+    "react": "^0.13.3"
+  },
+  "dependencies": {
+    "qs": "~4.0.0"
+  }
+}

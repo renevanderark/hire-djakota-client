@@ -1,0 +1,13 @@
+.hire-djakota-client {
+	width: 100%;
+	height: 100%;
+}
+
+.hire-djakota-client > .interaction,
+.hire-djakota-client > .image {
+	position: absolute;
+}
+
+.hire-djakota-client > .interaction {
+	z-index: 1;
+}
