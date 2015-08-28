@@ -1136,6 +1136,10 @@ Object.defineProperty(exports, "__esModule", {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+var _insertCss = _dereq_("insert-css");
+
+var _insertCss2 = _interopRequireDefault(_insertCss);
+
 var _react = _dereq_("react");
 
 var _react2 = _interopRequireDefault(_react);
@@ -1148,12 +1152,17 @@ var _minimap = _dereq_("./minimap");
 
 var _minimap2 = _interopRequireDefault(_minimap);
 
+
+
+var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQ==","base64");
+(0, _insertCss2["default"])(css, { prepend: true });
+
 _react2["default"].initializeTouchEvents(true);
 exports.DjakotaClient = _djakotaClient2["default"];
 exports.Minimap = _minimap2["default"];
 exports["default"] = _djakotaClient2["default"];
 
-},{"./djakota-client":7,"./minimap":9,"react":"react"}],9:[function(_dereq_,module,exports){
+},{"./djakota-client":7,"./minimap":9,"insert-css":1,"react":"react"}],9:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
