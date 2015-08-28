@@ -195,14 +195,20 @@ class Api {
 	widthFill(opts) {
 		let level = this.findLevel(opts.viewport.w, IDX_WIDTH);
 		let scale = opts.viewport.w / this.resolutions[level - 1][IDX_WIDTH];
-		if(opts.onScale) { opts.onScale(scale, level); }
+		let upscaleFactor = this.resolutions.length - level;
+		let viewportScale = this.downScale(scale, upscaleFactor);
+
+		if(opts.onScale) { opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale))); }
 		this.makeTiles(opts, level, scale);
 	}
 
 	heightFill(opts) {
 		let level = this.findLevel(opts.viewport.h, IDX_HEIGHT);
 		let scale = opts.viewport.h / this.resolutions[level - 1][IDX_HEIGHT];
-		if(opts.onScale) { opts.onScale(scale, level); }
+		let upscaleFactor = this.resolutions.length - level;
+		let viewportScale = this.downScale(scale, upscaleFactor);
+
+		if(opts.onScale) { opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale))); }
 
 		this.makeTiles(opts, level, scale);
 	}

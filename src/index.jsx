@@ -98,14 +98,14 @@ class DjakotaClient extends React.Component {
 		}
 	}
 
-	loadImage(opts = {scaleMode: "widthFill"}) {
+	loadImage(opts = {scaleMode: "heightFill"}) {
 		this.clearTime = new Date().getTime() - 10;
 		this.frameClearBuffer.push([0,0,this.state.width, this.state.height]);
 		this.api.loadImage({
 			viewport: {w: this.state.width, h: this.state.height},
 			position: this.imagePos,
 			onTile: this.renderTile.bind(this),
-			onScale: this.setScale.bind(this),
+			onScale: this.zoom.bind(this),
 			timeStamp: new Date().getTime(),
 			...opts
 		});
@@ -152,8 +152,8 @@ class DjakotaClient extends React.Component {
 			case MOUSE_DOWN:
 				this.movement.x = this.mousePos.x - ev.clientX;
 				this.movement.y = this.mousePos.y - ev.clientY;
-				this.imagePos.x -= this.movement.x;
-				this.imagePos.y -= this.movement.y
+				this.imagePos.x -= this.movement.x / this.scale;
+				this.imagePos.y -= this.movement.y / this.scale;
 				this.mousePos.x = ev.clientX;
 				this.mousePos.y = ev.clientY;
 
@@ -191,8 +191,8 @@ class DjakotaClient extends React.Component {
 		} else {
 			this.movement.x = this.touchPos.x - ev.touches[0].pageX;
 			this.movement.y = this.touchPos.y - ev.touches[0].pageY;
-			this.imagePos.x -= this.movement.x;
-			this.imagePos.y -= this.movement.y
+			this.imagePos.x -= this.movement.x / this.scale;
+			this.imagePos.y -= this.movement.y / this.scale;
 			this.touchPos.x = ev.touches[0].pageX;
 			this.touchPos.y = ev.touches[0].pageY;
 			this.frameBuffer = [];
