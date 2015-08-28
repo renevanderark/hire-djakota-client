@@ -15,7 +15,8 @@ const TOUCH_START = 1;
 
 const SUPPORTED_SCALE_MODES = [
 	"heightFill",
-	"widthFill"
+	"widthFill",
+	"fullZoom"
 ];
 
 React.initializeTouchEvents(true)
@@ -273,8 +274,9 @@ DjakotaClient.propTypes = {
 	config: React.PropTypes.object.isRequired,
 	scaleMode: function(props, propName, componentName) {
 		if(SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
+			let msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
 			props[propName] = "heightFill";
-			return new Error("Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", "));
+			return new Error(msg);
 		}
 	},
 	service: React.PropTypes.string.isRequired

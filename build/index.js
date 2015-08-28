@@ -559,8 +559,6 @@ var _qs = _dereq_("qs");
 
 var _qs2 = _interopRequireDefault(_qs);
 
-var BASE_PARAMS = {};
-
 var IDX_WIDTH = 1;
 var IDX_HEIGHT = 0;
 var TILE_SIZE = 256;
@@ -717,6 +715,17 @@ var Api = (function () {
 			this.makeTiles(opts, level, scale);
 		}
 	}, {
+		key: "fullZoom",
+		value: function fullZoom(opts) {
+			var level = this.levels;
+			var scale = 1;
+
+			if (opts.onScale) {
+				opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth)), parseInt(Math.ceil(this.fullHeight)));
+			}
+			this.makeTiles(opts, level, scale);
+		}
+	}, {
 		key: "heightFill",
 		value: function heightFill(opts) {
 			var level = this.findLevel(opts.viewport.h, IDX_HEIGHT);
@@ -793,7 +802,7 @@ var MOUSE_DOWN = 1;
 var TOUCH_END = 0;
 var TOUCH_START = 1;
 
-var SUPPORTED_SCALE_MODES = ["heightFill", "widthFill"];
+var SUPPORTED_SCALE_MODES = ["heightFill", "widthFill", "fullZoom"];
 
 _react2["default"].initializeTouchEvents(true);
 
@@ -1060,8 +1069,9 @@ DjakotaClient.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
 	scaleMode: function scaleMode(props, propName, componentName) {
 		if (SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
+			var msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
 			props[propName] = "heightFill";
-			return new Error("Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", "));
+			return new Error(msg);
 		}
 	},
 	service: _react2["default"].PropTypes.string.isRequired

@@ -1,8 +1,5 @@
 import qs from "qs";
 
-const BASE_PARAMS = {
-};
-
 const IDX_WIDTH = 1;
 const IDX_HEIGHT = 0;
 const TILE_SIZE = 256;
@@ -151,6 +148,14 @@ class Api {
 		let viewportScale = this.downScale(scale, upscaleFactor);
 
 		if(opts.onScale) { opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale))); }
+		this.makeTiles(opts, level, scale);
+	}
+
+	fullZoom(opts) {
+		let level = this.levels;
+		let scale = 1;
+
+		if(opts.onScale) { opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth)), parseInt(Math.ceil(this.fullHeight))); }
 		this.makeTiles(opts, level, scale);
 	}
 
