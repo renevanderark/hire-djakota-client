@@ -74,7 +74,6 @@ class Minimap extends React.Component {
 	afterResize() {
 		this.api.loadImage({
 			viewport: {w: this.state.width, h: this.state.height},
-			position: this.imagePos,
 			onTile: this.renderTile.bind(this),
 			onScale: this.setScale.bind(this),
 			scaleMode: "autoFill",

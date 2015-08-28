@@ -1872,7 +1872,6 @@ var Minimap = (function (_React$Component) {
 		value: function afterResize() {
 			this.api.loadImage({
 				viewport: { w: this.state.width, h: this.state.height },
-				position: this.imagePos,
 				onTile: this.renderTile.bind(this),
 				onScale: this.setScale.bind(this),
 				scaleMode: "autoFill",
