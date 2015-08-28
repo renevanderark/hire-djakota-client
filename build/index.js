@@ -841,6 +841,8 @@ var MOUSE_DOWN = 1;
 var TOUCH_END = 0;
 var TOUCH_START = 1;
 
+var SUPPORTED_SCALE_MODES = ["heightFill", "widthFill"];
+
 _react2["default"].initializeTouchEvents(true);
 
 var DjakotaClient = (function (_React$Component) {
@@ -938,7 +940,7 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "loadImage",
 		value: function loadImage() {
-			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: "heightFill" } : arguments[0];
+			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: this.props.scaleMode } : arguments[0];
 
 			this.clearTime = new Date().getTime() - 10;
 			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
@@ -1104,7 +1106,17 @@ var DjakotaClient = (function (_React$Component) {
 
 DjakotaClient.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
+	scaleMode: function scaleMode(props, propName, componentName) {
+		if (SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
+			props[propName] = "heightFill";
+			return new Error("Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", "));
+		}
+	},
 	service: _react2["default"].PropTypes.string.isRequired
+};
+
+DjakotaClient.defaultProps = {
+	scaleMode: "heightFill"
 };
 
 exports["default"] = DjakotaClient;
