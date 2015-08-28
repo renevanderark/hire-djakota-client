@@ -186,7 +186,7 @@ class DjakotaClient extends React.Component {
 			this.touchmap.pinchDelta = oldD - this.touchmap.pinchDistance;
 			if (this.touchmap.pinchDelta < 20 && this.touchmap.pinchDelta > -20) {
 				let sHeur = 1.0 - (this.touchmap.pinchDelta * 0.01);
-				this.api.zoomBy(sHeur, this.scale, this.level, this.zoom.bind(this), this.onImageBoundsBeforeZoom.bind(this));
+				this.api.zoomBy(sHeur, this.scale, this.level, this.zoom.bind(this));
 			}
 		} else {
 			this.movement.x = this.touchPos.x - ev.touches[0].pageX;
@@ -211,31 +211,30 @@ class DjakotaClient extends React.Component {
 		this.loadImage({scale: this.scale, level: this.level});
 	}
 
-	zoom(s, l) {
+	zoom(s, l, w, h) {
 		this.setScale(s, l);
-		this.loadImage({scale: this.scale, level: this.level});
-	}
-	onImageBoundsBeforeZoom(w, h) {
-		if(w > this.state.width) {
-			this.imagePos.x = -parseInt((w - this.state.width) / 2);
+
+		if(w > this.state.width) {			
+			this.imagePos.x = -parseInt((w - this.state.width) / 2) / this.scale;
 		} else if(w < this.state.width) {
-			this.imagePos.x = parseInt((this.state.width - w) / 2);
+			this.imagePos.x = parseInt((this.state.width - w) / 2) / this.scale;
 		}
 
 		if(h > this.state.height) {
-			this.imagePos.y = -parseInt((h - this.state.height) / 2);	
+			this.imagePos.y = -parseInt((h - this.state.height) / 2) / this.scale;	
 		} else if(h < this.state.width) {
-			this.imagePos.y = parseInt((this.state.height - h) / 2);
+			this.imagePos.y = parseInt((this.state.height - h) / 2) / this.scale;
 		}
 
+		this.loadImage({scale: this.scale, level: this.level});
 	}
 
 	onWheel(ev) {
 
 		if(ev.nativeEvent.deltaY < 0) {
-			this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this), this.onImageBoundsBeforeZoom.bind(this));
+			this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
 		} else if(ev.nativeEvent.deltaY > 0) {
-			this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this), this.onImageBoundsBeforeZoom.bind(this));
+			this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
 		}
 
 

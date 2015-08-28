@@ -182,17 +182,13 @@ class Api {
 		return this.findLevelForScale(s, --level, current / 2);
 	}
 
-	zoomBy(factor, scale, level, onScale, onImageBounds) {
+	zoomBy(factor, scale, level, onScale) {
 		let upscaleFactor = this.resolutions.length - level;
 		let viewportScale = this.downScale(scale, upscaleFactor) * factor;
 		let newLevel = this.findLevelForScale(viewportScale, this.levels);
 		let newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
 
-		onImageBounds(
-			parseInt(Math.ceil(this.fullWidth * viewportScale)), 
-			parseInt(Math.ceil(this.fullHeight * viewportScale))
-		);
-		onScale(newScale, newLevel);
+		onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
 	}
 
 
