@@ -756,8 +756,11 @@ var Api = (function () {
 		value: function widthFill(opts) {
 			var level = this.findLevel(opts.viewport.w, IDX_WIDTH);
 			var scale = opts.viewport.w / this.resolutions[level - 1][IDX_WIDTH];
+			var upscaleFactor = this.resolutions.length - level;
+			var viewportScale = this.downScale(scale, upscaleFactor);
+
 			if (opts.onScale) {
-				opts.onScale(scale, level);
+				opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
 			}
 			this.makeTiles(opts, level, scale);
 		}
@@ -766,8 +769,11 @@ var Api = (function () {
 		value: function heightFill(opts) {
 			var level = this.findLevel(opts.viewport.h, IDX_HEIGHT);
 			var scale = opts.viewport.h / this.resolutions[level - 1][IDX_HEIGHT];
+			var upscaleFactor = this.resolutions.length - level;
+			var viewportScale = this.downScale(scale, upscaleFactor);
+
 			if (opts.onScale) {
-				opts.onScale(scale, level);
+				opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
 			}
 
 			this.makeTiles(opts, level, scale);
@@ -932,7 +938,7 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "loadImage",
 		value: function loadImage() {
-			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: "widthFill" } : arguments[0];
+			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: "heightFill" } : arguments[0];
 
 			this.clearTime = new Date().getTime() - 10;
 			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
@@ -940,7 +946,7 @@ var DjakotaClient = (function (_React$Component) {
 				viewport: { w: this.state.width, h: this.state.height },
 				position: this.imagePos,
 				onTile: this.renderTile.bind(this),
-				onScale: this.setScale.bind(this),
+				onScale: this.zoom.bind(this),
 				timeStamp: new Date().getTime()
 			}, opts));
 		}
@@ -985,8 +991,8 @@ var DjakotaClient = (function (_React$Component) {
 				case MOUSE_DOWN:
 					this.movement.x = this.mousePos.x - ev.clientX;
 					this.movement.y = this.mousePos.y - ev.clientY;
-					this.imagePos.x -= this.movement.x;
-					this.imagePos.y -= this.movement.y;
+					this.imagePos.x -= this.movement.x / this.scale;
+					this.imagePos.y -= this.movement.y / this.scale;
 					this.mousePos.x = ev.clientX;
 					this.mousePos.y = ev.clientY;
 
@@ -1017,8 +1023,8 @@ var DjakotaClient = (function (_React$Component) {
 			} else {
 				this.movement.x = this.touchPos.x - ev.touches[0].pageX;
 				this.movement.y = this.touchPos.y - ev.touches[0].pageY;
-				this.imagePos.x -= this.movement.x;
-				this.imagePos.y -= this.movement.y;
+				this.imagePos.x -= this.movement.x / this.scale;
+				this.imagePos.y -= this.movement.y / this.scale;
 				this.touchPos.x = ev.touches[0].pageX;
 				this.touchPos.y = ev.touches[0].pageY;
 				this.frameBuffer = [];
