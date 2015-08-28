@@ -2,7 +2,7 @@ import qs from "qs";
 
 const IDX_WIDTH = 1;
 const IDX_HEIGHT = 0;
-const TILE_SIZE = 256;
+const TILE_SIZE = 512;
 
 class Api {
 	constructor(service, config) {
@@ -119,7 +119,7 @@ class Api {
 					},
 					level: level,
 					url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE,TILE_SIZE])
-				}, opts.onTile);
+				}, opts.onTile, opts.onTileInit);
 			}
 		}
 	}

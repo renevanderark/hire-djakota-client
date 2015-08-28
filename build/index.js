@@ -1108,7 +1108,7 @@ var _qs2 = _interopRequireDefault(_qs);
 
 var IDX_WIDTH = 1;
 var IDX_HEIGHT = 0;
-var TILE_SIZE = 256;
+var TILE_SIZE = 512;
 
 var Api = (function () {
 	function Api(service, config) {
@@ -1224,7 +1224,7 @@ var Api = (function () {
 						},
 						level: level,
 						url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
-					}, opts.onTile);
+					}, opts.onTile, opts.onTileInit);
 				}
 			}
 		}
@@ -1404,6 +1404,7 @@ var DjakotaClient = (function (_React$Component) {
 		this.frameBuffer = [];
 		this.frameClearBuffer = [];
 		this.clearTime = 0;
+		this.repaintDelay = -1;
 		this.touchmap = { startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0 };
 	}
 
@@ -1440,11 +1441,10 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "onAnimationFrame",
 		value: function onAnimationFrame() {
-			if (this.redrawDelay === 0) {
-				this.loadImage({ scale: this.scale, level: this.level, noClear: true });
-				this.redrawDelay = -1;
-			} else if (this.redrawDelay > 0) {
-				this.redrawDelay--;
+			if (this.repaintDelay === 0) {
+				this.loadImage({ scale: this.scale, level: this.level });
+			} else if (this.repaintDelay > 0) {
+				this.repaintDelay--;
 			}
 
 			while (this.frameClearBuffer.length > 0) {
@@ -1488,13 +1488,33 @@ var DjakotaClient = (function (_React$Component) {
 			}, this.afterResize.bind(this));
 		}
 	}, {
+		key: "stageClearRects",
+		value: function stageClearRects() {
+			var x = this.imagePos.x * this.scale;
+			var y = this.imagePos.y * this.scale;
+			var x1 = x + this.width;
+			var y1 = y + this.height;
+
+			if (x > 0) {
+				this.frameClearBuffer.push([0, 0, x, this.state.height]);
+			}
+			if (y > 0) {
+				this.frameClearBuffer.push([0, 0, this.state.width, y]);
+			}
+			if (x1 < this.state.width) {
+				this.frameClearBuffer.push([x1, 0, this.state.width - x1, this.state.height]);
+			}
+			if (y1 < this.state.width) {
+				this.frameClearBuffer.push([0, y1, this.state.width, this.state.height - y1]);
+			}
+		}
+	}, {
 		key: "loadImage",
 		value: function loadImage() {
 			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: this.props.scaleMode } : arguments[0];
 
-			console.log(new Date().getTime());
 			this.clearTime = new Date().getTime() - 10;
-			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
+			this.stageClearRects();
 			this.api.loadImage(_extends({
 				viewport: { w: this.state.width, h: this.state.height },
 				position: this.imagePos,
@@ -1523,9 +1543,7 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "renderTile",
 		value: function renderTile(tileIm, tile) {
-			if (tile.timeStamp >= this.clearTime) {
-				this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
-			}
+			this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
 		}
 	}, {
 		key: "onMouseDown",
@@ -1644,7 +1662,6 @@ var DjakotaClient = (function (_React$Component) {
 				this.imagePos.x = (origX + diffX) / this.scale;
 				this.imagePos.y = (origY + diffY) / this.scale;
 			}
-			this.redrawDelay = 30;
 			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
@@ -1652,8 +1669,10 @@ var DjakotaClient = (function (_React$Component) {
 		value: function onWheel(ev) {
 			if (ev.nativeEvent.deltaY < 0) {
 				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
+				this.repaintDelay = 30;
 			} else if (ev.nativeEvent.deltaY > 0) {
 				this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
+				this.repaintDelay = 10;
 			}
 		}
 	}, {
