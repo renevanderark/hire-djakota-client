@@ -1,6 +1,8 @@
 import React from "react";
 import Api from "./api";
 import { requestAnimationFrame, cancelAnimationFrame } from './request-animation-frame';
+import { setRealViewPort } from "./actions";
+import store from "./store";
 
 const RESIZE_DELAY = 5;
 
@@ -28,13 +30,21 @@ class Minimap extends React.Component {
 		window.addEventListener("resize", this.resizeListener);
 		requestAnimationFrame(this.animationFrameListener);
 
+		this.unsubscribe = store.subscribe(() =>
+			this.setSharedState(store.getState())
+		);
+
 	}
 
 
 	componentWillUnmount() {
 		window.removeEventListener("resize", this.resizeListener);
 		cancelAnimationFrame(this.animationFrameListener);
+		this.unsubscribe();
+	}
 
+	setSharedState(state) {
+		console.log(state);
 	}
 
 	onAnimationFrame() {
@@ -76,6 +86,7 @@ class Minimap extends React.Component {
 		this.scale = s;
 		this.level = l;
 	}
+
 	renderTile(tileIm, tile) {
 		this.imageCtx.drawImage(...[
 			tileIm, 
@@ -86,11 +97,21 @@ class Minimap extends React.Component {
 		]);
 	}
 
+	onClick(ev) {
+		let me = React.findDOMNode(this);
+		console.log(me);
+		console.log((ev.pageX - me.offsetLeft) / this.state.width, (ev.pageY - me.offsetTop) / this.state.height)
+		store.dispatch(setRealViewPort({
+			x: (ev.pageX - me.offsetLeft) / this.state.width,
+			y: (ev.pageY - me.offsetTop) / this.state.height
+		}));
+	}
+
 	render() {
 		return (
 			<div className="hire-djakota-minimap">
 				<canvas className="image" height={this.state.height} width={this.state.width} />
-				<canvas className="interaction" height={this.state.height} width={this.state.width} />
+				<canvas className="interaction"  height={this.state.height} onClick={this.onClick.bind(this)} width={this.state.width} />
 			</div>
 		);
 	}

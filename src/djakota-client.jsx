@@ -1,11 +1,7 @@
 import React from "react";
 import Api from "./api";
 import { requestAnimationFrame, cancelAnimationFrame } from './request-animation-frame';
-
-let fs = require("fs");
-import insertCss from "insert-css";
-let css = fs.readFileSync(__dirname + "/index.css");
-insertCss(css, {prepend: true});
+import store from "./store";
 
 const MOUSE_UP = 0;
 const MOUSE_DOWN = 1;
@@ -63,6 +59,9 @@ class DjakotaClient extends React.Component {
 		window.addEventListener("mousemove", this.mousemoveListener);
 		window.addEventListener("mouseup", this.mouseupListener);
 
+		this.unsubscribe = store.subscribe(() =>
+			this.setSharedState(store.getState())
+		);
 		requestAnimationFrame(this.animationFrameListener);
 
 	}
@@ -71,19 +70,28 @@ class DjakotaClient extends React.Component {
 		window.removeEventListener("resize", this.resizeListener);
 		window.removeEventListener("mousemove", this.mousemoveListener);
 		window.removeEventListener("mouseup", this.mouseupListener);
-
+		this.unsubscribe();
 		cancelAnimationFrame(this.animationFrameListener);
 	}
 
+
+	setSharedState(state) {
+		console.log(state);
+	}
+
+
+
 	onAnimationFrame() {
-		if(this.frameClearBuffer.length > 0 ||  this.frameBuffer.length === 0) {
-			// trigger a redraw when window is cleared, but no new tiles in framebuffer
-			this.loadImage({scale: this.scale, level: this.level});	
+		if(this.redrawDelay === 0) {
+			this.loadImage({scale: this.scale, level: this.level, noClear: true});
+			this.redrawDelay = -1;
+		} else if(this.redrawDelay > 0) {
+			this.redrawDelay--;
 		}
+
 		while(this.frameClearBuffer.length > 0) {
 			this.imageCtx.clearRect(...this.frameClearBuffer.pop());
 		}
-
 
 		while(this.frameBuffer.length > 0) {
 			this.imageCtx.drawImage(...this.frameBuffer.pop());
@@ -117,13 +125,14 @@ class DjakotaClient extends React.Component {
 	}
 
 	loadImage(opts = {scaleMode: this.props.scaleMode}) {
+		console.log(new Date().getTime());
 		this.clearTime = new Date().getTime() - 10;
 		this.frameClearBuffer.push([0,0,this.state.width, this.state.height]);
 		this.api.loadImage({
 			viewport: {w: this.state.width, h: this.state.height},
 			position: this.imagePos,
 			onTile: this.renderTile.bind(this),
-			onScale: this.zoom.bind(this),
+			onScale: this.onDimensions.bind(this),
 			timeStamp: new Date().getTime(),
 			...opts
 		});
@@ -142,6 +151,7 @@ class DjakotaClient extends React.Component {
 		this.width = w;
 		this.height = h;
 	}
+
 
 	renderTile(tileIm, tile) {
 		if(tile.timeStamp >= this.clearTime) {
@@ -247,6 +257,12 @@ class DjakotaClient extends React.Component {
 		}
 	}
 
+	onDimensions(s, l, w, h) {
+		this.setDimensions(w, h)
+		this.setScale(s, l);
+		this.center(w, h);
+	}
+
 	zoom(s, l, w, h) {
 		let origX = this.imagePos.x * this.scale;
 		let origY = this.imagePos.y * this.scale;
@@ -265,7 +281,7 @@ class DjakotaClient extends React.Component {
 			this.imagePos.x  = (origX + diffX) / this.scale;
 			this.imagePos.y = (origY + diffY) / this.scale;
 		}
-
+		this.redrawDelay = 30;
 		this.loadImage({scale: this.scale, level: this.level});
 	}
 

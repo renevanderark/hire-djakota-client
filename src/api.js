@@ -140,6 +140,17 @@ class Api {
 		onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
 	}
 
+	getRealScale(scale, level) {
+		return this.downScale(scale, this.resolutions.length - level);
+	}
+
+	getRealImagePos(position, scale, level) {
+		let upscaleFactor = this.resolutions.length - level;
+		return {
+			x: this.upScale(position.x, upscaleFactor) * this.getRealScale(scale, level),
+			y: this.upScale(position.y, upscaleFactor) * this.getRealScale(scale, level)
+		}
+	}
 
 	widthFill(opts) {
 		let level = this.findLevel(opts.viewport.w, IDX_WIDTH);
@@ -177,6 +188,8 @@ class Api {
 			this.widthFill(opts);
 		}
 	}
+
+
 
 	loadImage(opts, onScale) {
 		if(opts.scaleMode) {
