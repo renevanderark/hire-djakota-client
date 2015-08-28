@@ -170,6 +170,14 @@ class Api {
 		this.makeTiles(opts, level, scale);
 	}
 
+	autoFill(opts) {
+		if(opts.viewport.h < opts.viewport.w) {
+			this.heightFill(opts);
+		} else {
+			this.widthFill(opts);
+		}
+	}
+
 	loadImage(opts, onScale) {
 		if(opts.scaleMode) {
 			this[opts.scaleMode](opts);

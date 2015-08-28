@@ -740,6 +740,15 @@ var Api = (function () {
 			this.makeTiles(opts, level, scale);
 		}
 	}, {
+		key: "autoFill",
+		value: function autoFill(opts) {
+			if (opts.viewport.h < opts.viewport.w) {
+				this.heightFill(opts);
+			} else {
+				this.widthFill(opts);
+			}
+		}
+	}, {
 		key: "loadImage",
 		value: function loadImage(opts, onScale) {
 			if (opts.scaleMode) {
@@ -793,7 +802,7 @@ var _insertCss2 = _interopRequireDefault(_insertCss);
 
 
 
-var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQgewoJd2lkdGg6IDEwMCU7CgloZWlnaHQ6IDEwMCU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLWNsaWVudCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uIHsKCXotaW5kZXg6IDE7Cn0=","base64");
+var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQ==","base64");
 (0, _insertCss2["default"])(css, { prepend: true });
 
 var MOUSE_UP = 0;
@@ -802,9 +811,9 @@ var MOUSE_DOWN = 1;
 var TOUCH_END = 0;
 var TOUCH_START = 1;
 
-var SUPPORTED_SCALE_MODES = ["heightFill", "widthFill", "fullZoom"];
+var RESIZE_DELAY = 5;
 
-_react2["default"].initializeTouchEvents(true);
+var SUPPORTED_SCALE_MODES = ["heightFill", "widthFill", "autoFill", "fullZoom"];
 
 var DjakotaClient = (function (_React$Component) {
 	_inherits(DjakotaClient, _React$Component);
@@ -845,7 +854,7 @@ var DjakotaClient = (function (_React$Component) {
 	_createClass(DjakotaClient, [{
 		key: "componentDidMount",
 		value: function componentDidMount() {
-			this.onResize();
+			this.commitResize();
 			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext('2d');
 			window.addEventListener("resize", this.resizeListener);
 			window.addEventListener("mousemove", this.mousemoveListener);
@@ -880,25 +889,34 @@ var DjakotaClient = (function (_React$Component) {
 
 				(_imageCtx2 = this.imageCtx).drawImage.apply(_imageCtx2, _toConsumableArray(this.frameBuffer.pop()));
 			}
+
+			if (this.resizeDelay === 0 && this.resizing) {
+				this.commitResize();
+			} else if (this.resizeDelay > 0) {
+				this.resizeDelay--;
+			}
 			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
 		key: "onResize",
 		value: function onResize() {
-			if (this.resizeDelay > 0) {
-				this.resizeDelay--;
-				window.setTimeout(this.onResize.bind(this), 10);
-			} else {
-				this.imagePos.x = 0;
-				this.imagePos.y = 0;
-
-				var node = _react2["default"].findDOMNode(this);
-				this.setState({
-					width: node.clientWidth,
-					height: node.clientHeight
-				}, this.afterResize.bind(this));
-				this.resizeDelay = 5;
-			}
+			this.resizeDelay = RESIZE_DELAY;
+			this.resizing = true;
+		}
+	}, {
+		key: "commitResize",
+		value: function commitResize() {
+			this.resizeDelay = RESIZE_DELAY;
+			this.resizing = false;
+			this.imagePos.x = 0;
+			this.imagePos.y = 0;
+			this.width = null;
+			this.height = null;
+			var node = _react2["default"].findDOMNode(this);
+			this.setState({
+				width: node.clientWidth,
+				height: node.clientHeight
+			}, this.afterResize.bind(this));
 		}
 	}, {
 		key: "loadImage",
@@ -1109,7 +1127,172 @@ DjakotaClient.defaultProps = {
 exports["default"] = DjakotaClient;
 module.exports = exports["default"];
 
-},{"./api":6,"./request-animation-frame":8,"insert-css":1,"react":"react"}],8:[function(_dereq_,module,exports){
+},{"./api":6,"./request-animation-frame":10,"insert-css":1,"react":"react"}],8:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _djakotaClient = _dereq_("./djakota-client");
+
+var _djakotaClient2 = _interopRequireDefault(_djakotaClient);
+
+var _minimap = _dereq_("./minimap");
+
+var _minimap2 = _interopRequireDefault(_minimap);
+
+_react2["default"].initializeTouchEvents(true);
+exports.DjakotaClient = _djakotaClient2["default"];
+exports.Minimap = _minimap2["default"];
+exports["default"] = _djakotaClient2["default"];
+
+},{"./djakota-client":7,"./minimap":9,"react":"react"}],9:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _api = _dereq_("./api");
+
+var _api2 = _interopRequireDefault(_api);
+
+var _requestAnimationFrame = _dereq_('./request-animation-frame');
+
+var RESIZE_DELAY = 5;
+
+var Minimap = (function (_React$Component) {
+	_inherits(Minimap, _React$Component);
+
+	function Minimap(props) {
+		_classCallCheck(this, Minimap);
+
+		_get(Object.getPrototypeOf(Minimap.prototype), "constructor", this).call(this, props);
+		this.api = new _api2["default"](this.props.service, this.props.config);
+
+		this.state = {
+			width: null,
+			height: null
+		};
+
+		this.resizeListener = this.onResize.bind(this);
+		this.animationFrameListener = this.onAnimationFrame.bind(this);
+
+		this.imageCtx = null;
+		this.resizeDelay = 0;
+	}
+
+	_createClass(Minimap, [{
+		key: "componentDidMount",
+		value: function componentDidMount() {
+			this.onResize();
+			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext('2d');
+			window.addEventListener("resize", this.resizeListener);
+			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+		}
+	}, {
+		key: "componentWillUnmount",
+		value: function componentWillUnmount() {
+			window.removeEventListener("resize", this.resizeListener);
+			(0, _requestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
+		}
+	}, {
+		key: "onAnimationFrame",
+		value: function onAnimationFrame() {
+			if (this.resizeDelay === 0 && this.resizing) {
+				this.commitResize();
+			} else if (this.resizeDelay > 0) {
+				this.resizeDelay--;
+			}
+			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+		}
+	}, {
+		key: "onResize",
+		value: function onResize() {
+			this.resizeDelay = RESIZE_DELAY;
+			this.resizing = true;
+		}
+	}, {
+		key: "commitResize",
+		value: function commitResize() {
+			this.resizing = false;
+			this.resizeDelay = RESIZE_DELAY;
+			var node = _react2["default"].findDOMNode(this);
+			this.setState({
+				width: node.clientWidth,
+				height: node.clientHeight
+			}, this.afterResize.bind(this));
+		}
+	}, {
+		key: "afterResize",
+		value: function afterResize() {
+			this.api.loadImage({
+				viewport: { w: this.state.width, h: this.state.height },
+				position: this.imagePos,
+				onTile: this.renderTile.bind(this),
+				onScale: this.setScale.bind(this),
+				scaleMode: "autoFill",
+				position: { x: 0, y: 0 }
+			});
+		}
+	}, {
+		key: "setScale",
+		value: function setScale(s, l) {
+			this.scale = s;
+			this.level = l;
+		}
+	}, {
+		key: "renderTile",
+		value: function renderTile(tileIm, tile) {
+			var _imageCtx;
+
+			(_imageCtx = this.imageCtx).drawImage.apply(_imageCtx, [tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
+		}
+	}, {
+		key: "render",
+		value: function render() {
+			return _react2["default"].createElement(
+				"div",
+				{ className: "hire-djakota-minimap" },
+				_react2["default"].createElement("canvas", { className: "image", height: this.state.height, width: this.state.width }),
+				_react2["default"].createElement("canvas", { className: "interaction", height: this.state.height, width: this.state.width })
+			);
+		}
+	}]);
+
+	return Minimap;
+})(_react2["default"].Component);
+
+Minimap.propTypes = {
+	config: _react2["default"].PropTypes.object.isRequired,
+	service: _react2["default"].PropTypes.string.isRequired
+};
+
+exports["default"] = Minimap;
+module.exports = exports["default"];
+
+},{"./api":6,"./request-animation-frame":10,"react":"react"}],10:[function(_dereq_,module,exports){
 /*
 The MIT License (MIT)
 
@@ -1160,5 +1343,5 @@ var cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ? f
 } : undefined;
 exports.cancelAnimationFrame = cancelAnimationFrame;
 
-},{}]},{},[7])(7)
+},{}]},{},[8])(8)
 });
