@@ -561,54 +561,6 @@ var _qs2 = _interopRequireDefault(_qs);
 
 var BASE_PARAMS = {};
 
-/*
-var params = {
-	url: url,
-	rft_id: "http://localhost:8080/jp2/14284083156311.jp2",
-	svc_id: "info:lanl-repo/svc/getMetadata"
-}
-
-url_ver=Z39.88-2004&
-rft_id=http://localhost:8080/jp2/14284083156311.jp2&
-svc_id=info:lanl-repo/svc/getRegion&
-svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&
-svc.format=image/jpeg&
-svc.scale=42,278
-
-*/
-
-/*
-https://tomcat.tiler01.huygens.knaw.nl/adore-djatoka/resolver?
-url_ver=Z39.88-2004&
-rft_id=http://localhost:8080/jp2/14284083156311.jp2&
-svc_id=info:lanl-repo/svc/getRegion&
-svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&
-svc.format=image/jpeg&
-svc.level=1&
-svc.rotate=0&
-svc.region=0,0,256,256
-*/
-
-/*
-https://tomcat.tiler01.huygens.knaw.nl/adore-djatoka/resolver?
-rft_id=http%3A%2F%2Flocalhost%3A8080%2Fjp2%2F14284083156311.jp2
-&url_ver=Z39.88-2004&
-svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&
-svc.format=image%2Fjpeg&
-svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion&
-level=1
-*/
-
-/*
-https://tomcat.tiler01.huygens.knaw.nl/adore-djatoka/resolver?
-url_ver=Z39.88-2004&
-rft_id=http://localhost:8080/jp2/14284083156311.jp2&
-svc_id=info:lanl-repo/svc/getRegion&
-svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&
-svc.format=image/jpeg&svc.level=4&
-svc.region=2048,0,256,256
-*/
-
 var IDX_WIDTH = 1;
 var IDX_HEIGHT = 0;
 var TILE_SIZE = 256;
