@@ -829,6 +829,8 @@ var DjakotaClient = (function (_React$Component) {
 		this.resizeDelay = 0;
 		this.scale = 1.0;
 		this.level = null;
+		this.width = null;
+		this.height = null;
 
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
@@ -925,6 +927,12 @@ var DjakotaClient = (function (_React$Component) {
 			this.level = l;
 		}
 	}, {
+		key: "setDimensions",
+		value: function setDimensions(w, h) {
+			this.width = w;
+			this.height = h;
+		}
+	}, {
 		key: "renderTile",
 		value: function renderTile(tileIm, tile) {
 			if (tile.timeStamp >= this.clearTime) {
@@ -974,13 +982,13 @@ var DjakotaClient = (function (_React$Component) {
 				var cur = { x: ev.touches[i].pageX, y: ev.touches[i].pageY };
 				this.touchmap.positions[i] = cur;
 			}
-
+			// TODO use TOUCH_STATE PINCH and TOUCH_STATE TOUCH
 			if (ev.touches.length === 2) {
 				var oldD = this.touchmap.pinchDistance;
 				this.touchmap.pinchDistance = parseInt(Math.sqrt((this.touchmap.positions[0].x - this.touchmap.positions[1].x) * (this.touchmap.positions[0].x - this.touchmap.positions[1].x) + (this.touchmap.positions[0].y - this.touchmap.positions[1].y) * (this.touchmap.positions[0].y - this.touchmap.positions[1].y)), 10);
 				this.touchmap.pinchDelta = oldD - this.touchmap.pinchDistance;
 				if (this.touchmap.pinchDelta < 20 && this.touchmap.pinchDelta > -20) {
-					var sHeur = 1.0 - this.touchmap.pinchDelta * 0.01;
+					var sHeur = 1.0 - this.touchmap.pinchDelta * 0.005;
 					this.api.zoomBy(sHeur, this.scale, this.level, this.zoom.bind(this));
 				}
 			} else {
@@ -1008,10 +1016,8 @@ var DjakotaClient = (function (_React$Component) {
 			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
-		key: "zoom",
-		value: function zoom(s, l, w, h) {
-			this.setScale(s, l);
-
+		key: "center",
+		value: function center(w, h) {
 			if (w > this.state.width) {
 				this.imagePos.x = -parseInt((w - this.state.width) / 2) / this.scale;
 			} else if (w < this.state.width) {
@@ -1023,13 +1029,32 @@ var DjakotaClient = (function (_React$Component) {
 			} else if (h < this.state.width) {
 				this.imagePos.y = parseInt((this.state.height - h) / 2) / this.scale;
 			}
+		}
+	}, {
+		key: "zoom",
+		value: function zoom(s, l, w, h) {
+			var origX = this.imagePos.x * this.scale;
+			var origY = this.imagePos.y * this.scale;
+			var origW = this.width;
+			var origH = this.height;
+
+			this.setDimensions(w, h);
+			this.setScale(s, l);
+
+			if (origW === null || origH === null) {
+				this.center(w, h);
+			} else {
+				var diffX = Math.floor((origW - this.width) / 2);
+				var diffY = Math.floor((origH - this.height) / 2);
+				this.imagePos.x = (origX + diffX) / this.scale;
+				this.imagePos.y = (origY + diffY) / this.scale;
+			}
 
 			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
 		key: "onWheel",
 		value: function onWheel(ev) {
-
 			if (ev.nativeEvent.deltaY < 0) {
 				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
 			} else if (ev.nativeEvent.deltaY > 0) {

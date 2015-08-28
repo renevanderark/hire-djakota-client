@@ -41,6 +41,8 @@ class DjakotaClient extends React.Component {
 		this.resizeDelay = 0;
 		this.scale = 1.0;
 		this.level = null;
+		this.width = null;
+		this.height = null;
 
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
@@ -126,6 +128,11 @@ class DjakotaClient extends React.Component {
 		this.level = l;
 	}
 
+	setDimensions(w, h) {
+		this.width = w;
+		this.height = h;
+	}
+
 	renderTile(tileIm, tile) {
 		if(tile.timeStamp >= this.clearTime) {
 			this.frameBuffer.push([
@@ -177,7 +184,7 @@ class DjakotaClient extends React.Component {
 			let cur = {x: ev.touches[i].pageX, y: ev.touches[i].pageY};
 			this.touchmap.positions[i] = cur;
 		}
-
+		// TODO use TOUCH_STATE PINCH and TOUCH_STATE TOUCH
 		if (ev.touches.length === 2) {
 			let oldD = this.touchmap.pinchDistance;
 			this.touchmap.pinchDistance = parseInt(Math.sqrt(
@@ -191,7 +198,7 @@ class DjakotaClient extends React.Component {
 			), 10);
 			this.touchmap.pinchDelta = oldD - this.touchmap.pinchDistance;
 			if (this.touchmap.pinchDelta < 20 && this.touchmap.pinchDelta > -20) {
-				let sHeur = 1.0 - (this.touchmap.pinchDelta * 0.01);
+				let sHeur = 1.0 - (this.touchmap.pinchDelta * 0.005);
 				this.api.zoomBy(sHeur, this.scale, this.level, this.zoom.bind(this));
 			}
 		} else {
@@ -217,9 +224,7 @@ class DjakotaClient extends React.Component {
 		this.loadImage({scale: this.scale, level: this.level});
 	}
 
-	zoom(s, l, w, h) {
-		this.setScale(s, l);
-
+	center(w, h) {
 		if(w > this.state.width) {			
 			this.imagePos.x = -parseInt((w - this.state.width) / 2) / this.scale;
 		} else if(w < this.state.width) {
@@ -231,19 +236,36 @@ class DjakotaClient extends React.Component {
 		} else if(h < this.state.width) {
 			this.imagePos.y = parseInt((this.state.height - h) / 2) / this.scale;
 		}
+	}
+
+	zoom(s, l, w, h) {
+		let origX = this.imagePos.x * this.scale;
+		let origY = this.imagePos.y * this.scale;
+		let origW = this.width;
+		let origH = this.height;
+
+		this.setDimensions(w, h)
+		this.setScale(s, l);
+
+
+		if(origW === null || origH === null) { 
+			this.center(w, h);
+		} else {
+			let diffX = Math.floor((origW - this.width) / 2);
+			let diffY = Math.floor((origH - this.height) / 2);
+			this.imagePos.x  = (origX + diffX) / this.scale;
+			this.imagePos.y = (origY + diffY) / this.scale;
+		}
 
 		this.loadImage({scale: this.scale, level: this.level});
 	}
 
 	onWheel(ev) {
-
 		if(ev.nativeEvent.deltaY < 0) {
 			this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
 		} else if(ev.nativeEvent.deltaY > 0) {
 			this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
 		}
-
-
 	}
 
 	render() {
