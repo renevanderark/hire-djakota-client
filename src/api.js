@@ -163,6 +163,7 @@ class Api {
 				this.fetchTile({
 					realX: x,
 					realY: y,
+					timeStamp: opts.timeStamp,
 					pos: {
 						x: x + opts.position.x,
 						y: y + opts.position.y
@@ -181,11 +182,16 @@ class Api {
 		return this.findLevelForScale(s, --level, current / 2);
 	}
 
-	zoomBy(factor, scale, level, onScale) {
+	zoomBy(factor, scale, level, onScale, onImageBounds) {
 		let upscaleFactor = this.resolutions.length - level;
 		let viewportScale = this.downScale(scale, upscaleFactor) * factor;
 		let newLevel = this.findLevelForScale(viewportScale, this.levels);
 		let newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
+
+		onImageBounds(
+			parseInt(Math.ceil(this.fullWidth * viewportScale)), 
+			parseInt(Math.ceil(this.fullHeight * viewportScale))
+		);
 		onScale(newScale, newLevel);
 	}
 

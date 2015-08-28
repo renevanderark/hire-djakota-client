@@ -720,6 +720,7 @@ var Api = (function () {
 					this.fetchTile({
 						realX: x,
 						realY: y,
+						timeStamp: opts.timeStamp,
 						pos: {
 							x: x + opts.position.x,
 							y: y + opts.position.y
@@ -742,11 +743,13 @@ var Api = (function () {
 		}
 	}, {
 		key: "zoomBy",
-		value: function zoomBy(factor, scale, level, onScale) {
+		value: function zoomBy(factor, scale, level, onScale, onImageBounds) {
 			var upscaleFactor = this.resolutions.length - level;
 			var viewportScale = this.downScale(scale, upscaleFactor) * factor;
 			var newLevel = this.findLevelForScale(viewportScale, this.levels);
 			var newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
+
+			onImageBounds(parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
 			onScale(newScale, newLevel);
 		}
 	}, {
@@ -830,6 +833,11 @@ var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQgewoJd2lkdGg6IDEwMCU7CgloZWlnaHQ6ID
 var MOUSE_UP = 0;
 var MOUSE_DOWN = 1;
 
+var TOUCH_END = 0;
+var TOUCH_START = 1;
+
+_react2["default"].initializeTouchEvents(true);
+
 var DjakotaClient = (function (_React$Component) {
 	_inherits(DjakotaClient, _React$Component);
 
@@ -845,6 +853,7 @@ var DjakotaClient = (function (_React$Component) {
 		};
 
 		this.movement = { x: 0, y: 0 };
+		this.touchPos = { x: 0, y: 0 };
 		this.mousePos = { x: 0, y: 0 };
 		this.imagePos = { x: 0, y: 0 };
 		this.mouseState = MOUSE_UP;
@@ -859,6 +868,8 @@ var DjakotaClient = (function (_React$Component) {
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.frameBuffer = [];
 		this.frameClearBuffer = [];
+		this.clearTime = 0;
+		this.touchmap = { startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0 };
 	}
 
 	_createClass(DjakotaClient, [{
@@ -884,11 +895,16 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "onAnimationFrame",
 		value: function onAnimationFrame() {
+			if (this.frameClearBuffer.length > 0 || this.frameBuffer.length === 0) {
+				// trigger a redraw when window is cleared, but no new tiles in framebuffer
+				this.loadImage({ scale: this.scale, level: this.level });
+			}
 			while (this.frameClearBuffer.length > 0) {
 				var _imageCtx;
 
 				(_imageCtx = this.imageCtx).clearRect.apply(_imageCtx, _toConsumableArray(this.frameClearBuffer.pop()));
 			}
+
 			while (this.frameBuffer.length > 0) {
 				var _imageCtx2;
 
@@ -919,12 +935,14 @@ var DjakotaClient = (function (_React$Component) {
 		value: function loadImage() {
 			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: "widthFill" } : arguments[0];
 
+			this.clearTime = new Date().getTime() - 10;
 			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
 			this.api.loadImage(_extends({
 				viewport: { w: this.state.width, h: this.state.height },
 				position: this.imagePos,
 				onTile: this.renderTile.bind(this),
-				onScale: this.setScale.bind(this)
+				onScale: this.setScale.bind(this),
+				timeStamp: new Date().getTime()
 			}, opts));
 		}
 	}, {
@@ -941,7 +959,9 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "renderTile",
 		value: function renderTile(tileIm, tile) {
-			this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
+			if (tile.timeStamp >= this.clearTime) {
+				this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
+			}
 		}
 	}, {
 		key: "onMouseDown",
@@ -950,6 +970,14 @@ var DjakotaClient = (function (_React$Component) {
 			this.mousePos.y = ev.clientY;
 			this.movement = { x: 0, y: 0 };
 			this.mouseState = MOUSE_DOWN;
+		}
+	}, {
+		key: "onTouchStart",
+		value: function onTouchStart(ev) {
+			this.touchPos.x = ev.touches[0].pageX;
+			this.touchPos.y = ev.touches[0].pageY;
+			this.movement = { x: 0, y: 0 };
+			this.touchState = TOUCH_START;
 		}
 	}, {
 		key: "onMouseMove",
@@ -972,6 +1000,40 @@ var DjakotaClient = (function (_React$Component) {
 			}
 		}
 	}, {
+		key: "onTouchMove",
+		value: function onTouchMove(ev) {
+			for (var i = 0; i < ev.touches.length; i++) {
+				var cur = { x: ev.touches[i].pageX, y: ev.touches[i].pageY };
+				this.touchmap.positions[i] = cur;
+			}
+
+			if (ev.touches.length === 2) {
+				var oldD = this.touchmap.pinchDistance;
+				this.touchmap.pinchDistance = parseInt(Math.sqrt((this.touchmap.positions[0].x - this.touchmap.positions[1].x) * (this.touchmap.positions[0].x - this.touchmap.positions[1].x) + (this.touchmap.positions[0].y - this.touchmap.positions[1].y) * (this.touchmap.positions[0].y - this.touchmap.positions[1].y)), 10);
+				this.touchmap.pinchDelta = oldD - this.touchmap.pinchDistance;
+				if (this.touchmap.pinchDelta < 20 && this.touchmap.pinchDelta > -20) {
+					var sHeur = 1.0 - this.touchmap.pinchDelta * 0.01;
+					this.api.zoomBy(sHeur, this.scale, this.level, this.zoom.bind(this), this.onImageBoundsBeforeZoom.bind(this));
+				}
+			} else {
+				this.movement.x = this.touchPos.x - ev.touches[0].pageX;
+				this.movement.y = this.touchPos.y - ev.touches[0].pageY;
+				this.imagePos.x -= this.movement.x;
+				this.imagePos.y -= this.movement.y;
+				this.touchPos.x = ev.touches[0].pageX;
+				this.touchPos.y = ev.touches[0].pageY;
+				this.frameBuffer = [];
+				this.loadImage({ scale: this.scale, level: this.level });
+			}
+			ev.preventDefault();
+			ev.stopPropagation();
+		}
+	}, {
+		key: "onTouchEnd",
+		value: function onTouchEnd(ev) {
+			this.touchState = TOUCH_END;
+		}
+	}, {
 		key: "onMouseUp",
 		value: function onMouseUp(ev) {
 			this.mouseState = MOUSE_UP;
@@ -984,14 +1046,28 @@ var DjakotaClient = (function (_React$Component) {
 			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
+		key: "onImageBoundsBeforeZoom",
+		value: function onImageBoundsBeforeZoom(w, h) {
+			if (w > this.state.width) {
+				this.imagePos.x = -parseInt((w - this.state.width) / 2);
+			} else if (w < this.state.width) {
+				this.imagePos.x = parseInt((this.state.width - w) / 2);
+			}
+
+			if (h > this.state.height) {
+				this.imagePos.y = -parseInt((h - this.state.height) / 2);
+			} else if (h < this.state.width) {
+				this.imagePos.y = parseInt((this.state.height - h) / 2);
+			}
+		}
+	}, {
 		key: "onWheel",
 		value: function onWheel(ev) {
-			this.imagePos.x = 0;
-			this.imagePos.y = 0;
+
 			if (ev.nativeEvent.deltaY < 0) {
-				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
+				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this), this.onImageBoundsBeforeZoom.bind(this));
 			} else if (ev.nativeEvent.deltaY > 0) {
-				this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
+				this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this), this.onImageBoundsBeforeZoom.bind(this));
 			}
 		}
 	}, {
@@ -1010,6 +1086,9 @@ var DjakotaClient = (function (_React$Component) {
 					className: "interaction",
 					height: this.state.height,
 					onMouseDown: this.onMouseDown.bind(this),
+					onTouchEnd: this.onTouchEnd.bind(this),
+					onTouchMove: this.onTouchMove.bind(this),
+					onTouchStart: this.onTouchStart.bind(this),
 					onWheel: this.onWheel.bind(this),
 					width: this.state.width
 				})
