@@ -174,13 +174,22 @@ class DjakotaClient extends React.Component {
 
 
 	renderTile(tileIm, tile) {
-		this.frameBuffer.push([
-			tileIm, 
-			parseInt(Math.floor(tile.pos.x * this.scale)), 
-			parseInt(Math.floor(tile.pos.y * this.scale)), 
-			parseInt(Math.ceil(tileIm.width * this.scale)), 
-			parseInt(Math.ceil(tileIm.height * this.scale))
-		]);
+		if(tileIm.complete) {
+			this.frameBuffer.push([
+				tileIm, 
+				parseInt(Math.floor(tile.pos.x * this.scale)), 
+				parseInt(Math.floor(tile.pos.y * this.scale)), 
+				parseInt(Math.ceil(tileIm.width * this.scale)), 
+				parseInt(Math.ceil(tileIm.height * this.scale))
+			]);
+		} else {
+			this.imageCtx.fillRect(
+				parseInt(Math.floor(tile.pos.x * this.scale)), 
+				parseInt(Math.floor(tile.pos.y * this.scale)), 
+				parseInt(Math.ceil(tileIm.width * this.scale)), 
+				parseInt(Math.ceil(tileIm.height * this.scale))
+			);
+		}
 	}
 
 	onMouseDown(ev) {
@@ -303,7 +312,9 @@ class DjakotaClient extends React.Component {
 	}
 
 	onWheel(ev) {
+		this.frameClearBuffer.push([0,0,this.state.width, this.state.height]);
 		if(ev.nativeEvent.deltaY < 0) {
+
 			this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
 			this.repaintDelay = 30;
 		} else if(ev.nativeEvent.deltaY > 0) {

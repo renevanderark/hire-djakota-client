@@ -1182,13 +1182,12 @@ var Api = (function () {
 		key: "fetchTile",
 		value: function fetchTile(tile, onTile) {
 			var key = tile.realX + "-" + tile.realY + "-" + tile.level + "-" + tile.url;
-			if (this.tileMap[key]) {
-				onTile(this.tileMap[key], tile);
-			} else {
+			if (!this.tileMap[key]) {
 				this.tileMap[key] = new Image();
 				this.tileMap[key].onload = this.onTileLoad.bind(this, this.tileMap[key], tile, onTile);
 				this.tileMap[key].src = tile.url;
 			}
+			onTile(this.tileMap[key], tile);
 		}
 	}, {
 		key: "getStart",
@@ -1543,7 +1542,11 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "renderTile",
 		value: function renderTile(tileIm, tile) {
-			this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
+			if (tileIm.complete) {
+				this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
+			} else {
+				this.imageCtx.fillRect(parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale)));
+			}
 		}
 	}, {
 		key: "onMouseDown",
@@ -1667,7 +1670,9 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "onWheel",
 		value: function onWheel(ev) {
+			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
 			if (ev.nativeEvent.deltaY < 0) {
+
 				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
 				this.repaintDelay = 30;
 			} else if (ev.nativeEvent.deltaY > 0) {

@@ -68,13 +68,12 @@ class Api {
 
 	fetchTile(tile, onTile) {
 		let key = tile.realX + "-" + tile.realY + "-" + tile.level + "-" + tile.url;
-		if(this.tileMap[key]) {
-			onTile(this.tileMap[key], tile);
-		} else {
+		if(!this.tileMap[key]) {
 			this.tileMap[key] = new Image();
 			this.tileMap[key].onload = this.onTileLoad.bind(this, this.tileMap[key], tile, onTile);
 			this.tileMap[key].src = tile.url;
 		}
+		onTile(this.tileMap[key], tile);
 	}
 
 	getStart(dim) {
