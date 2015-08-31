@@ -1912,10 +1912,10 @@ var Minimap = (function (_React$Component) {
 		key: "onMouseMove",
 		value: function onMouseMove(ev) {
 			if (this.mouseState === MOUSE_DOWN) {
-				var me = _react2["default"].findDOMNode(this);
+				var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
 				_store2["default"].dispatch((0, _actions.setRealViewPort)({
-					x: (ev.pageX - me.offsetLeft) / this.state.width - this.state.realViewPort.w / 2,
-					y: (ev.pageY - me.offsetTop) / this.state.height - this.state.realViewPort.h / 2,
+					x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
+					y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
 					reposition: true
 				}));
 			}
@@ -1925,10 +1925,10 @@ var Minimap = (function (_React$Component) {
 		value: function onMouseUp(ev) {
 
 			this.mouseState = MOUSE_UP;
-			var me = _react2["default"].findDOMNode(this);
+			var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
 			_store2["default"].dispatch((0, _actions.setRealViewPort)({
-				x: (ev.pageX - me.offsetLeft) / this.state.width - this.state.realViewPort.w / 2,
-				y: (ev.pageY - me.offsetTop) / this.state.height - this.state.realViewPort.h / 2,
+				x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
+				y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
 				reposition: true
 			}));
 		}

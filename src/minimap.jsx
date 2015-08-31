@@ -122,10 +122,10 @@ class Minimap extends React.Component {
 
 	onMouseMove(ev) {
 		if(this.mouseState === MOUSE_DOWN) {
-			let me = React.findDOMNode(this);
+			let rect = React.findDOMNode(this).getBoundingClientRect();
 			store.dispatch(setRealViewPort({
-				x: (ev.pageX - me.offsetLeft) / this.state.width - (this.state.realViewPort.w / 2),
-				y: (ev.pageY - me.offsetTop) / this.state.height - (this.state.realViewPort.h / 2),
+				x: (ev.pageX - rect.left) / this.state.width - (this.state.realViewPort.w / 2),
+				y: (ev.pageY - rect.top) / this.state.height - (this.state.realViewPort.h / 2),
 				reposition: true
 			}));
 		}
@@ -134,10 +134,10 @@ class Minimap extends React.Component {
 	onMouseUp(ev) {
 		
 		this.mouseState = MOUSE_UP;
-		let me = React.findDOMNode(this);
+		let rect = React.findDOMNode(this).getBoundingClientRect();
 		store.dispatch(setRealViewPort({
-			x: (ev.pageX - me.offsetLeft) / this.state.width - (this.state.realViewPort.w / 2),
-			y: (ev.pageY - me.offsetTop) / this.state.height - (this.state.realViewPort.h / 2),
+			x: (ev.pageX - rect.left) / this.state.width - (this.state.realViewPort.w / 2),
+			y: (ev.pageY - rect.top) / this.state.height - (this.state.realViewPort.h / 2),
 			reposition: true
 		}));		
 	}
