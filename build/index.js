@@ -1257,8 +1257,10 @@ var Api = (function () {
 		value: function getRealImagePos(position, scale, level) {
 			var upscaleFactor = this.resolutions.length - level;
 			return {
-				x: this.upScale(position.x, upscaleFactor) * this.getRealScale(scale, level),
-				y: this.upScale(position.y, upscaleFactor) * this.getRealScale(scale, level)
+				x: Math.floor(this.upScale(position.x, upscaleFactor) * this.getRealScale(scale, level)),
+				y: Math.floor(this.upScale(position.y, upscaleFactor) * this.getRealScale(scale, level)),
+				w: Math.ceil(this.fullWidth * this.getRealScale(scale, level)),
+				h: Math.ceil(this.fullHeight * this.getRealScale(scale, level))
 			};
 		}
 	}, {
@@ -1356,6 +1358,8 @@ var _api2 = _interopRequireDefault(_api);
 
 var _requestAnimationFrame = _dereq_('./request-animation-frame');
 
+var _actions = _dereq_("./actions");
+
 var _store = _dereq_("./store");
 
 var _store2 = _interopRequireDefault(_store);
@@ -1417,9 +1421,14 @@ var DjakotaClient = (function (_React$Component) {
 			window.addEventListener("mouseup", this.mouseupListener);
 
 			this.unsubscribe = _store2["default"].subscribe(function () {
-				return _this.setSharedState(_store2["default"].getState());
+				return _this.setState(_store2["default"].getState());
 			});
 			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+		}
+	}, {
+		key: "shouldComponentUpdate",
+		value: function shouldComponentUpdate(nextProps, nextState) {
+			return this.state.width !== nextState.width || this.state.height !== nextState.height || this.props.config.identifier !== nextProps.config.identifier;
 		}
 	}, {
 		key: "componentWillUnmount",
@@ -1431,9 +1440,15 @@ var DjakotaClient = (function (_React$Component) {
 			(0, _requestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
-		key: "setSharedState",
-		value: function setSharedState(state) {
-			console.log(state);
+		key: "notifyRealImagePos",
+		value: function notifyRealImagePos() {
+			var dims = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
+			_store2["default"].dispatch((0, _actions.setRealViewPort)({
+				x: -dims.x / dims.w,
+				y: -dims.y / dims.h,
+				w: this.state.width / dims.w,
+				h: this.state.height / dims.h
+			}));
 		}
 	}, {
 		key: "onAnimationFrame",
@@ -1472,13 +1487,14 @@ var DjakotaClient = (function (_React$Component) {
 			this.setState({
 				width: node.clientWidth,
 				height: node.clientHeight
-			}, this.afterResize.bind(this));
+			}, this.loadImage.bind(this));
 		}
 	}, {
 		key: "loadImage",
 		value: function loadImage() {
 			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: this.props.scaleMode } : arguments[0];
 
+			this.notifyRealImagePos();
 			this.frameBuffer = [];
 			this.api.loadImage(_extends({
 				viewport: { w: this.state.width, h: this.state.height },
@@ -1486,11 +1502,6 @@ var DjakotaClient = (function (_React$Component) {
 				onTile: this.renderTile.bind(this),
 				onScale: this.onDimensions.bind(this)
 			}, opts));
-		}
-	}, {
-		key: "afterResize",
-		value: function afterResize() {
-			this.loadImage();
 		}
 	}, {
 		key: "setScale",
@@ -1604,6 +1615,7 @@ var DjakotaClient = (function (_React$Component) {
 			this.setDimensions(w, h);
 			this.setScale(s, l);
 			this.center(w, h);
+			this.notifyRealImagePos();
 		}
 	}, {
 		key: "zoom",
@@ -1638,7 +1650,6 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "render",
 		value: function render() {
-
 			return _react2["default"].createElement(
 				"div",
 				{ className: "hire-djakota-client" },
@@ -1683,7 +1694,7 @@ DjakotaClient.defaultProps = {
 exports["default"] = DjakotaClient;
 module.exports = exports["default"];
 
-},{"./api":16,"./request-animation-frame":21,"./store":22,"react":"react"}],18:[function(_dereq_,module,exports){
+},{"./actions":15,"./api":16,"./request-animation-frame":21,"./store":22,"react":"react"}],18:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1771,7 +1782,8 @@ var Minimap = (function (_React$Component) {
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
 
 		this.imageCtx = null;
-		this.resizeDelay = 0;
+		this.interactionCtx = null;
+		this.resizeDelay = -1;
 	}
 
 	_createClass(Minimap, [{
@@ -1781,12 +1793,18 @@ var Minimap = (function (_React$Component) {
 
 			this.onResize();
 			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext('2d');
+			this.interactionCtx = _react2["default"].findDOMNode(this).children[1].getContext('2d');
 			window.addEventListener("resize", this.resizeListener);
 			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 
 			this.unsubscribe = _store2["default"].subscribe(function () {
-				return _this.setSharedState(_store2["default"].getState());
+				return _this.setState(_store2["default"].getState());
 			});
+		}
+	}, {
+		key: "shouldComponentUpdate",
+		value: function shouldComponentUpdate(nextProps, nextState) {
+			return this.state.width !== nextState.width || this.state.height !== nextState.height || this.props.config.identifier !== nextProps.config.identifier;
 		}
 	}, {
 		key: "componentWillUnmount",
@@ -1796,25 +1814,25 @@ var Minimap = (function (_React$Component) {
 			this.unsubscribe();
 		}
 	}, {
-		key: "setSharedState",
-		value: function setSharedState(state) {
-			console.log(state);
-		}
-	}, {
 		key: "onAnimationFrame",
 		value: function onAnimationFrame() {
-			if (this.resizeDelay === 0 && this.resizing) {
+			if (this.resizeDelay === 0) {
 				this.commitResize();
+				this.resizeDelay = -1;
 			} else if (this.resizeDelay > 0) {
 				this.resizeDelay--;
 			}
+
+			this.interactionCtx.fillStyle = "rgba(255,128,128,0.1)";
+			this.interactionCtx.clearRect(0, 0, this.state.width, this.state.height);
+			this.interactionCtx.fillRect(Math.floor(this.state.realViewPort.x * this.state.width), Math.floor(this.state.realViewPort.y * this.state.height), Math.ceil(this.state.realViewPort.w * this.state.width), Math.ceil(this.state.realViewPort.h * this.state.height));
+
 			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
 		key: "onResize",
 		value: function onResize() {
 			this.resizeDelay = RESIZE_DELAY;
-			this.resizing = true;
 		}
 	}, {
 		key: "commitResize",
@@ -1843,6 +1861,8 @@ var Minimap = (function (_React$Component) {
 		value: function setScale(s, l) {
 			this.scale = s;
 			this.level = l;
+			var dims = this.api.getRealImagePos({ x: 0, y: 0 }, this.scale, this.level);
+			this.setState({ width: dims.w, height: dims.h });
 		}
 	}, {
 		key: "renderTile",
@@ -1855,8 +1875,6 @@ var Minimap = (function (_React$Component) {
 		key: "onClick",
 		value: function onClick(ev) {
 			var me = _react2["default"].findDOMNode(this);
-			console.log(me);
-			console.log((ev.pageX - me.offsetLeft) / this.state.width, (ev.pageY - me.offsetTop) / this.state.height);
 			_store2["default"].dispatch((0, _actions.setRealViewPort)({
 				x: (ev.pageX - me.offsetLeft) / this.state.width,
 				y: (ev.pageY - me.offsetTop) / this.state.height

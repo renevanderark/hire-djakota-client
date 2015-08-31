@@ -21,19 +21,27 @@ class Minimap extends React.Component {
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
 
 		this.imageCtx = null;
-		this.resizeDelay = 0;
+		this.interactionCtx = null;
+		this.resizeDelay = -1;
+
 	}
 
 	componentDidMount() {
 		this.onResize();
 		this.imageCtx = React.findDOMNode(this).children[0].getContext('2d');
+		this.interactionCtx = React.findDOMNode(this).children[1].getContext('2d');
 		window.addEventListener("resize", this.resizeListener);
 		requestAnimationFrame(this.animationFrameListener);
 
 		this.unsubscribe = store.subscribe(() =>
-			this.setSharedState(store.getState())
+			this.setState(store.getState())
 		);
+	}
 
+	shouldComponentUpdate(nextProps, nextState) {
+		return this.state.width !== nextState.width || 
+			this.state.height !== nextState.height ||
+			this.props.config.identifier !== nextProps.config.identifier;
 	}
 
 
@@ -43,22 +51,29 @@ class Minimap extends React.Component {
 		this.unsubscribe();
 	}
 
-	setSharedState(state) {
-		console.log(state);
-	}
 
 	onAnimationFrame() {
-		if(this.resizeDelay === 0 && this.resizing) {
+		if(this.resizeDelay === 0) {
 			this.commitResize();
+			this.resizeDelay = -1;
 		} else if(this.resizeDelay > 0) {
 			this.resizeDelay--;
 		}
+
+		this.interactionCtx.fillStyle = "rgba(255,128,128,0.1)";
+		this.interactionCtx.clearRect(0,0,this.state.width, this.state.height);
+		this.interactionCtx.fillRect(
+			Math.floor(this.state.realViewPort.x * this.state.width),
+			Math.floor(this.state.realViewPort.y * this.state.height),
+			Math.ceil(this.state.realViewPort.w * this.state.width),
+			Math.ceil(this.state.realViewPort.h * this.state.height)
+		);
+
 		requestAnimationFrame(this.animationFrameListener);
 	}
 
 	onResize() {
 		this.resizeDelay = RESIZE_DELAY;
-		this.resizing = true;
 	}
 
 	commitResize() {
@@ -84,6 +99,8 @@ class Minimap extends React.Component {
 	setScale(s, l) {
 		this.scale = s;
 		this.level = l;
+		let dims = this.api.getRealImagePos({x:0,y:0}, this.scale, this.level);
+		this.setState({width: dims.w, height: dims.h});
 	}
 
 	renderTile(tileIm, tile) {
@@ -98,8 +115,6 @@ class Minimap extends React.Component {
 
 	onClick(ev) {
 		let me = React.findDOMNode(this);
-		console.log(me);
-		console.log((ev.pageX - me.offsetLeft) / this.state.width, (ev.pageY - me.offsetTop) / this.state.height)
 		store.dispatch(setRealViewPort({
 			x: (ev.pageX - me.offsetLeft) / this.state.width,
 			y: (ev.pageY - me.offsetTop) / this.state.height

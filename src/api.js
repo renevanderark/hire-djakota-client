@@ -146,8 +146,10 @@ class Api {
 	getRealImagePos(position, scale, level) {
 		let upscaleFactor = this.resolutions.length - level;
 		return {
-			x: this.upScale(position.x, upscaleFactor) * this.getRealScale(scale, level),
-			y: this.upScale(position.y, upscaleFactor) * this.getRealScale(scale, level)
+			x: Math.floor(this.upScale(position.x, upscaleFactor) * this.getRealScale(scale, level)),
+			y: Math.floor(this.upScale(position.y, upscaleFactor) * this.getRealScale(scale, level)),
+			w: Math.ceil(this.fullWidth * this.getRealScale(scale, level)),
+			h: Math.ceil(this.fullHeight * this.getRealScale(scale, level))
 		}
 	}
 

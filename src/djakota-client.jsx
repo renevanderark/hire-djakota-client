@@ -1,6 +1,7 @@
 import React from "react";
 import Api from "./api";
 import { requestAnimationFrame, cancelAnimationFrame } from './request-animation-frame';
+import { setRealViewPort } from "./actions";
 import store from "./store";
 
 const MOUSE_UP = 0;
@@ -59,10 +60,16 @@ class DjakotaClient extends React.Component {
 		window.addEventListener("mouseup", this.mouseupListener);
 
 		this.unsubscribe = store.subscribe(() =>
-			this.setSharedState(store.getState())
+			this.setState(store.getState())
 		);
 		requestAnimationFrame(this.animationFrameListener);
 
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		return this.state.width !== nextState.width || 
+			this.state.height !== nextState.height ||
+			this.props.config.identifier !== nextProps.config.identifier;
 	}
 
 	componentWillUnmount() {
@@ -74,8 +81,14 @@ class DjakotaClient extends React.Component {
 	}
 
 
-	setSharedState(state) {
-		console.log(state);
+	notifyRealImagePos() {
+		let dims = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
+		store.dispatch(setRealViewPort({
+			x: -dims.x / dims.w,
+			y: -dims.y / dims.h,
+			w: this.state.width / dims.w,
+			h: this.state.height / dims.h,
+		}));
 	}
 
 	onAnimationFrame() {
@@ -109,11 +122,11 @@ class DjakotaClient extends React.Component {
 		this.setState({
 			width: node.clientWidth,
 			height: node.clientHeight
-		}, this.afterResize.bind(this));
+		}, this.loadImage.bind(this));
 	}
 
-
 	loadImage(opts = {scaleMode: this.props.scaleMode}) {
+		this.notifyRealImagePos();
 		this.frameBuffer = [];
 		this.api.loadImage({
 			viewport: {w: this.state.width, h: this.state.height},
@@ -122,11 +135,6 @@ class DjakotaClient extends React.Component {
 			onScale: this.onDimensions.bind(this),
 			...opts
 		});
-	}
-
-
-	afterResize() {
-		this.loadImage();
 	}
 
 	setScale(s, l) {
@@ -244,6 +252,7 @@ class DjakotaClient extends React.Component {
 		this.setDimensions(w, h)
 		this.setScale(s, l);
 		this.center(w, h);
+		this.notifyRealImagePos();
 	}
 
 	zoom(s, l, w, h) {
@@ -276,7 +285,6 @@ class DjakotaClient extends React.Component {
 	}
 
 	render() {
-
 		return (
 			<div className="hire-djakota-client">
 				<canvas 
