@@ -1218,8 +1218,8 @@ var Api = (function () {
 						realY: y,
 						timeStamp: opts.timeStamp,
 						pos: {
-							x: x + opts.position.x,
-							y: y + opts.position.y
+							x: x,
+							y: y
 						},
 						level: level,
 						url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
@@ -1401,8 +1401,6 @@ var DjakotaClient = (function (_React$Component) {
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.frameBuffer = [];
-		this.frameClearBuffer = [];
-		this.clearTime = 0;
 		this.repaintDelay = -1;
 		this.touchmap = { startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0 };
 	}
@@ -1440,22 +1438,12 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "onAnimationFrame",
 		value: function onAnimationFrame() {
-			if (this.repaintDelay === 0) {
-				this.loadImage({ scale: this.scale, level: this.level });
-			} else if (this.repaintDelay > 0) {
-				this.repaintDelay--;
-			}
+			this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
 
-			while (this.frameClearBuffer.length > 0) {
+			for (var i = 0; i < this.frameBuffer.length; i++) {
 				var _imageCtx;
 
-				(_imageCtx = this.imageCtx).clearRect.apply(_imageCtx, _toConsumableArray(this.frameClearBuffer.pop()));
-			}
-
-			while (this.frameBuffer.length > 0) {
-				var _imageCtx2;
-
-				(_imageCtx2 = this.imageCtx).drawImage.apply(_imageCtx2, _toConsumableArray(this.frameBuffer.pop()));
+				(_imageCtx = this.imageCtx).drawImage.apply(_imageCtx, _toConsumableArray(this.frameBuffer[i]));
 			}
 
 			if (this.resizeDelay === 0 && this.resizing) {
@@ -1487,39 +1475,16 @@ var DjakotaClient = (function (_React$Component) {
 			}, this.afterResize.bind(this));
 		}
 	}, {
-		key: "stageClearRects",
-		value: function stageClearRects() {
-			var x = this.imagePos.x * this.scale;
-			var y = this.imagePos.y * this.scale;
-			var x1 = x + this.width;
-			var y1 = y + this.height;
-
-			if (x > 0) {
-				this.frameClearBuffer.push([0, 0, x, this.state.height]);
-			}
-			if (y > 0) {
-				this.frameClearBuffer.push([0, 0, this.state.width, y]);
-			}
-			if (x1 < this.state.width) {
-				this.frameClearBuffer.push([x1, 0, this.state.width - x1, this.state.height]);
-			}
-			if (y1 < this.state.width) {
-				this.frameClearBuffer.push([0, y1, this.state.width, this.state.height - y1]);
-			}
-		}
-	}, {
 		key: "loadImage",
 		value: function loadImage() {
 			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: this.props.scaleMode } : arguments[0];
 
-			this.clearTime = new Date().getTime() - 10;
-			this.stageClearRects();
+			this.frameBuffer = [];
 			this.api.loadImage(_extends({
 				viewport: { w: this.state.width, h: this.state.height },
 				position: this.imagePos,
 				onTile: this.renderTile.bind(this),
-				onScale: this.onDimensions.bind(this),
-				timeStamp: new Date().getTime()
+				onScale: this.onDimensions.bind(this)
 			}, opts));
 		}
 	}, {
@@ -1542,11 +1507,7 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "renderTile",
 		value: function renderTile(tileIm, tile) {
-			if (tileIm.complete) {
-				this.frameBuffer.push([tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
-			} else {
-				this.imageCtx.fillRect(parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale)));
-			}
+			this.frameBuffer.push([tileIm, parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)), parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
 		}
 	}, {
 		key: "onMouseDown",
@@ -1670,14 +1631,10 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "onWheel",
 		value: function onWheel(ev) {
-			this.frameClearBuffer.push([0, 0, this.state.width, this.state.height]);
 			if (ev.nativeEvent.deltaY < 0) {
-
 				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
-				this.repaintDelay = 30;
 			} else if (ev.nativeEvent.deltaY > 0) {
 				this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
-				this.repaintDelay = 10;
 			}
 		}
 	}, {

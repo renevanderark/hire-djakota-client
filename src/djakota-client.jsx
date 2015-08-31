@@ -47,8 +47,6 @@ class DjakotaClient extends React.Component {
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.frameBuffer = [];
-		this.frameClearBuffer = [];
-		this.clearTime = 0;
 		this.repaintDelay = -1;
 		this.touchmap = {startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0};		
 	}
@@ -83,18 +81,10 @@ class DjakotaClient extends React.Component {
 
 
 	onAnimationFrame() {
-		if(this.repaintDelay === 0) {
-			this.loadImage({scale: this.scale, level: this.level});
-		} else if(this.repaintDelay > 0) {
-			this.repaintDelay--;
-		}
+		this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
 
-		while(this.frameClearBuffer.length > 0) {
-			this.imageCtx.clearRect(...this.frameClearBuffer.pop());
-		}
-
-		while(this.frameBuffer.length > 0) {
-			this.imageCtx.drawImage(...this.frameBuffer.pop());
+		for(let i = 0; i < this.frameBuffer.length; i++) {
+			this.imageCtx.drawImage(...this.frameBuffer[i]);
 		}
 		
 		if(this.resizeDelay === 0 && this.resizing) {
@@ -124,35 +114,14 @@ class DjakotaClient extends React.Component {
 		}, this.afterResize.bind(this));
 	}
 
-	stageClearRects() {
-		let x = this.imagePos.x * this.scale;
-		let y = this.imagePos.y * this.scale;
-		let x1 = x + this.width;
-		let y1 = y + this.height;
-
-		if(x > 0) {
-			this.frameClearBuffer.push([0,0, x, this.state.height]);
-		}
-		if(y > 0) {
-			this.frameClearBuffer.push([0,0,this.state.width, y]);
-		}
-		if(x1 < this.state.width) {
-			this.frameClearBuffer.push([x1, 0, this.state.width - x1, this.state.height]);	
-		}
-		if(y1 < this.state.width) {
-			this.frameClearBuffer.push([0, y1, this.state.width, this.state.height - y1]);		
-		}
-	}
 
 	loadImage(opts = {scaleMode: this.props.scaleMode}) {
-		this.clearTime = new Date().getTime() - 10;
-		this.stageClearRects();
+		this.frameBuffer = [];
 		this.api.loadImage({
 			viewport: {w: this.state.width, h: this.state.height},
 			position: this.imagePos,
 			onTile: this.renderTile.bind(this),
 			onScale: this.onDimensions.bind(this),
-			timeStamp: new Date().getTime(),
 			...opts
 		});
 	}
@@ -174,22 +143,13 @@ class DjakotaClient extends React.Component {
 
 
 	renderTile(tileIm, tile) {
-		if(tileIm.complete) {
-			this.frameBuffer.push([
-				tileIm, 
-				parseInt(Math.floor(tile.pos.x * this.scale)), 
-				parseInt(Math.floor(tile.pos.y * this.scale)), 
-				parseInt(Math.ceil(tileIm.width * this.scale)), 
-				parseInt(Math.ceil(tileIm.height * this.scale))
-			]);
-		} else {
-			this.imageCtx.fillRect(
-				parseInt(Math.floor(tile.pos.x * this.scale)), 
-				parseInt(Math.floor(tile.pos.y * this.scale)), 
-				parseInt(Math.ceil(tileIm.width * this.scale)), 
-				parseInt(Math.ceil(tileIm.height * this.scale))
-			);
-		}
+		this.frameBuffer.push([
+			tileIm, 
+			parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)), 
+			parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)), 
+			parseInt(Math.ceil(tileIm.width * this.scale)), 
+			parseInt(Math.ceil(tileIm.height * this.scale))
+		]);
 	}
 
 	onMouseDown(ev) {
@@ -312,14 +272,10 @@ class DjakotaClient extends React.Component {
 	}
 
 	onWheel(ev) {
-		this.frameClearBuffer.push([0,0,this.state.width, this.state.height]);
 		if(ev.nativeEvent.deltaY < 0) {
-
 			this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
-			this.repaintDelay = 30;
 		} else if(ev.nativeEvent.deltaY > 0) {
 			this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
-			this.repaintDelay = 10;
 		}
 	}
 

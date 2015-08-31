@@ -113,8 +113,8 @@ class Api {
 					realY: y,
 					timeStamp: opts.timeStamp,
 					pos: {
-						x: x + opts.position.x,
-						y: y + opts.position.y
+						x: x,
+						y: y
 					},
 					level: level,
 					url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE,TILE_SIZE])
