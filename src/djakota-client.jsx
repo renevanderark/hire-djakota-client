@@ -78,8 +78,6 @@ class DjakotaClient extends React.Component {
 		console.log(state);
 	}
 
-
-
 	onAnimationFrame() {
 		this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
 
@@ -176,7 +174,6 @@ class DjakotaClient extends React.Component {
 				this.mousePos.x = ev.clientX;
 				this.mousePos.y = ev.clientY;
 
-				this.frameBuffer = [];
 				this.loadImage({scale: this.scale, level: this.level});
 
 				break;
@@ -214,7 +211,6 @@ class DjakotaClient extends React.Component {
 			this.imagePos.y -= this.movement.y / this.scale;
 			this.touchPos.x = ev.touches[0].pageX;
 			this.touchPos.y = ev.touches[0].pageY;
-			this.frameBuffer = [];
 			this.loadImage({scale: this.scale, level: this.level});
 		}
 		ev.preventDefault();

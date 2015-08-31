@@ -1537,7 +1537,6 @@ var DjakotaClient = (function (_React$Component) {
 					this.mousePos.x = ev.clientX;
 					this.mousePos.y = ev.clientY;
 
-					this.frameBuffer = [];
 					this.loadImage({ scale: this.scale, level: this.level });
 
 					break;
@@ -1568,7 +1567,6 @@ var DjakotaClient = (function (_React$Component) {
 				this.imagePos.y -= this.movement.y / this.scale;
 				this.touchPos.x = ev.touches[0].pageX;
 				this.touchPos.y = ev.touches[0].pageY;
-				this.frameBuffer = [];
 				this.loadImage({ scale: this.scale, level: this.level });
 			}
 			ev.preventDefault();
