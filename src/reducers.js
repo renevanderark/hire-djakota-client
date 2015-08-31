@@ -10,6 +10,8 @@ export default function(state = initialState, action) {
 	switch(action.type) {
 		case "SET_REAL_VIEWPORT":
 			return {...state, realViewPort: {...state.realViewPort, ...action.realViewPort}};
+		case "SEND_MOUSEWHEEL":
+			return {...state, mousewheel: action.mousewheel};		
 		default:
 			return state;
 	}

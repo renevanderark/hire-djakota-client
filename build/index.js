@@ -1081,11 +1081,19 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.setRealViewPort = setRealViewPort;
+exports.sendMouseWheel = sendMouseWheel;
 
 function setRealViewPort(realViewPort) {
 	return {
 		type: "SET_REAL_VIEWPORT",
 		realViewPort: realViewPort
+	};
+}
+
+function sendMouseWheel(wheelState) {
+	return {
+		type: "SEND_MOUSEWHEEL",
+		mousewheel: wheelState
 	};
 }
 
@@ -1421,7 +1429,7 @@ var DjakotaClient = (function (_React$Component) {
 			window.addEventListener("mouseup", this.mouseupListener);
 
 			this.unsubscribe = _store2["default"].subscribe(function () {
-				return _this.setState(_store2["default"].getState());
+				return _this.setState(_store2["default"].getState(), _this.receiveNewState.bind(_this));
 			});
 			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
@@ -1447,8 +1455,28 @@ var DjakotaClient = (function (_React$Component) {
 				x: -dims.x / dims.w,
 				y: -dims.y / dims.h,
 				w: this.state.width / dims.w,
-				h: this.state.height / dims.h
+				h: this.state.height / dims.h,
+				reposition: false
 			}));
+		}
+	}, {
+		key: "receiveNewState",
+		value: function receiveNewState() {
+			if (this.state.realViewPort.reposition) {
+				var _api$getRealImagePos = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
+
+				var w = _api$getRealImagePos.w;
+				var h = _api$getRealImagePos.h;
+
+				this.imagePos.x = -(w * this.state.realViewPort.x / this.scale);
+				this.imagePos.y = -(h * this.state.realViewPort.y / this.scale);
+				this.loadImage({ scale: this.scale, level: this.level });
+			}
+
+			if (this.state.mousewheel) {
+				_store2["default"].dispatch((0, _actions.sendMouseWheel)(false));
+				this.api.zoomBy(this.state.mousewheel.deltaY < 0 ? 1.1 : 0.9, this.scale, this.level, this.zoom.bind(this));
+			}
 		}
 	}, {
 		key: "onAnimationFrame",
@@ -1764,6 +1792,9 @@ var _store2 = _interopRequireDefault(_store);
 
 var RESIZE_DELAY = 5;
 
+var MOUSE_UP = 0;
+var MOUSE_DOWN = 1;
+
 var Minimap = (function (_React$Component) {
 	_inherits(Minimap, _React$Component);
 
@@ -1784,6 +1815,7 @@ var Minimap = (function (_React$Component) {
 		this.imageCtx = null;
 		this.interactionCtx = null;
 		this.resizeDelay = -1;
+		this.mouseState = MOUSE_UP;
 	}
 
 	_createClass(Minimap, [{
@@ -1872,13 +1904,38 @@ var Minimap = (function (_React$Component) {
 			(_imageCtx = this.imageCtx).drawImage.apply(_imageCtx, [tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
 		}
 	}, {
-		key: "onClick",
-		value: function onClick(ev) {
+		key: "onMouseDown",
+		value: function onMouseDown(ev) {
+			this.mouseState = MOUSE_DOWN;
+		}
+	}, {
+		key: "onMouseMove",
+		value: function onMouseMove(ev) {
+			if (this.mouseState === MOUSE_DOWN) {
+				var me = _react2["default"].findDOMNode(this);
+				_store2["default"].dispatch((0, _actions.setRealViewPort)({
+					x: (ev.pageX - me.offsetLeft) / this.state.width - this.state.realViewPort.w / 2,
+					y: (ev.pageY - me.offsetTop) / this.state.height - this.state.realViewPort.h / 2,
+					reposition: true
+				}));
+			}
+		}
+	}, {
+		key: "onMouseUp",
+		value: function onMouseUp(ev) {
+
+			this.mouseState = MOUSE_UP;
 			var me = _react2["default"].findDOMNode(this);
 			_store2["default"].dispatch((0, _actions.setRealViewPort)({
-				x: (ev.pageX - me.offsetLeft) / this.state.width,
-				y: (ev.pageY - me.offsetTop) / this.state.height
+				x: (ev.pageX - me.offsetLeft) / this.state.width - this.state.realViewPort.w / 2,
+				y: (ev.pageY - me.offsetTop) / this.state.height - this.state.realViewPort.h / 2,
+				reposition: true
 			}));
+		}
+	}, {
+		key: "onWheel",
+		value: function onWheel(ev) {
+			_store2["default"].dispatch((0, _actions.sendMouseWheel)({ deltaY: ev.deltaY }));
 		}
 	}, {
 		key: "render",
@@ -1887,7 +1944,13 @@ var Minimap = (function (_React$Component) {
 				"div",
 				{ className: "hire-djakota-minimap" },
 				_react2["default"].createElement("canvas", { className: "image", height: this.state.height, width: this.state.width }),
-				_react2["default"].createElement("canvas", { className: "interaction", height: this.state.height, onClick: this.onClick.bind(this), width: this.state.width })
+				_react2["default"].createElement("canvas", { className: "interaction",
+					height: this.state.height,
+					onMouseDown: this.onMouseDown.bind(this),
+					onMouseMove: this.onMouseMove.bind(this),
+					onMouseUp: this.onMouseUp.bind(this),
+					onWheel: this.onWheel.bind(this),
+					width: this.state.width })
 			);
 		}
 	}]);
@@ -1924,6 +1987,8 @@ exports["default"] = function (state, action) {
 	switch (action.type) {
 		case "SET_REAL_VIEWPORT":
 			return _extends({}, state, { realViewPort: _extends({}, state.realViewPort, action.realViewPort) });
+		case "SEND_MOUSEWHEEL":
+			return _extends({}, state, { mousewheel: action.mousewheel });
 		default:
 			return state;
 	}

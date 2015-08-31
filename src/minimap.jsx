@@ -1,11 +1,14 @@
 import React from "react";
 import Api from "./api";
 import { requestAnimationFrame, cancelAnimationFrame } from './request-animation-frame';
-import { setRealViewPort } from "./actions";
+import { setRealViewPort, sendMouseWheel } from "./actions";
 import store from "./store";
 
 const RESIZE_DELAY = 5;
 
+
+const MOUSE_UP = 0;
+const MOUSE_DOWN = 1;
 
 class Minimap extends React.Component {
 	constructor(props) {
@@ -23,7 +26,7 @@ class Minimap extends React.Component {
 		this.imageCtx = null;
 		this.interactionCtx = null;
 		this.resizeDelay = -1;
-
+		this.mouseState = MOUSE_UP;
 	}
 
 	componentDidMount() {
@@ -113,19 +116,47 @@ class Minimap extends React.Component {
 		]);
 	}
 
-	onClick(ev) {
+	onMouseDown(ev) {
+		this.mouseState = MOUSE_DOWN;
+	}
+
+	onMouseMove(ev) {
+		if(this.mouseState === MOUSE_DOWN) {
+			let me = React.findDOMNode(this);
+			store.dispatch(setRealViewPort({
+				x: (ev.pageX - me.offsetLeft) / this.state.width - (this.state.realViewPort.w / 2),
+				y: (ev.pageY - me.offsetTop) / this.state.height - (this.state.realViewPort.h / 2),
+				reposition: true
+			}));
+		}
+	}
+
+	onMouseUp(ev) {
+		
+		this.mouseState = MOUSE_UP;
 		let me = React.findDOMNode(this);
 		store.dispatch(setRealViewPort({
-			x: (ev.pageX - me.offsetLeft) / this.state.width,
-			y: (ev.pageY - me.offsetTop) / this.state.height
-		}));
+			x: (ev.pageX - me.offsetLeft) / this.state.width - (this.state.realViewPort.w / 2),
+			y: (ev.pageY - me.offsetTop) / this.state.height - (this.state.realViewPort.h / 2),
+			reposition: true
+		}));		
+	}
+
+	onWheel(ev) {
+		store.dispatch(sendMouseWheel({deltaY: ev.deltaY}));
 	}
 
 	render() {
 		return (
 			<div className="hire-djakota-minimap">
 				<canvas className="image" height={this.state.height} width={this.state.width} />
-				<canvas className="interaction"  height={this.state.height} onClick={this.onClick.bind(this)} width={this.state.width} />
+				<canvas className="interaction" 
+					height={this.state.height} 
+					onMouseDown={this.onMouseDown.bind(this)} 
+					onMouseMove={this.onMouseMove.bind(this)} 
+					onMouseUp={this.onMouseUp.bind(this)} 
+					onWheel={this.onWheel.bind(this)}
+					width={this.state.width} />
 			</div>
 		);
 	}

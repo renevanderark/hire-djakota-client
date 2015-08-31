@@ -1,7 +1,7 @@
 import React from "react";
 import Api from "./api";
 import { requestAnimationFrame, cancelAnimationFrame } from './request-animation-frame';
-import { setRealViewPort } from "./actions";
+import { setRealViewPort, sendMouseWheel } from "./actions";
 import store from "./store";
 
 const MOUSE_UP = 0;
@@ -60,7 +60,7 @@ class DjakotaClient extends React.Component {
 		window.addEventListener("mouseup", this.mouseupListener);
 
 		this.unsubscribe = store.subscribe(() =>
-			this.setState(store.getState())
+			this.setState(store.getState(), this.receiveNewState.bind(this))
 		);
 		requestAnimationFrame(this.animationFrameListener);
 
@@ -88,7 +88,22 @@ class DjakotaClient extends React.Component {
 			y: -dims.y / dims.h,
 			w: this.state.width / dims.w,
 			h: this.state.height / dims.h,
+			reposition: false
 		}));
+	}
+
+	receiveNewState() {
+		if(this.state.realViewPort.reposition) {
+			let {w, h} = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
+			this.imagePos.x = -(w * this.state.realViewPort.x / this.scale);
+			this.imagePos.y = -(h * this.state.realViewPort.y / this.scale);
+			this.loadImage({scale: this.scale, level: this.level});
+		}
+
+		if(this.state.mousewheel) {
+			store.dispatch(sendMouseWheel(false));
+			this.api.zoomBy(this.state.mousewheel.deltaY < 0 ? 1.1 : 0.9, this.scale, this.level, this.zoom.bind(this));
+		}
 	}
 
 	onAnimationFrame() {
