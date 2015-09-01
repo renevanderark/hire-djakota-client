@@ -63,7 +63,14 @@ class DjakotaClient extends React.Component {
 			this.setState(store.getState(), this.receiveNewState.bind(this))
 		);
 		requestAnimationFrame(this.animationFrameListener);
+	}
 
+
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.config.identifier !== this.props.config.identifier) {
+			this.api = new Api(this.props.service, nextProps.config);
+			this.commitResize();
+		}
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
@@ -196,10 +203,8 @@ class DjakotaClient extends React.Component {
 				this.imagePos.y -= this.movement.y / this.scale;
 				this.mousePos.x = ev.clientX;
 				this.mousePos.y = ev.clientY;
-
 				this.loadImage({scale: this.scale, level: this.level});
-
-				break;
+				return ev.preventDefault();
 			case MOUSE_UP:
 			default:
 		}

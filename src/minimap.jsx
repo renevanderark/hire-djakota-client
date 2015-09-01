@@ -46,6 +46,13 @@ class Minimap extends React.Component {
 		);
 	}
 
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.config.identifier !== this.props.config.identifier) {
+			this.api = new Api(this.props.service, nextProps.config);
+			this.commitResize();
+		}
+	}
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state.width !== nextState.width || 
 			this.state.height !== nextState.height ||
@@ -128,6 +135,7 @@ class Minimap extends React.Component {
 				y: (ev.pageY - rect.top) / this.state.height - (this.state.realViewPort.h / 2),
 				reposition: true
 			}));
+			return ev.preventDefault();
 		}
 	}
 

@@ -1434,6 +1434,14 @@ var DjakotaClient = (function (_React$Component) {
 			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
+		key: "componentWillReceiveProps",
+		value: function componentWillReceiveProps(nextProps) {
+			if (nextProps.config.identifier !== this.props.config.identifier) {
+				this.api = new _api2["default"](this.props.service, nextProps.config);
+				this.commitResize();
+			}
+		}
+	}, {
 		key: "shouldComponentUpdate",
 		value: function shouldComponentUpdate(nextProps, nextState) {
 			return this.state.width !== nextState.width || this.state.height !== nextState.height || this.props.config.identifier !== nextProps.config.identifier;
@@ -1575,10 +1583,8 @@ var DjakotaClient = (function (_React$Component) {
 					this.imagePos.y -= this.movement.y / this.scale;
 					this.mousePos.x = ev.clientX;
 					this.mousePos.y = ev.clientY;
-
 					this.loadImage({ scale: this.scale, level: this.level });
-
-					break;
+					return ev.preventDefault();
 				case MOUSE_UP:
 				default:
 			}
@@ -1839,6 +1845,14 @@ var Minimap = (function (_React$Component) {
 			});
 		}
 	}, {
+		key: "componentWillReceiveProps",
+		value: function componentWillReceiveProps(nextProps) {
+			if (nextProps.config.identifier !== this.props.config.identifier) {
+				this.api = new _api2["default"](this.props.service, nextProps.config);
+				this.commitResize();
+			}
+		}
+	}, {
 		key: "shouldComponentUpdate",
 		value: function shouldComponentUpdate(nextProps, nextState) {
 			return this.state.width !== nextState.width || this.state.height !== nextState.height || this.props.config.identifier !== nextProps.config.identifier;
@@ -1917,6 +1931,7 @@ var Minimap = (function (_React$Component) {
 					y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
 					reposition: true
 				}));
+				return ev.preventDefault();
 			}
 		}
 	}, {
