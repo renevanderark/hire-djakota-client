@@ -1674,6 +1674,7 @@ var DjakotaClient = (function (_React$Component) {
 			} else if (ev.nativeEvent.deltaY > 0) {
 				this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
 			}
+			return ev.preventDefault();
 		}
 	}, {
 		key: "render",
@@ -1928,6 +1929,7 @@ var Minimap = (function (_React$Component) {
 		key: "onWheel",
 		value: function onWheel(ev) {
 			_store2["default"].dispatch((0, _actions.sendMouseWheel)({ deltaY: ev.deltaY }));
+			return ev.preventDefault();
 		}
 	}, {
 		key: "render",

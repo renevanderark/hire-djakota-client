@@ -297,6 +297,7 @@ class DjakotaClient extends React.Component {
 		} else if(ev.nativeEvent.deltaY > 0) {
 			this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
 		}
+		return ev.preventDefault();
 	}
 
 	render() {

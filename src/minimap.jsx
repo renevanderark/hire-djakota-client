@@ -139,6 +139,7 @@ class Minimap extends React.Component {
 
 	onWheel(ev) {
 		store.dispatch(sendMouseWheel({deltaY: ev.deltaY}));
+		return ev.preventDefault();
 	}
 
 	render() {
