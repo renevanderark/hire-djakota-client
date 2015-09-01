@@ -1816,6 +1816,8 @@ var Minimap = (function (_React$Component) {
 		this.interactionCtx = null;
 		this.resizeDelay = -1;
 		this.mouseState = MOUSE_UP;
+		this.mousemoveListener = this.onMouseMove.bind(this);
+		this.mouseupListener = this.onMouseUp.bind(this);
 	}
 
 	_createClass(Minimap, [{
@@ -1827,6 +1829,8 @@ var Minimap = (function (_React$Component) {
 			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext('2d');
 			this.interactionCtx = _react2["default"].findDOMNode(this).children[1].getContext('2d');
 			window.addEventListener("resize", this.resizeListener);
+			window.addEventListener("mousemove", this.mousemoveListener);
+			window.addEventListener("mouseup", this.mouseupListener);
 			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 
 			this.unsubscribe = _store2["default"].subscribe(function () {
@@ -1842,6 +1846,8 @@ var Minimap = (function (_React$Component) {
 		key: "componentWillUnmount",
 		value: function componentWillUnmount() {
 			window.removeEventListener("resize", this.resizeListener);
+			window.removeEventListener("mousemove", this.mousemoveListener);
+			window.removeEventListener("mouseup", this.mouseupListener);
 			(0, _requestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
 			this.unsubscribe();
 		}
@@ -1872,16 +1878,8 @@ var Minimap = (function (_React$Component) {
 			this.resizing = false;
 			this.resizeDelay = RESIZE_DELAY;
 			var node = _react2["default"].findDOMNode(this);
-			this.setState({
-				width: node.clientWidth,
-				height: node.clientHeight
-			}, this.afterResize.bind(this));
-		}
-	}, {
-		key: "afterResize",
-		value: function afterResize() {
 			this.api.loadImage({
-				viewport: { w: this.state.width, h: this.state.height },
+				viewport: { w: node.clientWidth, h: node.clientHeight },
 				onTile: this.renderTile.bind(this),
 				onScale: this.setScale.bind(this),
 				scaleMode: "autoFill",
@@ -1925,12 +1923,6 @@ var Minimap = (function (_React$Component) {
 		value: function onMouseUp(ev) {
 
 			this.mouseState = MOUSE_UP;
-			var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
-			_store2["default"].dispatch((0, _actions.setRealViewPort)({
-				x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
-				y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
-				reposition: true
-			}));
 		}
 	}, {
 		key: "onWheel",
@@ -1947,8 +1939,6 @@ var Minimap = (function (_React$Component) {
 				_react2["default"].createElement("canvas", { className: "interaction",
 					height: this.state.height,
 					onMouseDown: this.onMouseDown.bind(this),
-					onMouseMove: this.onMouseMove.bind(this),
-					onMouseUp: this.onMouseUp.bind(this),
 					onWheel: this.onWheel.bind(this),
 					width: this.state.width })
 			);

@@ -27,6 +27,9 @@ class Minimap extends React.Component {
 		this.interactionCtx = null;
 		this.resizeDelay = -1;
 		this.mouseState = MOUSE_UP;
+		this.mousemoveListener = this.onMouseMove.bind(this);
+		this.mouseupListener = this.onMouseUp.bind(this);
+
 	}
 
 	componentDidMount() {
@@ -34,6 +37,8 @@ class Minimap extends React.Component {
 		this.imageCtx = React.findDOMNode(this).children[0].getContext('2d');
 		this.interactionCtx = React.findDOMNode(this).children[1].getContext('2d');
 		window.addEventListener("resize", this.resizeListener);
+		window.addEventListener("mousemove", this.mousemoveListener);
+		window.addEventListener("mouseup", this.mouseupListener);
 		requestAnimationFrame(this.animationFrameListener);
 
 		this.unsubscribe = store.subscribe(() =>
@@ -50,6 +55,8 @@ class Minimap extends React.Component {
 
 	componentWillUnmount() {
 		window.removeEventListener("resize", this.resizeListener);
+		window.removeEventListener("mousemove", this.mousemoveListener);
+		window.removeEventListener("mouseup", this.mouseupListener);
 		cancelAnimationFrame(this.animationFrameListener);
 		this.unsubscribe();
 	}
@@ -83,15 +90,8 @@ class Minimap extends React.Component {
 		this.resizing = false;
 		this.resizeDelay = RESIZE_DELAY;
 		let node = React.findDOMNode(this);
-		this.setState({
-			width: node.clientWidth,
-			height: node.clientHeight
-		}, this.afterResize.bind(this));
-	}
-
-	afterResize() {
 		this.api.loadImage({
-			viewport: {w: this.state.width, h: this.state.height},
+			viewport: {w: node.clientWidth, h: node.clientHeight},
 			onTile: this.renderTile.bind(this),
 			onScale: this.setScale.bind(this),
 			scaleMode: "autoFill",
@@ -134,12 +134,7 @@ class Minimap extends React.Component {
 	onMouseUp(ev) {
 		
 		this.mouseState = MOUSE_UP;
-		let rect = React.findDOMNode(this).getBoundingClientRect();
-		store.dispatch(setRealViewPort({
-			x: (ev.pageX - rect.left) / this.state.width - (this.state.realViewPort.w / 2),
-			y: (ev.pageY - rect.top) / this.state.height - (this.state.realViewPort.h / 2),
-			reposition: true
-		}));		
+	
 	}
 
 	onWheel(ev) {
@@ -153,8 +148,6 @@ class Minimap extends React.Component {
 				<canvas className="interaction" 
 					height={this.state.height} 
 					onMouseDown={this.onMouseDown.bind(this)} 
-					onMouseMove={this.onMouseMove.bind(this)} 
-					onMouseUp={this.onMouseUp.bind(this)} 
 					onWheel={this.onWheel.bind(this)}
 					width={this.state.width} />
 			</div>
