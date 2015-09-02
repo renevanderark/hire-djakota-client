@@ -1976,6 +1976,16 @@ var Minimap = (function (_React$Component) {
 			return ev.preventDefault();
 		}
 	}, {
+		key: "onTouchStart",
+		value: function onTouchStart(ev) {
+			var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
+			_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
+				x: (ev.touches[0].pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
+				y: (ev.touches[0].pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
+				reposition: true
+			}));
+		}
+	}, {
 		key: "render",
 		value: function render() {
 			return _react2["default"].createElement(
@@ -1985,6 +1995,7 @@ var Minimap = (function (_React$Component) {
 				_react2["default"].createElement("canvas", { className: "interaction",
 					height: this.state.height,
 					onMouseDown: this.onMouseDown.bind(this),
+					onTouchStart: this.onTouchStart.bind(this),
 					onWheel: this.onWheel.bind(this),
 					width: this.state.width })
 			);

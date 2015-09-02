@@ -150,6 +150,15 @@ class Minimap extends React.Component {
 		return ev.preventDefault();
 	}
 
+	onTouchStart(ev) {
+		let rect = React.findDOMNode(this).getBoundingClientRect();
+		store.dispatch(setRealViewPort({
+			x: (ev.touches[0].pageX - rect.left) / this.state.width - (this.state.realViewPort.w / 2),
+			y: (ev.touches[0].pageY - rect.top) / this.state.height - (this.state.realViewPort.h / 2),
+			reposition: true
+		}));
+	}
+
 	render() {
 		return (
 			<div className="hire-djakota-minimap">
@@ -157,6 +166,7 @@ class Minimap extends React.Component {
 				<canvas className="interaction" 
 					height={this.state.height} 
 					onMouseDown={this.onMouseDown.bind(this)} 
+					onTouchStart={this.onTouchStart.bind(this)}
 					onWheel={this.onWheel.bind(this)}
 					width={this.state.width} />
 			</div>
