@@ -1,12 +1,12 @@
 
 const initialState = {
 	realViewPort: {
-		x:0,y:0,w:0,h:0
-	}
+		x:0,y:0,w:0,h:0,zoom:0,reposition:false
+	},
+	mousewheel: null,
 };
 
 export default function(state = initialState, action) {
-
 	switch(action.type) {
 		case "SET_REAL_VIEWPORT":
 			return {...state, realViewPort: {...state.realViewPort, ...action.realViewPort}};

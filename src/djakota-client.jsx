@@ -89,12 +89,14 @@ class DjakotaClient extends React.Component {
 
 
 	notifyRealImagePos() {
+		let zoom = this.api.getRealScale(this.scale, this.level);
 		let dims = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
 		store.dispatch(setRealViewPort({
 			x: -dims.x / dims.w,
 			y: -dims.y / dims.h,
 			w: this.state.width / dims.w,
 			h: this.state.height / dims.h,
+			zoom: zoom,
 			reposition: false
 		}));
 	}

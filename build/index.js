@@ -1458,12 +1458,14 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "notifyRealImagePos",
 		value: function notifyRealImagePos() {
+			var zoom = this.api.getRealScale(this.scale, this.level);
 			var dims = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
 			_store2["default"].dispatch((0, _actions.setRealViewPort)({
 				x: -dims.x / dims.w,
 				y: -dims.y / dims.h,
 				w: this.state.width / dims.w,
 				h: this.state.height / dims.h,
+				zoom: zoom,
 				reposition: false
 			}));
 		}
@@ -1989,8 +1991,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var initialState = {
 	realViewPort: {
-		x: 0, y: 0, w: 0, h: 0
-	}
+		x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false
+	},
+	mousewheel: null
 };
 
 exports["default"] = function (state, action) {
