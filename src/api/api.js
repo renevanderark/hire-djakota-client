@@ -130,6 +130,13 @@ class Api {
 		return this.findLevelForScale(s, --level, current / 2);
 	}
 
+	zoomTo(zoom, scale, level, onScale) {
+		let newLevel = this.findLevelForScale(zoom, this.levels);
+		let newScale = this.upScale(zoom, this.resolutions.length - newLevel);
+		onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * zoom)), parseInt(Math.ceil(this.fullHeight * zoom)));
+	}
+
+
 	zoomBy(factor, scale, level, onScale) {
 		let viewportScale = this.getRealScale(scale, level) + factor;
 		if(viewportScale < 0.01) { viewportScale = 0.01; }

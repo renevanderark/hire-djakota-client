@@ -1246,6 +1246,13 @@ var Api = (function () {
 			return this.findLevelForScale(s, --level, current / 2);
 		}
 	}, {
+		key: "zoomTo",
+		value: function zoomTo(zoom, scale, level, onScale) {
+			var newLevel = this.findLevelForScale(zoom, this.levels);
+			var newScale = this.upScale(zoom, this.resolutions.length - newLevel);
+			onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * zoom)), parseInt(Math.ceil(this.fullHeight * zoom)));
+		}
+	}, {
 		key: "zoomBy",
 		value: function zoomBy(factor, scale, level, onScale) {
 			var viewportScale = this.getRealScale(scale, level) + factor;
@@ -1519,7 +1526,8 @@ var DjakotaClient = (function (_React$Component) {
 				w: this.state.width / dims.w,
 				h: this.state.height / dims.h,
 				zoom: zoom,
-				reposition: false
+				reposition: false,
+				applyZoom: false
 			}));
 		}
 	}, {
@@ -1534,6 +1542,10 @@ var DjakotaClient = (function (_React$Component) {
 				this.imagePos.x = -(w * this.state.realViewPort.x / this.scale);
 				this.imagePos.y = -(h * this.state.realViewPort.y / this.scale);
 				this.loadImage({ scale: this.scale, level: this.level });
+			}
+
+			if (this.state.realViewPort.applyZoom) {
+				this.api.zoomTo(this.state.realViewPort.zoom, this.scale, this.level, this.zoom.bind(this));
 			}
 
 			if (this.state.mousewheel) {
@@ -1946,6 +1958,16 @@ var Minimap = (function (_React$Component) {
 			(_imageCtx = this.imageCtx).drawImage.apply(_imageCtx, [tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
 		}
 	}, {
+		key: "dispatchReposition",
+		value: function dispatchReposition(ev) {
+			var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
+			_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
+				x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
+				y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
+				reposition: true
+			}));
+		}
+	}, {
 		key: "onMouseDown",
 		value: function onMouseDown(ev) {
 			this.mouseState = MOUSE_DOWN;
@@ -1954,19 +1976,16 @@ var Minimap = (function (_React$Component) {
 		key: "onMouseMove",
 		value: function onMouseMove(ev) {
 			if (this.mouseState === MOUSE_DOWN) {
-				var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
-				_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
-					x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
-					y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
-					reposition: true
-				}));
+				this.dispatchReposition(ev);
 				return ev.preventDefault();
 			}
 		}
 	}, {
 		key: "onMouseUp",
 		value: function onMouseUp(ev) {
-
+			if (this.mouseState === MOUSE_DOWN) {
+				this.dispatchReposition(ev);
+			}
 			this.mouseState = MOUSE_UP;
 		}
 	}, {
@@ -1976,14 +1995,9 @@ var Minimap = (function (_React$Component) {
 			return ev.preventDefault();
 		}
 	}, {
-		key: "onTouchStart",
-		value: function onTouchStart(ev) {
-			var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
-			_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
-				x: (ev.touches[0].pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
-				y: (ev.touches[0].pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
-				reposition: true
-			}));
+		key: "onTouchEnd",
+		value: function onTouchEnd(ev) {
+			this.dispatchReposition({ pageX: ev.touches[0].pageX, pageY: ev.touches[0].pageY });
 		}
 	}, {
 		key: "render",
@@ -1995,7 +2009,7 @@ var Minimap = (function (_React$Component) {
 				_react2["default"].createElement("canvas", { className: "interaction",
 					height: this.state.height,
 					onMouseDown: this.onMouseDown.bind(this),
-					onTouchStart: this.onTouchStart.bind(this),
+					onTouchEnd: this.onTouchEnd.bind(this),
 					onWheel: this.onWheel.bind(this),
 					width: this.state.width })
 			);
@@ -2039,9 +2053,14 @@ var _react = _dereq_("react");
 
 var _react2 = _interopRequireDefault(_react);
 
+var _apiActions = _dereq_("../api/actions");
+
 var _apiStore = _dereq_("../api/store");
 
 var _apiStore2 = _interopRequireDefault(_apiStore);
+
+var MOUSE_UP = 0;
+var MOUSE_DOWN = 1;
 
 var Zoom = (function (_React$Component) {
 	_inherits(Zoom, _React$Component);
@@ -2051,12 +2070,15 @@ var Zoom = (function (_React$Component) {
 
 		_get(Object.getPrototypeOf(Zoom.prototype), "constructor", this).call(this, props);
 		this.state = _apiStore2["default"].getState();
+		this.mouseupListener = this.onMouseUp.bind(this);
 	}
 
 	_createClass(Zoom, [{
 		key: "componentDidMount",
 		value: function componentDidMount() {
 			var _this = this;
+
+			window.addEventListener("mouseup", this.mouseupListener);
 
 			this.unsubscribe = _apiStore2["default"].subscribe(function () {
 				return _this.setState(_apiStore2["default"].getState());
@@ -2065,17 +2087,71 @@ var Zoom = (function (_React$Component) {
 	}, {
 		key: "componentWillUnmount",
 		value: function componentWillUnmount() {
+			window.addEventListener("mouseup", this.mouseupListener);
+
 			this.unsubscribe();
+		}
+	}, {
+		key: "onMouseDown",
+		value: function onMouseDown(ev) {
+			this.mouseState = MOUSE_DOWN;
+		}
+	}, {
+		key: "dispatchRealScale",
+		value: function dispatchRealScale(ev) {
+			var rect = _react2["default"].findDOMNode(ev.target).getBoundingClientRect();
+			if (rect.width > 0 && !this.state.realViewPort.applyZoom) {
+				_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
+					zoom: (ev.pageX - rect.left) / rect.width * 2,
+					applyZoom: true
+				}));
+			}
+		}
+	}, {
+		key: "onMouseMove",
+		value: function onMouseMove(ev) {
+			if (this.mouseState === MOUSE_DOWN) {
+				// this.dispatchRealScale(ev);
+				return ev.preventDefault();
+			}
+		}
+	}, {
+		key: "onMouseUp",
+		value: function onMouseUp(ev) {
+			if (this.mouseState === MOUSE_DOWN) {
+				this.dispatchRealScale(ev);
+			}
+			this.mouseState = MOUSE_UP;
 		}
 	}, {
 		key: "render",
 		value: function render() {
-
+			var zoom = parseInt(this.state.realViewPort.zoom * 100);
 			return _react2["default"].createElement(
-				"label",
+				"span",
 				null,
-				parseInt(this.state.realViewPort.zoom * 100),
-				"%"
+				_react2["default"].createElement(
+					"label",
+					null,
+					zoom,
+					"%"
+				),
+				_react2["default"].createElement(
+					"svg",
+					{
+						fill: this.props.fill,
+						height: "12",
+						onMouseDown: this.onMouseDown.bind(this),
+						onMouseMove: this.onMouseMove.bind(this),
+						stroke: this.props.stroke,
+						style: { cursor: "pointer" },
+						viewBox: "0 0 210 12",
+						width: "210" },
+					_react2["default"].createElement("path", { d: "M1 0 L 1 12 Z", fill: "transparent" }),
+					_react2["default"].createElement("path", { d: "M209 0 L 209 12 Z", fill: "transparent" }),
+					_react2["default"].createElement("path", { d: "M0 6 L 210 6 Z", fill: "transparent" }),
+					_react2["default"].createElement("circle", { cx: zoom > 200 ? 204 : zoom + 4, cy: "6", fillOpacity: ".8", r: "4" })
+				)
 			);
 		}
 	}]);
@@ -2083,10 +2159,20 @@ var Zoom = (function (_React$Component) {
 	return Zoom;
 })(_react2["default"].Component);
 
+Zoom.propTypes = {
+	fill: _react2["default"].PropTypes.string,
+	stroke: _react2["default"].PropTypes.string
+};
+
+Zoom.defaultProps = {
+	fill: "rgba(0,0,0, 0.7)",
+	stroke: "rgba(0,0,0, 1)"
+};
+
 exports["default"] = Zoom;
 module.exports = exports["default"];
 
-},{"../api/store":18,"react":"react"}],22:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/store":18,"react":"react"}],22:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

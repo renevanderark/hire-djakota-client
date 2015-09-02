@@ -97,7 +97,8 @@ class DjakotaClient extends React.Component {
 			w: this.state.width / dims.w,
 			h: this.state.height / dims.h,
 			zoom: zoom,
-			reposition: false
+			reposition: false,
+			applyZoom: false
 		}));
 	}
 
@@ -108,6 +109,11 @@ class DjakotaClient extends React.Component {
 			this.imagePos.y = -(h * this.state.realViewPort.y / this.scale);
 			this.loadImage({scale: this.scale, level: this.level});
 		}
+
+		if(this.state.realViewPort.applyZoom) {
+			this.api.zoomTo(this.state.realViewPort.zoom, this.scale, this.level, this.zoom.bind(this));
+		}
+
 
 		if(this.state.mousewheel) {
 			store.dispatch(sendMouseWheel(false));
