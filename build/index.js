@@ -2111,7 +2111,7 @@ var Zoom = (function (_React$Component) {
 		key: "onMouseMove",
 		value: function onMouseMove(ev) {
 			if (this.mouseState === MOUSE_DOWN) {
-				// this.dispatchRealScale(ev);
+				this.dispatchRealScale(ev);
 				return ev.preventDefault();
 			}
 		}
@@ -2122,6 +2122,26 @@ var Zoom = (function (_React$Component) {
 				this.dispatchRealScale(ev);
 			}
 			this.mouseState = MOUSE_UP;
+		}
+	}, {
+		key: "renderInteractionBar",
+		value: function renderInteractionBar() {
+			this.renderedInteractionBar = this.renderedInteractionBar || _react2["default"].createElement(
+				"svg",
+				{
+					fill: this.props.fill,
+					height: "12",
+					onMouseDown: this.onMouseDown.bind(this),
+					onMouseMove: this.onMouseMove.bind(this),
+					stroke: this.props.stroke,
+					style: { cursor: "pointer", position: "relative", top: "-19px" },
+					viewBox: "0 0 210 12",
+					width: "210" },
+				_react2["default"].createElement("path", { d: "M1 0 L 1 12 Z", fill: "transparent" }),
+				_react2["default"].createElement("path", { d: "M209 0 L 209 12 Z", fill: "transparent" }),
+				_react2["default"].createElement("path", { d: "M0 6 L 210 6 Z", fill: "transparent" })
+			);
+			return this.renderedInteractionBar;
 		}
 	}, {
 		key: "render",
@@ -2141,17 +2161,11 @@ var Zoom = (function (_React$Component) {
 					{
 						fill: this.props.fill,
 						height: "12",
-						onMouseDown: this.onMouseDown.bind(this),
-						onMouseMove: this.onMouseMove.bind(this),
-						stroke: this.props.stroke,
-						style: { cursor: "pointer" },
 						viewBox: "0 0 210 12",
 						width: "210" },
-					_react2["default"].createElement("path", { d: "M1 0 L 1 12 Z", fill: "transparent" }),
-					_react2["default"].createElement("path", { d: "M209 0 L 209 12 Z", fill: "transparent" }),
-					_react2["default"].createElement("path", { d: "M0 6 L 210 6 Z", fill: "transparent" }),
 					_react2["default"].createElement("circle", { cx: zoom > 200 ? 204 : zoom + 4, cy: "6", fillOpacity: ".8", r: "4" })
-				)
+				),
+				this.renderInteractionBar()
 			);
 		}
 	}]);

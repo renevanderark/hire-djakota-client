@@ -23,6 +23,7 @@ class Zoom extends React.Component {
 		);
 	}
 
+
 	componentWillUnmount() {
 		window.addEventListener("mouseup", this.mouseupListener);
 
@@ -47,7 +48,7 @@ class Zoom extends React.Component {
 
 	onMouseMove(ev) {
 		if(this.mouseState === MOUSE_DOWN) {
-			// this.dispatchRealScale(ev);
+			this.dispatchRealScale(ev);
 			return ev.preventDefault();
 		}
 	}
@@ -59,6 +60,23 @@ class Zoom extends React.Component {
 		this.mouseState = MOUSE_UP;
 	}
 
+	renderInteractionBar() {
+		this.renderedInteractionBar = this.renderedInteractionBar ||
+			(<svg
+				fill={this.props.fill}
+				height="12"
+				onMouseDown={this.onMouseDown.bind(this)} 
+				onMouseMove={this.onMouseMove.bind(this)} 
+				stroke={this.props.stroke}
+				style={{cursor: "pointer", position: "relative", top: "-19px"}}
+				viewBox="0 0 210 12"
+				width="210">
+				<path d="M1 0 L 1 12 Z" fill="transparent"   />
+				<path d="M209 0 L 209 12 Z" fill="transparent"  />
+				<path d="M0 6 L 210 6 Z" fill="transparent"  />
+			</svg>);
+		return this.renderedInteractionBar;
+	}
 
 	render() {
 		let zoom = parseInt(this.state.realViewPort.zoom * 100)
@@ -68,17 +86,11 @@ class Zoom extends React.Component {
 				<svg
 					fill={this.props.fill}
 					height="12"
-					onMouseDown={this.onMouseDown.bind(this)} 
-					onMouseMove={this.onMouseMove.bind(this)} 
-					stroke={this.props.stroke}
-					style={{cursor: "pointer"}}
 					viewBox="0 0 210 12"
 					width="210">
-					<path d="M1 0 L 1 12 Z" fill="transparent"   />
-					<path d="M209 0 L 209 12 Z" fill="transparent"  />
-					<path d="M0 6 L 210 6 Z" fill="transparent"  />
-					<circle	cx={zoom > 200 ? 204 : zoom + 4} cy="6" fillOpacity=".8" r="4"  />
+						<circle	cx={zoom > 200 ? 204 : zoom + 4} cy="6" fillOpacity=".8" r="4"  />
 				</svg>
+				{this.renderInteractionBar()}
 			</span>
 		)
 	}
