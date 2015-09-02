@@ -1876,7 +1876,7 @@ var Minimap = (function (_React$Component) {
 				this.resizeDelay--;
 			}
 
-			this.interactionCtx.fillStyle = "rgba(255,128,128,0.1)";
+			this.interactionCtx.fillStyle = this.props.rectColor;
 			this.interactionCtx.clearRect(0, 0, this.state.width, this.state.height);
 			this.interactionCtx.fillRect(Math.floor(this.state.realViewPort.x * this.state.width), Math.floor(this.state.realViewPort.y * this.state.height), Math.ceil(this.state.realViewPort.w * this.state.width), Math.ceil(this.state.realViewPort.h * this.state.height));
 
@@ -1967,7 +1967,12 @@ var Minimap = (function (_React$Component) {
 
 Minimap.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
+	rectColor: _react2["default"].PropTypes.string,
 	service: _react2["default"].PropTypes.string.isRequired
+};
+
+Minimap.defaultProps = {
+	rectColor: "rgba(128,128,255,0.2)"
 };
 
 exports["default"] = Minimap;

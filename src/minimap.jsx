@@ -77,7 +77,7 @@ class Minimap extends React.Component {
 			this.resizeDelay--;
 		}
 
-		this.interactionCtx.fillStyle = "rgba(255,128,128,0.1)";
+		this.interactionCtx.fillStyle = this.props.rectColor;
 		this.interactionCtx.clearRect(0,0,this.state.width, this.state.height);
 		this.interactionCtx.fillRect(
 			Math.floor(this.state.realViewPort.x * this.state.width),
@@ -166,7 +166,12 @@ class Minimap extends React.Component {
 
 Minimap.propTypes = {
 	config: React.PropTypes.object.isRequired,
+	rectColor: React.PropTypes.string,
 	service: React.PropTypes.string.isRequired
 };
+
+Minimap.defaultProps = {
+	rectColor: "rgba(128,128,255,0.2)"
+}
 
 export default Minimap;
