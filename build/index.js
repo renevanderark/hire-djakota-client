@@ -1344,6 +1344,57 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var initialState = {
+	realViewPort: {
+		x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false
+	},
+	mousewheel: null
+};
+
+exports["default"] = function (state, action) {
+	if (state === undefined) state = initialState;
+
+	switch (action.type) {
+		case "SET_REAL_VIEWPORT":
+			return _extends({}, state, { realViewPort: _extends({}, state.realViewPort, action.realViewPort) });
+		case "SEND_MOUSEWHEEL":
+			return _extends({}, state, { mousewheel: action.mousewheel });
+		default:
+			return state;
+	}
+};
+
+module.exports = exports["default"];
+
+},{}],18:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var _redux = _dereq_("redux");
+
+var _reducers = _dereq_("./reducers");
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+var store = (0, _redux.createStore)(_reducers2["default"]);
+
+exports["default"] = store;
+module.exports = exports["default"];
+
+},{"./reducers":17,"redux":7}],19:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
@@ -1360,17 +1411,17 @@ var _react = _dereq_("react");
 
 var _react2 = _interopRequireDefault(_react);
 
-var _api = _dereq_("./api");
+var _apiApi = _dereq_("../api/api");
 
-var _api2 = _interopRequireDefault(_api);
+var _apiApi2 = _interopRequireDefault(_apiApi);
 
-var _requestAnimationFrame = _dereq_('./request-animation-frame');
+var _apiActions = _dereq_("../api/actions");
 
-var _actions = _dereq_("./actions");
+var _apiStore = _dereq_("../api/store");
 
-var _store = _dereq_("./store");
+var _apiStore2 = _interopRequireDefault(_apiStore);
 
-var _store2 = _interopRequireDefault(_store);
+var _utilRequestAnimationFrame = _dereq_('../util/request-animation-frame');
 
 var MOUSE_UP = 0;
 var MOUSE_DOWN = 1;
@@ -1389,7 +1440,7 @@ var DjakotaClient = (function (_React$Component) {
 		_classCallCheck(this, DjakotaClient);
 
 		_get(Object.getPrototypeOf(DjakotaClient.prototype), "constructor", this).call(this, props);
-		this.api = new _api2["default"](this.props.service, this.props.config);
+		this.api = new _apiApi2["default"](this.props.service, this.props.config);
 
 		this.state = {
 			width: null,
@@ -1428,16 +1479,16 @@ var DjakotaClient = (function (_React$Component) {
 			window.addEventListener("mousemove", this.mousemoveListener);
 			window.addEventListener("mouseup", this.mouseupListener);
 
-			this.unsubscribe = _store2["default"].subscribe(function () {
-				return _this.setState(_store2["default"].getState(), _this.receiveNewState.bind(_this));
+			this.unsubscribe = _apiStore2["default"].subscribe(function () {
+				return _this.setState(_apiStore2["default"].getState(), _this.receiveNewState.bind(_this));
 			});
-			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
 		key: "componentWillReceiveProps",
 		value: function componentWillReceiveProps(nextProps) {
 			if (nextProps.config.identifier !== this.props.config.identifier) {
-				this.api = new _api2["default"](this.props.service, nextProps.config);
+				this.api = new _apiApi2["default"](this.props.service, nextProps.config);
 				this.commitResize();
 			}
 		}
@@ -1453,14 +1504,14 @@ var DjakotaClient = (function (_React$Component) {
 			window.removeEventListener("mousemove", this.mousemoveListener);
 			window.removeEventListener("mouseup", this.mouseupListener);
 			this.unsubscribe();
-			(0, _requestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
+			(0, _utilRequestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
 		key: "notifyRealImagePos",
 		value: function notifyRealImagePos() {
 			var zoom = this.api.getRealScale(this.scale, this.level);
 			var dims = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
-			_store2["default"].dispatch((0, _actions.setRealViewPort)({
+			_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
 				x: -dims.x / dims.w,
 				y: -dims.y / dims.h,
 				w: this.state.width / dims.w,
@@ -1484,7 +1535,7 @@ var DjakotaClient = (function (_React$Component) {
 			}
 
 			if (this.state.mousewheel) {
-				_store2["default"].dispatch((0, _actions.sendMouseWheel)(false));
+				_apiStore2["default"].dispatch((0, _apiActions.sendMouseWheel)(false));
 				this.api.zoomBy(this.state.mousewheel.deltaY < 0 ? 1.1 : 0.9, this.scale, this.level, this.zoom.bind(this));
 			}
 		}
@@ -1504,7 +1555,7 @@ var DjakotaClient = (function (_React$Component) {
 			} else if (this.resizeDelay > 0) {
 				this.resizeDelay--;
 			}
-			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
 		key: "onResize",
@@ -1731,42 +1782,7 @@ DjakotaClient.defaultProps = {
 exports["default"] = DjakotaClient;
 module.exports = exports["default"];
 
-},{"./actions":15,"./api":16,"./request-animation-frame":21,"./store":22,"react":"react"}],18:[function(_dereq_,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var _insertCss = _dereq_("insert-css");
-
-var _insertCss2 = _interopRequireDefault(_insertCss);
-
-var _react = _dereq_("react");
-
-var _react2 = _interopRequireDefault(_react);
-
-var _djakotaClient = _dereq_("./djakota-client");
-
-var _djakotaClient2 = _interopRequireDefault(_djakotaClient);
-
-var _minimap = _dereq_("./minimap");
-
-var _minimap2 = _interopRequireDefault(_minimap);
-
-
-
-var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQ==","base64");
-(0, _insertCss2["default"])(css, { prepend: true });
-
-_react2["default"].initializeTouchEvents(true);
-exports.DjakotaClient = _djakotaClient2["default"];
-exports.Minimap = _minimap2["default"];
-exports["default"] = _djakotaClient2["default"];
-
-},{"./djakota-client":17,"./minimap":19,"insert-css":1,"react":"react"}],19:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":22,"react":"react"}],20:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1787,17 +1803,17 @@ var _react = _dereq_("react");
 
 var _react2 = _interopRequireDefault(_react);
 
-var _api = _dereq_("./api");
+var _apiApi = _dereq_("../api/api");
 
-var _api2 = _interopRequireDefault(_api);
+var _apiApi2 = _interopRequireDefault(_apiApi);
 
-var _requestAnimationFrame = _dereq_('./request-animation-frame');
+var _apiActions = _dereq_("../api/actions");
 
-var _actions = _dereq_("./actions");
+var _apiStore = _dereq_("../api/store");
 
-var _store = _dereq_("./store");
+var _apiStore2 = _interopRequireDefault(_apiStore);
 
-var _store2 = _interopRequireDefault(_store);
+var _utilRequestAnimationFrame = _dereq_('../util/request-animation-frame');
 
 var RESIZE_DELAY = 5;
 
@@ -1811,7 +1827,7 @@ var Minimap = (function (_React$Component) {
 		_classCallCheck(this, Minimap);
 
 		_get(Object.getPrototypeOf(Minimap.prototype), "constructor", this).call(this, props);
-		this.api = new _api2["default"](this.props.service, this.props.config);
+		this.api = new _apiApi2["default"](this.props.service, this.props.config);
 
 		this.state = {
 			width: null,
@@ -1840,17 +1856,17 @@ var Minimap = (function (_React$Component) {
 			window.addEventListener("resize", this.resizeListener);
 			window.addEventListener("mousemove", this.mousemoveListener);
 			window.addEventListener("mouseup", this.mouseupListener);
-			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 
-			this.unsubscribe = _store2["default"].subscribe(function () {
-				return _this.setState(_store2["default"].getState());
+			this.unsubscribe = _apiStore2["default"].subscribe(function () {
+				return _this.setState(_apiStore2["default"].getState());
 			});
 		}
 	}, {
 		key: "componentWillReceiveProps",
 		value: function componentWillReceiveProps(nextProps) {
 			if (nextProps.config.identifier !== this.props.config.identifier) {
-				this.api = new _api2["default"](this.props.service, nextProps.config);
+				this.api = new _apiApi2["default"](this.props.service, nextProps.config);
 				this.commitResize();
 			}
 		}
@@ -1865,7 +1881,7 @@ var Minimap = (function (_React$Component) {
 			window.removeEventListener("resize", this.resizeListener);
 			window.removeEventListener("mousemove", this.mousemoveListener);
 			window.removeEventListener("mouseup", this.mouseupListener);
-			(0, _requestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
+			(0, _utilRequestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
 			this.unsubscribe();
 		}
 	}, {
@@ -1882,7 +1898,7 @@ var Minimap = (function (_React$Component) {
 			this.interactionCtx.clearRect(0, 0, this.state.width, this.state.height);
 			this.interactionCtx.fillRect(Math.floor(this.state.realViewPort.x * this.state.width), Math.floor(this.state.realViewPort.y * this.state.height), Math.ceil(this.state.realViewPort.w * this.state.width), Math.ceil(this.state.realViewPort.h * this.state.height));
 
-			(0, _requestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
 		key: "onResize",
@@ -1928,7 +1944,7 @@ var Minimap = (function (_React$Component) {
 		value: function onMouseMove(ev) {
 			if (this.mouseState === MOUSE_DOWN) {
 				var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
-				_store2["default"].dispatch((0, _actions.setRealViewPort)({
+				_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
 					x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
 					y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
 					reposition: true
@@ -1945,7 +1961,7 @@ var Minimap = (function (_React$Component) {
 	}, {
 		key: "onWheel",
 		value: function onWheel(ev) {
-			_store2["default"].dispatch((0, _actions.sendMouseWheel)({ deltaY: ev.deltaY }));
+			_apiStore2["default"].dispatch((0, _apiActions.sendMouseWheel)({ deltaY: ev.deltaY }));
 			return ev.preventDefault();
 		}
 	}, {
@@ -1980,38 +1996,42 @@ Minimap.defaultProps = {
 exports["default"] = Minimap;
 module.exports = exports["default"];
 
-},{"./actions":15,"./api":16,"./request-animation-frame":21,"./store":22,"react":"react"}],20:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":22,"react":"react"}],21:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var initialState = {
-	realViewPort: {
-		x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false
-	},
-	mousewheel: null
-};
+var _insertCss = _dereq_("insert-css");
 
-exports["default"] = function (state, action) {
-	if (state === undefined) state = initialState;
+var _insertCss2 = _interopRequireDefault(_insertCss);
 
-	switch (action.type) {
-		case "SET_REAL_VIEWPORT":
-			return _extends({}, state, { realViewPort: _extends({}, state.realViewPort, action.realViewPort) });
-		case "SEND_MOUSEWHEEL":
-			return _extends({}, state, { mousewheel: action.mousewheel });
-		default:
-			return state;
-	}
-};
+var _react = _dereq_("react");
 
-module.exports = exports["default"];
+var _react2 = _interopRequireDefault(_react);
 
-},{}],21:[function(_dereq_,module,exports){
+var _componentsDjakotaClient = _dereq_("./components/djakota-client");
+
+var _componentsDjakotaClient2 = _interopRequireDefault(_componentsDjakotaClient);
+
+var _componentsMinimap = _dereq_("./components/minimap");
+
+var _componentsMinimap2 = _interopRequireDefault(_componentsMinimap);
+
+
+
+var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQ==","base64");
+(0, _insertCss2["default"])(css, { prepend: true });
+
+_react2["default"].initializeTouchEvents(true);
+exports.DjakotaClient = _componentsDjakotaClient2["default"];
+exports.Minimap = _componentsMinimap2["default"];
+exports["default"] = _componentsDjakotaClient2["default"];
+
+},{"./components/djakota-client":19,"./components/minimap":20,"insert-css":1,"react":"react"}],22:[function(_dereq_,module,exports){
 /*
 The MIT License (MIT)
 
@@ -2062,25 +2082,5 @@ var cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ? f
 } : undefined;
 exports.cancelAnimationFrame = cancelAnimationFrame;
 
-},{}],22:[function(_dereq_,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var _redux = _dereq_("redux");
-
-var _reducers = _dereq_("./reducers");
-
-var _reducers2 = _interopRequireDefault(_reducers);
-
-var store = (0, _redux.createStore)(_reducers2["default"]);
-
-exports["default"] = store;
-module.exports = exports["default"];
-
-},{"./reducers":20,"redux":7}]},{},[18])(18)
+},{}]},{},[21])(21)
 });

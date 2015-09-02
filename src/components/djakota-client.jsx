@@ -1,8 +1,8 @@
 import React from "react";
-import Api from "./api";
-import { requestAnimationFrame, cancelAnimationFrame } from './request-animation-frame';
-import { setRealViewPort, sendMouseWheel } from "./actions";
-import store from "./store";
+import Api from "../api/api";
+import { setRealViewPort, sendMouseWheel } from "../api/actions";
+import store from "../api/store";
+import { requestAnimationFrame, cancelAnimationFrame } from '../util/request-animation-frame';
 
 const MOUSE_UP = 0;
 const MOUSE_DOWN = 1;
