@@ -7,6 +7,7 @@ import React from "react";
 React.initializeTouchEvents(true);
 import DjakotaClient from "./components/djakota-client";
 import Minimap from "./components/minimap";
+import Zoom from "./components/zoom";
 
-export {DjakotaClient as DjakotaClient, Minimap as Minimap};
+export {DjakotaClient as DjakotaClient, Minimap as Minimap, Zoom as Zoom};
 export default DjakotaClient;

@@ -131,13 +131,14 @@ class Api {
 	}
 
 	zoomBy(factor, scale, level, onScale) {
-		let upscaleFactor = this.resolutions.length - level;
-		let viewportScale = this.downScale(scale, upscaleFactor) * factor;
+		let viewportScale = this.getRealScale(scale, level) + factor;
+		if(viewportScale < 0.01) { viewportScale = 0.01; }
 		let newLevel = this.findLevelForScale(viewportScale, this.levels);
 		let newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
 
 		onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
 	}
+
 
 	getRealScale(scale, level) {
 		return this.downScale(scale, this.resolutions.length - level);

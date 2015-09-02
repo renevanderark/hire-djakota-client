@@ -111,7 +111,7 @@ class DjakotaClient extends React.Component {
 
 		if(this.state.mousewheel) {
 			store.dispatch(sendMouseWheel(false));
-			this.api.zoomBy(this.state.mousewheel.deltaY < 0 ? 1.1 : 0.9, this.scale, this.level, this.zoom.bind(this));
+			this.api.zoomBy(this.determineZoomFactor(this.state.mousewheel.deltaY), this.scale, this.level, this.zoom.bind(this));
 		}
 	}
 
@@ -230,9 +230,8 @@ class DjakotaClient extends React.Component {
 				)
 			), 10);
 			this.touchmap.pinchDelta = oldD - this.touchmap.pinchDistance;
-			if (this.touchmap.pinchDelta < 20 && this.touchmap.pinchDelta > -20) {
-				let sHeur = 1.0 - (this.touchmap.pinchDelta * 0.005);
-				this.api.zoomBy(sHeur, this.scale, this.level, this.zoom.bind(this));
+			if (this.touchmap.pinchDelta < 50 && this.touchmap.pinchDelta > -50) {
+				this.api.zoomBy(this.determineZoomFactor(this.touchmap.pinchDelta), this.scale, this.level, this.zoom.bind(this));
 			}
 		} else {
 			this.movement.x = this.touchPos.x - ev.touches[0].pageX;
@@ -298,12 +297,17 @@ class DjakotaClient extends React.Component {
 		this.loadImage({scale: this.scale, level: this.level});
 	}
 
+	determineZoomFactor(delta) {
+		let rev = delta > 0  ? -1 : 1;
+		let rs = this.api.getRealScale(this.scale, this.level)
+		if(rs >= 0.6) { return 0.04 * rev; }
+		else if(rs >= 0.3) { return 0.02 * rev; }
+		else { return 0.01 * rev; }
+	}
+
 	onWheel(ev) {
-		if(ev.nativeEvent.deltaY < 0) {
-			this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
-		} else if(ev.nativeEvent.deltaY > 0) {
-			this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
-		}
+		this.api.zoomBy(this.determineZoomFactor(ev.nativeEvent.deltaY), this.scale, this.level, this.zoom.bind(this));
+
 		return ev.preventDefault();
 	}
 

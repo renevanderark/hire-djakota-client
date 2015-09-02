@@ -1248,8 +1248,10 @@ var Api = (function () {
 	}, {
 		key: "zoomBy",
 		value: function zoomBy(factor, scale, level, onScale) {
-			var upscaleFactor = this.resolutions.length - level;
-			var viewportScale = this.downScale(scale, upscaleFactor) * factor;
+			var viewportScale = this.getRealScale(scale, level) + factor;
+			if (viewportScale < 0.01) {
+				viewportScale = 0.01;
+			}
 			var newLevel = this.findLevelForScale(viewportScale, this.levels);
 			var newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
 
@@ -1536,7 +1538,7 @@ var DjakotaClient = (function (_React$Component) {
 
 			if (this.state.mousewheel) {
 				_apiStore2["default"].dispatch((0, _apiActions.sendMouseWheel)(false));
-				this.api.zoomBy(this.state.mousewheel.deltaY < 0 ? 1.1 : 0.9, this.scale, this.level, this.zoom.bind(this));
+				this.api.zoomBy(this.determineZoomFactor(this.state.mousewheel.deltaY), this.scale, this.level, this.zoom.bind(this));
 			}
 		}
 	}, {
@@ -1654,9 +1656,8 @@ var DjakotaClient = (function (_React$Component) {
 				var oldD = this.touchmap.pinchDistance;
 				this.touchmap.pinchDistance = parseInt(Math.sqrt((this.touchmap.positions[0].x - this.touchmap.positions[1].x) * (this.touchmap.positions[0].x - this.touchmap.positions[1].x) + (this.touchmap.positions[0].y - this.touchmap.positions[1].y) * (this.touchmap.positions[0].y - this.touchmap.positions[1].y)), 10);
 				this.touchmap.pinchDelta = oldD - this.touchmap.pinchDistance;
-				if (this.touchmap.pinchDelta < 20 && this.touchmap.pinchDelta > -20) {
-					var sHeur = 1.0 - this.touchmap.pinchDelta * 0.005;
-					this.api.zoomBy(sHeur, this.scale, this.level, this.zoom.bind(this));
+				if (this.touchmap.pinchDelta < 50 && this.touchmap.pinchDelta > -50) {
+					this.api.zoomBy(this.determineZoomFactor(this.touchmap.pinchDelta), this.scale, this.level, this.zoom.bind(this));
 				}
 			} else {
 				this.movement.x = this.touchPos.x - ev.touches[0].pageX;
@@ -1726,13 +1727,23 @@ var DjakotaClient = (function (_React$Component) {
 			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
+		key: "determineZoomFactor",
+		value: function determineZoomFactor(delta) {
+			var rev = delta > 0 ? -1 : 1;
+			var rs = this.api.getRealScale(this.scale, this.level);
+			if (rs >= 0.6) {
+				return 0.04 * rev;
+			} else if (rs >= 0.3) {
+				return 0.02 * rev;
+			} else {
+				return 0.01 * rev;
+			}
+		}
+	}, {
 		key: "onWheel",
 		value: function onWheel(ev) {
-			if (ev.nativeEvent.deltaY < 0) {
-				this.api.zoomBy(1.1, this.scale, this.level, this.zoom.bind(this));
-			} else if (ev.nativeEvent.deltaY > 0) {
-				this.api.zoomBy(0.9, this.scale, this.level, this.zoom.bind(this));
-			}
+			this.api.zoomBy(this.determineZoomFactor(ev.nativeEvent.deltaY), this.scale, this.level, this.zoom.bind(this));
+
 			return ev.preventDefault();
 		}
 	}, {
@@ -1782,7 +1793,7 @@ DjakotaClient.defaultProps = {
 exports["default"] = DjakotaClient;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":22,"react":"react"}],20:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":23,"react":"react"}],20:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1996,7 +2007,75 @@ Minimap.defaultProps = {
 exports["default"] = Minimap;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":22,"react":"react"}],21:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":23,"react":"react"}],21:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _apiStore = _dereq_("../api/store");
+
+var _apiStore2 = _interopRequireDefault(_apiStore);
+
+var Zoom = (function (_React$Component) {
+	_inherits(Zoom, _React$Component);
+
+	function Zoom(props) {
+		_classCallCheck(this, Zoom);
+
+		_get(Object.getPrototypeOf(Zoom.prototype), "constructor", this).call(this, props);
+		this.state = _apiStore2["default"].getState();
+	}
+
+	_createClass(Zoom, [{
+		key: "componentDidMount",
+		value: function componentDidMount() {
+			var _this = this;
+
+			this.unsubscribe = _apiStore2["default"].subscribe(function () {
+				return _this.setState(_apiStore2["default"].getState());
+			});
+		}
+	}, {
+		key: "componentWillUnmount",
+		value: function componentWillUnmount() {
+			this.unsubscribe();
+		}
+	}, {
+		key: "render",
+		value: function render() {
+
+			return _react2["default"].createElement(
+				"label",
+				null,
+				parseInt(this.state.realViewPort.zoom * 100),
+				"%"
+			);
+		}
+	}]);
+
+	return Zoom;
+})(_react2["default"].Component);
+
+exports["default"] = Zoom;
+module.exports = exports["default"];
+
+},{"../api/store":18,"react":"react"}],22:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2021,6 +2100,10 @@ var _componentsMinimap = _dereq_("./components/minimap");
 
 var _componentsMinimap2 = _interopRequireDefault(_componentsMinimap);
 
+var _componentsZoom = _dereq_("./components/zoom");
+
+var _componentsZoom2 = _interopRequireDefault(_componentsZoom);
+
 
 
 var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQ==","base64");
@@ -2029,9 +2112,10 @@ var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cg
 _react2["default"].initializeTouchEvents(true);
 exports.DjakotaClient = _componentsDjakotaClient2["default"];
 exports.Minimap = _componentsMinimap2["default"];
+exports.Zoom = _componentsZoom2["default"];
 exports["default"] = _componentsDjakotaClient2["default"];
 
-},{"./components/djakota-client":19,"./components/minimap":20,"insert-css":1,"react":"react"}],22:[function(_dereq_,module,exports){
+},{"./components/djakota-client":19,"./components/minimap":20,"./components/zoom":21,"insert-css":1,"react":"react"}],23:[function(_dereq_,module,exports){
 /*
 The MIT License (MIT)
 
@@ -2082,5 +2166,5 @@ var cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ? f
 } : undefined;
 exports.cancelAnimationFrame = cancelAnimationFrame;
 
-},{}]},{},[21])(21)
+},{}]},{},[22])(22)
 });
