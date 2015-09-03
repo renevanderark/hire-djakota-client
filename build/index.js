@@ -1082,6 +1082,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.setRealViewPort = setRealViewPort;
 exports.sendMouseWheel = sendMouseWheel;
+exports.setFill = setFill;
 
 function setRealViewPort(realViewPort) {
 	return {
@@ -1094,6 +1095,13 @@ function sendMouseWheel(wheelState) {
 	return {
 		type: "SEND_MOUSEWHEEL",
 		mousewheel: wheelState
+	};
+}
+
+function setFill(mode) {
+	return {
+		type: "SET_FILL",
+		mode: mode
 	};
 }
 
@@ -1357,7 +1365,8 @@ var initialState = {
 	realViewPort: {
 		x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false
 	},
-	mousewheel: null
+	mousewheel: null,
+	fillMode: null
 };
 
 exports["default"] = function (state, action) {
@@ -1368,6 +1377,8 @@ exports["default"] = function (state, action) {
 			return _extends({}, state, { realViewPort: _extends({}, state.realViewPort, action.realViewPort) });
 		case "SEND_MOUSEWHEEL":
 			return _extends({}, state, { mousewheel: action.mousewheel });
+		case "SET_FILL":
+			return _extends({}, state, { fillMode: action.mode });
 		default:
 			return state;
 	}
@@ -1533,6 +1544,7 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "receiveNewState",
 		value: function receiveNewState() {
+
 			if (this.state.realViewPort.reposition) {
 				var _api$getRealImagePos = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
 
@@ -1551,6 +1563,13 @@ var DjakotaClient = (function (_React$Component) {
 			if (this.state.mousewheel) {
 				_apiStore2["default"].dispatch((0, _apiActions.sendMouseWheel)(false));
 				this.api.zoomBy(this.determineZoomFactor(this.state.mousewheel.deltaY), this.scale, this.level, this.zoom.bind(this));
+			}
+
+			if (this.state.fillMode) {
+				_apiStore2["default"].dispatch((0, _apiActions.setFill)(false));
+				this.imagePos.x = 0;
+				this.imagePos.y = 0;
+				this.loadImage({ scaleMode: this.state.fillMode });
 			}
 		}
 	}, {
@@ -1691,8 +1710,10 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "onMouseUp",
 		value: function onMouseUp(ev) {
+			if (this.mouseState === MOUSE_DOWN) {
+				this.loadImage({ scale: this.scale, level: this.level });
+			}
 			this.mouseState = MOUSE_UP;
-			this.loadImage({ scale: this.scale, level: this.level });
 		}
 	}, {
 		key: "center",
@@ -1805,7 +1826,315 @@ DjakotaClient.defaultProps = {
 exports["default"] = DjakotaClient;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":23,"react":"react"}],20:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":27,"react":"react"}],20:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _iconsHeightFill = _dereq_("./icons/height-fill");
+
+var _iconsHeightFill2 = _interopRequireDefault(_iconsHeightFill);
+
+var _iconsWidthFill = _dereq_("./icons/width-fill");
+
+var _iconsWidthFill2 = _interopRequireDefault(_iconsWidthFill);
+
+var _iconsAutoFill = _dereq_("./icons/auto-fill");
+
+var _iconsAutoFill2 = _interopRequireDefault(_iconsAutoFill);
+
+var _apiActions = _dereq_("../api/actions");
+
+var _apiStore = _dereq_("../api/store");
+
+var _apiStore2 = _interopRequireDefault(_apiStore);
+
+var MOUSE_UP = 0;
+var MOUSE_DOWN = 1;
+
+var SUPPORTED_SCALE_MODES = ["heightFill", "widthFill", "autoFill", "fullZoom"];
+
+var FillButton = (function (_React$Component) {
+    _inherits(FillButton, _React$Component);
+
+    function FillButton() {
+        _classCallCheck(this, FillButton);
+
+        _get(Object.getPrototypeOf(FillButton.prototype), "constructor", this).apply(this, arguments);
+    }
+
+    _createClass(FillButton, [{
+        key: "renderIcon",
+        value: function renderIcon() {
+            switch (this.props.scaleMode) {
+                case "fullZoom":
+                    return "1:1";
+                case "autoFill":
+                    return _react2["default"].createElement(_iconsAutoFill2["default"], null);
+                case "heightFill":
+                    return _react2["default"].createElement(_iconsHeightFill2["default"], null);
+                case "widthFill":
+                default:
+                    return _react2["default"].createElement(_iconsWidthFill2["default"], null);
+            }
+        }
+    }, {
+        key: "onClick",
+        value: function onClick() {
+            _apiStore2["default"].dispatch((0, _apiActions.setFill)(this.props.scaleMode));
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            return _react2["default"].createElement(
+                "button",
+                { onClick: this.onClick.bind(this) },
+                this.renderIcon()
+            );
+        }
+    }]);
+
+    return FillButton;
+})(_react2["default"].Component);
+
+FillButton.propTypes = {
+    scaleMode: function scaleMode(props, propName, componentName) {
+        if (SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
+            var msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
+            props[propName] = "heightFill";
+            return new Error(msg);
+        }
+    }
+};
+
+FillButton.defaultProps = {
+    scaleMode: "heightFill"
+};
+
+exports["default"] = FillButton;
+
+/*
+<svg
+  style="stroke:#000000;stroke-width:1px;stroke-opacity:1"
+   viewBox="0 0 16 16">
+    <g transform="rotate(90,8,8)">
+        <path d="M 2.1,8.5 13.876786,8.5"/>
+        <path d="M 14.2895,8.8224 10.876793,5.4933"/>
+        <path d="M 1.5196504,8.7867 4.9323574,5.4576"/>
+        <path d="M 14.27524,8.1261353 11.216057,11.258414" />
+        <path d="M 1.5503841,8.1252136 4.3668137,11.302078" />
+        <path d="m 15.386755,4.3822 0.01012,8.1302" />
+        <path d="m 0.58963983,4.3191 0.010124,8.1302" />
+  </g>
+</svg>
+*/
+module.exports = exports["default"];
+
+},{"../api/actions":15,"../api/store":18,"./icons/auto-fill":21,"./icons/height-fill":22,"./icons/width-fill":23,"react":"react"}],21:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var AutoFill = (function (_React$Component) {
+    _inherits(AutoFill, _React$Component);
+
+    function AutoFill() {
+        _classCallCheck(this, AutoFill);
+
+        _get(Object.getPrototypeOf(AutoFill.prototype), "constructor", this).apply(this, arguments);
+    }
+
+    _createClass(AutoFill, [{
+        key: "render",
+        value: function render() {
+            return _react2["default"].createElement(
+                "svg",
+                {
+                    style: { stroke: "#000000", strokeWidth: "1px", strokeOpacity: "1", width: "10px" },
+                    viewBox: "0 0 16 16" },
+                _react2["default"].createElement(
+                    "g",
+                    { transform: "rotate(90,8,8)" },
+                    _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
+                    _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
+                    _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
+                    _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
+                    _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
+                    _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
+                    _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
+                ),
+                _react2["default"].createElement(
+                    "g",
+                    null,
+                    _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
+                    _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
+                    _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
+                    _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
+                    _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
+                    _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
+                    _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
+                )
+            );
+        }
+    }]);
+
+    return AutoFill;
+})(_react2["default"].Component);
+
+exports["default"] = AutoFill;
+module.exports = exports["default"];
+
+},{"react":"react"}],22:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var HeightFill = (function (_React$Component) {
+  _inherits(HeightFill, _React$Component);
+
+  function HeightFill() {
+    _classCallCheck(this, HeightFill);
+
+    _get(Object.getPrototypeOf(HeightFill.prototype), "constructor", this).apply(this, arguments);
+  }
+
+  _createClass(HeightFill, [{
+    key: "render",
+    value: function render() {
+      return _react2["default"].createElement(
+        "svg",
+        {
+          style: { stroke: "#000000", strokeWidth: "1px", strokeOpacity: "1", width: "10px" },
+          viewBox: "0 0 16 16" },
+        _react2["default"].createElement(
+          "g",
+          { transform: "rotate(90,8,8)" },
+          _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
+          _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
+          _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
+          _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
+          _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
+          _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
+          _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
+        )
+      );
+    }
+  }]);
+
+  return HeightFill;
+})(_react2["default"].Component);
+
+exports["default"] = HeightFill;
+module.exports = exports["default"];
+
+},{"react":"react"}],23:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var WidthFill = (function (_React$Component) {
+  _inherits(WidthFill, _React$Component);
+
+  function WidthFill() {
+    _classCallCheck(this, WidthFill);
+
+    _get(Object.getPrototypeOf(WidthFill.prototype), "constructor", this).apply(this, arguments);
+  }
+
+  _createClass(WidthFill, [{
+    key: "render",
+    value: function render() {
+      return _react2["default"].createElement(
+        "svg",
+        {
+          style: { stroke: "#000000", strokeWidth: "1px", strokeOpacity: "1", width: "10px" },
+          viewBox: "0 0 16 16" },
+        _react2["default"].createElement(
+          "g",
+          null,
+          _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
+          _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
+          _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
+          _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
+          _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
+          _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
+          _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
+        )
+      );
+    }
+  }]);
+
+  return WidthFill;
+})(_react2["default"].Component);
+
+exports["default"] = WidthFill;
+module.exports = exports["default"];
+
+},{"react":"react"}],24:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2032,7 +2361,7 @@ Minimap.defaultProps = {
 exports["default"] = Minimap;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":23,"react":"react"}],21:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":27,"react":"react"}],25:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2160,7 +2489,7 @@ var Zoom = (function (_React$Component) {
 			var zoom = parseInt(this.state.realViewPort.zoom * 100);
 			return _react2["default"].createElement(
 				"span",
-				{ onWheel: this.onWheel.bind(this) },
+				{ onWheel: this.onWheel.bind(this), style: { display: "inline-block", width: "300px" } },
 				_react2["default"].createElement(
 					"label",
 					{ style: { display: "inline-block", width: "80px", textAlign: "right" } },
@@ -2198,7 +2527,7 @@ Zoom.defaultProps = {
 exports["default"] = Zoom;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/store":18,"react":"react"}],22:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/store":18,"react":"react"}],26:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2227,6 +2556,10 @@ var _componentsZoom = _dereq_("./components/zoom");
 
 var _componentsZoom2 = _interopRequireDefault(_componentsZoom);
 
+var _componentsFillButton = _dereq_("./components/fill-button");
+
+var _componentsFillButton2 = _interopRequireDefault(_componentsFillButton);
+
 
 
 var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQ==","base64");
@@ -2236,9 +2569,10 @@ _react2["default"].initializeTouchEvents(true);
 exports.DjakotaClient = _componentsDjakotaClient2["default"];
 exports.Minimap = _componentsMinimap2["default"];
 exports.Zoom = _componentsZoom2["default"];
+exports.FillButton = _componentsFillButton2["default"];
 exports["default"] = _componentsDjakotaClient2["default"];
 
-},{"./components/djakota-client":19,"./components/minimap":20,"./components/zoom":21,"insert-css":1,"react":"react"}],23:[function(_dereq_,module,exports){
+},{"./components/djakota-client":19,"./components/fill-button":20,"./components/minimap":24,"./components/zoom":25,"insert-css":1,"react":"react"}],27:[function(_dereq_,module,exports){
 /*
 The MIT License (MIT)
 
@@ -2289,5 +2623,5 @@ var cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ? f
 } : undefined;
 exports.cancelAnimationFrame = cancelAnimationFrame;
 
-},{}]},{},[22])(22)
+},{}]},{},[26])(26)
 });

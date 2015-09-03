@@ -11,3 +11,10 @@ export function sendMouseWheel(wheelState) {
 		mousewheel: wheelState
 	}
 }
+
+export function setFill(mode) {
+	return {
+		type: "SET_FILL",
+		mode: mode
+	}
+}

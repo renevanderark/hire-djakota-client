@@ -1,6 +1,5 @@
 import React from "react";
 import { setRealViewPort, sendMouseWheel } from "../api/actions";
-
 import store from "../api/store";
 
 const MOUSE_UP = 0;
@@ -88,7 +87,7 @@ class Zoom extends React.Component {
 	render() {
 		let zoom = parseInt(this.state.realViewPort.zoom * 100)
 		return (
-			<span onWheel={this.onWheel.bind(this)}>
+			<span onWheel={this.onWheel.bind(this)} style={{display: "inline-block", width: "300px"}}>
 				<label style={{display: "inline-block", width: "80px", textAlign: "right"}}>{zoom}%</label>
 				<svg
 					fill={this.props.fill}
