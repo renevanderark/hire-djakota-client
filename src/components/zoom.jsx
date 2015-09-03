@@ -41,12 +41,13 @@ class Zoom extends React.Component {
 		let rect = React.findDOMNode(this).children[2].getBoundingClientRect();
 		if(rect.width > 0 && !this.state.realViewPort.applyZoom) {
 			let zoom = ((ev.pageX - rect.left) / rect.width) * 2;
-			if(zoom >= 0.01 && zoom <= 2.0) {
-				store.dispatch(setRealViewPort({
-					zoom: zoom,
-					applyZoom: true
-				}));
-			}
+			if(zoom < 0.01) { zoom = 0.01; }
+			else if(zoom > 2.0) { zoom = 2.0; }
+			store.dispatch(setRealViewPort({
+				zoom: zoom,
+				applyZoom: true
+			}));
+			
 		}
 
 	}

@@ -2105,12 +2105,15 @@ var Zoom = (function (_React$Component) {
 			var rect = _react2["default"].findDOMNode(this).children[2].getBoundingClientRect();
 			if (rect.width > 0 && !this.state.realViewPort.applyZoom) {
 				var zoom = (ev.pageX - rect.left) / rect.width * 2;
-				if (zoom >= 0.01 && zoom <= 2.0) {
-					_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
-						zoom: zoom,
-						applyZoom: true
-					}));
+				if (zoom < 0.01) {
+					zoom = 0.01;
+				} else if (zoom > 2.0) {
+					zoom = 2.0;
 				}
+				_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
+					zoom: zoom,
+					applyZoom: true
+				}));
 			}
 		}
 	}, {
