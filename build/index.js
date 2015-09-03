@@ -2071,6 +2071,7 @@ var Zoom = (function (_React$Component) {
 		_get(Object.getPrototypeOf(Zoom.prototype), "constructor", this).call(this, props);
 		this.state = _apiStore2["default"].getState();
 		this.mouseupListener = this.onMouseUp.bind(this);
+		this.mousemoveListener = this.onMouseMove.bind(this);
 	}
 
 	_createClass(Zoom, [{
@@ -2079,6 +2080,7 @@ var Zoom = (function (_React$Component) {
 			var _this = this;
 
 			window.addEventListener("mouseup", this.mouseupListener);
+			window.addEventListener("mousemove", this.mousemoveListener);
 
 			this.unsubscribe = _apiStore2["default"].subscribe(function () {
 				return _this.setState(_apiStore2["default"].getState());
@@ -2088,6 +2090,7 @@ var Zoom = (function (_React$Component) {
 		key: "componentWillUnmount",
 		value: function componentWillUnmount() {
 			window.addEventListener("mouseup", this.mouseupListener);
+			window.removeEventListener("mousemove", this.mousemoveListener);
 
 			this.unsubscribe();
 		}
@@ -2099,13 +2102,22 @@ var Zoom = (function (_React$Component) {
 	}, {
 		key: "dispatchRealScale",
 		value: function dispatchRealScale(ev) {
-			var rect = _react2["default"].findDOMNode(ev.target).getBoundingClientRect();
+			var rect = _react2["default"].findDOMNode(this).children[2].getBoundingClientRect();
 			if (rect.width > 0 && !this.state.realViewPort.applyZoom) {
-				_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
-					zoom: (ev.pageX - rect.left) / rect.width * 2,
-					applyZoom: true
-				}));
+				var zoom = (ev.pageX - rect.left) / rect.width * 2;
+				if (zoom >= 0.01 && zoom <= 2.0) {
+					_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
+						zoom: zoom,
+						applyZoom: true
+					}));
+				}
 			}
+		}
+	}, {
+		key: "onWheel",
+		value: function onWheel(ev) {
+			_apiStore2["default"].dispatch((0, _apiActions.sendMouseWheel)({ deltaY: ev.deltaY }));
+			return ev.preventDefault();
 		}
 	}, {
 		key: "onMouseMove",
@@ -2118,9 +2130,6 @@ var Zoom = (function (_React$Component) {
 	}, {
 		key: "onMouseUp",
 		value: function onMouseUp(ev) {
-			if (this.mouseState === MOUSE_DOWN) {
-				this.dispatchRealScale(ev);
-			}
 			this.mouseState = MOUSE_UP;
 		}
 	}, {
@@ -2132,9 +2141,8 @@ var Zoom = (function (_React$Component) {
 					fill: this.props.fill,
 					height: "12",
 					onMouseDown: this.onMouseDown.bind(this),
-					onMouseMove: this.onMouseMove.bind(this),
 					stroke: this.props.stroke,
-					style: { cursor: "pointer", position: "relative", top: "-19px" },
+					style: { cursor: "pointer", position: "absolute" },
 					viewBox: "0 0 210 12",
 					width: "210" },
 				_react2["default"].createElement("path", { d: "M1 0 L 1 12 Z", fill: "transparent" }),
@@ -2149,10 +2157,10 @@ var Zoom = (function (_React$Component) {
 			var zoom = parseInt(this.state.realViewPort.zoom * 100);
 			return _react2["default"].createElement(
 				"span",
-				null,
+				{ onWheel: this.onWheel.bind(this) },
 				_react2["default"].createElement(
 					"label",
-					null,
+					{ style: { display: "inline-block", width: "80px", textAlign: "right" } },
 					zoom,
 					"%"
 				),
@@ -2161,6 +2169,7 @@ var Zoom = (function (_React$Component) {
 					{
 						fill: this.props.fill,
 						height: "12",
+						style: { position: "absolute" },
 						viewBox: "0 0 210 12",
 						width: "210" },
 					_react2["default"].createElement("circle", { cx: zoom > 200 ? 204 : zoom + 4, cy: "6", fillOpacity: ".8", r: "4" })

@@ -1,5 +1,5 @@
 import React from "react";
-import { setRealViewPort } from "../api/actions";
+import { setRealViewPort, sendMouseWheel } from "../api/actions";
 
 import store from "../api/store";
 
@@ -12,11 +12,13 @@ class Zoom extends React.Component {
 		super(props);
 		this.state = store.getState();
 		this.mouseupListener = this.onMouseUp.bind(this);
+		this.mousemoveListener = this.onMouseMove.bind(this);
 
 	}
 
 	componentDidMount() {
 		window.addEventListener("mouseup", this.mouseupListener);
+		window.addEventListener("mousemove", this.mousemoveListener);
 
 		this.unsubscribe = store.subscribe(() =>
 			this.setState(store.getState())
@@ -26,6 +28,7 @@ class Zoom extends React.Component {
 
 	componentWillUnmount() {
 		window.addEventListener("mouseup", this.mouseupListener);
+		window.removeEventListener("mousemove", this.mousemoveListener);
 
 		this.unsubscribe();
 	}
@@ -35,16 +38,23 @@ class Zoom extends React.Component {
 	}
 
 	dispatchRealScale(ev) {
-		let rect = React.findDOMNode(ev.target).getBoundingClientRect();
+		let rect = React.findDOMNode(this).children[2].getBoundingClientRect();
 		if(rect.width > 0 && !this.state.realViewPort.applyZoom) {
-			store.dispatch(setRealViewPort({
-				zoom: ((ev.pageX - rect.left) / rect.width) * 2,
-				applyZoom: true
-			}));
+			let zoom = ((ev.pageX - rect.left) / rect.width) * 2;
+			if(zoom >= 0.01 && zoom <= 2.0) {
+				store.dispatch(setRealViewPort({
+					zoom: zoom,
+					applyZoom: true
+				}));
+			}
 		}
 
 	}
 
+	onWheel(ev) {
+		store.dispatch(sendMouseWheel({deltaY: ev.deltaY}));
+		return ev.preventDefault();
+	}
 
 	onMouseMove(ev) {
 		if(this.mouseState === MOUSE_DOWN) {
@@ -54,9 +64,6 @@ class Zoom extends React.Component {
 	}
 
 	onMouseUp(ev) {
-		if(this.mouseState === MOUSE_DOWN) {
-			this.dispatchRealScale(ev);
-		}
 		this.mouseState = MOUSE_UP;
 	}
 
@@ -65,10 +72,9 @@ class Zoom extends React.Component {
 			(<svg
 				fill={this.props.fill}
 				height="12"
-				onMouseDown={this.onMouseDown.bind(this)} 
-				onMouseMove={this.onMouseMove.bind(this)} 
+				onMouseDown={this.onMouseDown.bind(this)}
 				stroke={this.props.stroke}
-				style={{cursor: "pointer", position: "relative", top: "-19px"}}
+				style={{cursor: "pointer", position: "absolute"}}
 				viewBox="0 0 210 12"
 				width="210">
 				<path d="M1 0 L 1 12 Z" fill="transparent"   />
@@ -81,11 +87,12 @@ class Zoom extends React.Component {
 	render() {
 		let zoom = parseInt(this.state.realViewPort.zoom * 100)
 		return (
-			<span>
-				<label>{zoom}%</label>
+			<span onWheel={this.onWheel.bind(this)}>
+				<label style={{display: "inline-block", width: "80px", textAlign: "right"}}>{zoom}%</label>
 				<svg
 					fill={this.props.fill}
 					height="12"
+					style={{position: "absolute"}}
 					viewBox="0 0 210 12"
 					width="210">
 						<circle	cx={zoom > 200 ? 204 : zoom + 4} cy="6" fillOpacity=".8" r="4"  />
