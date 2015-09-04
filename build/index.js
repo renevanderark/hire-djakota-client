@@ -2246,9 +2246,14 @@ var Minimap = (function (_React$Component) {
 				this.resizeDelay--;
 			}
 
-			this.interactionCtx.fillStyle = this.props.rectColor;
+			this.interactionCtx.strokeStyle = this.props.rectStroke;
+			this.interactionCtx.fillStyle = this.props.rectFill;
 			this.interactionCtx.clearRect(0, 0, this.state.width, this.state.height);
 			this.interactionCtx.fillRect(Math.floor(this.state.realViewPort.x * this.state.width), Math.floor(this.state.realViewPort.y * this.state.height), Math.ceil(this.state.realViewPort.w * this.state.width), Math.ceil(this.state.realViewPort.h * this.state.height));
+
+			this.interactionCtx.beginPath();
+			this.interactionCtx.rect(Math.floor(this.state.realViewPort.x * this.state.width), Math.floor(this.state.realViewPort.y * this.state.height), Math.ceil(this.state.realViewPort.w * this.state.width), Math.ceil(this.state.realViewPort.h * this.state.height));
+			this.interactionCtx.stroke();
 
 			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
@@ -2350,12 +2355,14 @@ var Minimap = (function (_React$Component) {
 
 Minimap.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
-	rectColor: _react2["default"].PropTypes.string,
+	rectFill: _react2["default"].PropTypes.string,
+	rectStroke: _react2["default"].PropTypes.string,
 	service: _react2["default"].PropTypes.string.isRequired
 };
 
 Minimap.defaultProps = {
-	rectColor: "rgba(128,128,255,0.2)"
+	rectFill: "rgba(128,128,255,0.1)",
+	rectStroke: "rgba(189,164,126,0.3)"
 };
 
 exports["default"] = Minimap;
@@ -2427,11 +2434,12 @@ var Zoom = (function (_React$Component) {
 		key: "onMouseDown",
 		value: function onMouseDown(ev) {
 			this.mouseState = MOUSE_DOWN;
+			this.dispatchRealScale(ev);
 		}
 	}, {
 		key: "dispatchRealScale",
 		value: function dispatchRealScale(ev) {
-			var rect = _react2["default"].findDOMNode(this).children[2].getBoundingClientRect();
+			var rect = _react2["default"].findDOMNode(this).children[0].getBoundingClientRect();
 			if (rect.width > 0 && !this.state.realViewPort.applyZoom) {
 				var zoom = (ev.pageX - rect.left) / rect.width * 2;
 				if (zoom < 0.01) {
@@ -2465,48 +2473,25 @@ var Zoom = (function (_React$Component) {
 			this.mouseState = MOUSE_UP;
 		}
 	}, {
-		key: "renderInteractionBar",
-		value: function renderInteractionBar() {
-			this.renderedInteractionBar = this.renderedInteractionBar || _react2["default"].createElement(
-				"svg",
-				{
-					fill: this.props.fill,
-					height: "12",
-					onMouseDown: this.onMouseDown.bind(this),
-					stroke: this.props.stroke,
-					style: { cursor: "pointer", position: "absolute" },
-					viewBox: "0 0 210 12",
-					width: "210" },
-				_react2["default"].createElement("path", { d: "M1 0 L 1 12 Z", fill: "transparent" }),
-				_react2["default"].createElement("path", { d: "M209 0 L 209 12 Z", fill: "transparent" }),
-				_react2["default"].createElement("path", { d: "M0 6 L 210 6 Z", fill: "transparent" })
-			);
-			return this.renderedInteractionBar;
-		}
-	}, {
 		key: "render",
 		value: function render() {
 			var zoom = parseInt(this.state.realViewPort.zoom * 100);
 			return _react2["default"].createElement(
 				"span",
-				{ onWheel: this.onWheel.bind(this), style: { display: "inline-block", width: "300px" } },
-				_react2["default"].createElement(
-					"label",
-					{ style: { display: "inline-block", width: "80px", textAlign: "right" } },
-					zoom,
-					"%"
-				),
+				{ className: "hire-zoom-bar", onWheel: this.onWheel.bind(this) },
 				_react2["default"].createElement(
 					"svg",
-					{
-						fill: this.props.fill,
-						height: "12",
-						style: { position: "absolute" },
-						viewBox: "0 0 210 12",
-						width: "210" },
-					_react2["default"].createElement("circle", { cx: zoom > 200 ? 204 : zoom + 4, cy: "6", fillOpacity: ".8", r: "4" })
+					{ onMouseDown: this.onMouseDown.bind(this),
+						viewBox: "-12 0 224 24" },
+					_react2["default"].createElement("path", { d: "M0 12 L 200 12 Z" }),
+					_react2["default"].createElement("circle", { cx: zoom > 200 ? 200 : zoom, cy: "12", r: "12" })
 				),
-				this.renderInteractionBar()
+				_react2["default"].createElement(
+					"label",
+					null,
+					zoom,
+					"%"
+				)
 			);
 		}
 	}]);
@@ -2562,7 +2547,7 @@ var _componentsFillButton2 = _interopRequireDefault(_componentsFillButton);
 
 
 
-var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQ==","base64");
+var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0=","base64");
 (0, _insertCss2["default"])(css, { prepend: true });
 
 _react2["default"].initializeTouchEvents(true);

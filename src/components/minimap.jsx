@@ -77,7 +77,8 @@ class Minimap extends React.Component {
 			this.resizeDelay--;
 		}
 
-		this.interactionCtx.fillStyle = this.props.rectColor;
+		this.interactionCtx.strokeStyle = this.props.rectStroke;
+		this.interactionCtx.fillStyle = this.props.rectFill;
 		this.interactionCtx.clearRect(0,0,this.state.width, this.state.height);
 		this.interactionCtx.fillRect(
 			Math.floor(this.state.realViewPort.x * this.state.width),
@@ -85,6 +86,15 @@ class Minimap extends React.Component {
 			Math.ceil(this.state.realViewPort.w * this.state.width),
 			Math.ceil(this.state.realViewPort.h * this.state.height)
 		);
+
+		this.interactionCtx.beginPath();
+		this.interactionCtx.rect(
+			Math.floor(this.state.realViewPort.x * this.state.width),
+			Math.floor(this.state.realViewPort.y * this.state.height),
+			Math.ceil(this.state.realViewPort.w * this.state.width),
+			Math.ceil(this.state.realViewPort.h * this.state.height)
+		);
+		this.interactionCtx.stroke();
 
 		requestAnimationFrame(this.animationFrameListener);
 	}
@@ -176,12 +186,14 @@ class Minimap extends React.Component {
 
 Minimap.propTypes = {
 	config: React.PropTypes.object.isRequired,
-	rectColor: React.PropTypes.string,
+	rectFill: React.PropTypes.string,
+	rectStroke: React.PropTypes.string,
 	service: React.PropTypes.string.isRequired
 };
 
 Minimap.defaultProps = {
-	rectColor: "rgba(128,128,255,0.2)"
+	rectFill: "rgba(128,128,255,0.1)",
+	rectStroke: "rgba(189,164,126,0.3)"
 }
 
 export default Minimap;

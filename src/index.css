@@ -15,3 +15,43 @@
 .hire-djakota-minimap > .interaction {
 	z-index: 1;
 }
+
+.hire-zoom-bar * {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none; 
+    -webkit-user-drag: none;
+    user-drag: none;
+}
+.hire-zoom-bar {
+	display: inline-block;
+	min-width: 400px;
+	min-height: 44px;
+}
+
+.hire-zoom-bar label {
+	display: inline-block;
+	width: 15%;
+	height: 100%;
+	vertical-align: top;
+}
+.hire-zoom-bar label > * {
+	display: inline-block;
+	height: 100%;
+	line-height: 34px
+}
+.hire-zoom-bar svg {
+	cursor: pointer;
+	fill: #BDA47E;
+	stroke: #F1EBE6;
+	width: 85%;
+}
+
+.hire-zoom-bar svg path {
+	stroke-width: 6px;
+}
+
+.hire-zoom-bar svg circle {
+	stroke-width: 0;
+}
