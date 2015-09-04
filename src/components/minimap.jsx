@@ -29,6 +29,7 @@ class Minimap extends React.Component {
 		this.mouseState = MOUSE_UP;
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
+		this.touchMoveListener = this.onTouchMove.bind(this);
 
 	}
 
@@ -39,6 +40,8 @@ class Minimap extends React.Component {
 		window.addEventListener("resize", this.resizeListener);
 		window.addEventListener("mousemove", this.mousemoveListener);
 		window.addEventListener("mouseup", this.mouseupListener);
+		window.addEventListener("touchend", this.mouseupListener);
+		window.addEventListener("touchmove", this.touchMoveListener);
 		requestAnimationFrame(this.animationFrameListener);
 
 		this.unsubscribe = store.subscribe(() =>
@@ -64,6 +67,8 @@ class Minimap extends React.Component {
 		window.removeEventListener("resize", this.resizeListener);
 		window.removeEventListener("mousemove", this.mousemoveListener);
 		window.removeEventListener("mouseup", this.mouseupListener);
+		window.addEventListener("touchend", this.mouseupListener);
+		window.removeEventListener("touchmove", this.touchMoveListener);
 		cancelAnimationFrame(this.animationFrameListener);
 		this.unsubscribe();
 	}
@@ -138,12 +143,22 @@ class Minimap extends React.Component {
 		store.dispatch(setRealViewPort({
 			x: (ev.pageX - rect.left) / this.state.width - (this.state.realViewPort.w / 2),
 			y: (ev.pageY - rect.top) / this.state.height - (this.state.realViewPort.h / 2),
-			reposition: true
+			reposition: true,
+			applyZoom: false
 		}));
 	}
 
+
+	onTouchStart(ev) {
+		this.mouseState = MOUSE_DOWN;
+		this.dispatchReposition({pageX: ev.touches[0].pageX, pageY: ev.touches[0].pageY});
+		return ev.preventDefault();
+	}
+
+
 	onMouseDown(ev) {
 		this.mouseState = MOUSE_DOWN;
+		this.dispatchReposition(ev);
 	}
 
 	onMouseMove(ev) {
@@ -152,11 +167,14 @@ class Minimap extends React.Component {
 			return ev.preventDefault();
 		}
 	}
+	onTouchMove(ev) {
+		if(this.mouseState === MOUSE_DOWN) {
+			this.dispatchReposition({pageX: ev.touches[0].pageX, pageY: ev.touches[0].pageY});
+			return ev.preventDefault();
+		}
+	}
 
 	onMouseUp(ev) {
-		if(this.mouseState === MOUSE_DOWN) {
-			this.dispatchReposition(ev);
-		}
 		this.mouseState = MOUSE_UP;
 	}
 
@@ -166,7 +184,7 @@ class Minimap extends React.Component {
 	}
 
 	onTouchEnd(ev) {
-		this.dispatchReposition({pageX: ev.touches[0].pageX, pageY: ev.touches[0].pageY});
+		this.mouseState = MOUSE_UP;
 	}
 
 	render() {
@@ -176,7 +194,7 @@ class Minimap extends React.Component {
 				<canvas className="interaction" 
 					height={this.state.height} 
 					onMouseDown={this.onMouseDown.bind(this)} 
-					onTouchEnd={this.onTouchEnd.bind(this)}
+					onTouchStart={this.onTouchStart.bind(this)}
 					onWheel={this.onWheel.bind(this)}
 					width={this.state.width} />
 			</div>
@@ -193,7 +211,7 @@ Minimap.propTypes = {
 
 Minimap.defaultProps = {
 	rectFill: "rgba(128,128,255,0.1)",
-	rectStroke: "rgba(189,164,126,0.3)"
+	rectStroke: "rgba(255,255,255,0.8)"
 }
 
 export default Minimap;

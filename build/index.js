@@ -1884,7 +1884,7 @@ var FillButton = (function (_React$Component) {
         value: function renderIcon() {
             switch (this.props.scaleMode) {
                 case "fullZoom":
-                    return "1:1";
+                    return "100%";
                 case "autoFill":
                     return _react2["default"].createElement(_iconsAutoFill2["default"], null);
                 case "heightFill":
@@ -1904,7 +1904,7 @@ var FillButton = (function (_React$Component) {
         value: function render() {
             return _react2["default"].createElement(
                 "button",
-                { onClick: this.onClick.bind(this) },
+                { className: "hire-fill-button", onClick: this.onClick.bind(this) },
                 this.renderIcon()
             );
         }
@@ -1950,7 +1950,7 @@ module.exports = exports["default"];
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -1968,49 +1968,46 @@ var _react = _dereq_("react");
 var _react2 = _interopRequireDefault(_react);
 
 var AutoFill = (function (_React$Component) {
-    _inherits(AutoFill, _React$Component);
+  _inherits(AutoFill, _React$Component);
 
-    function AutoFill() {
-        _classCallCheck(this, AutoFill);
+  function AutoFill() {
+    _classCallCheck(this, AutoFill);
 
-        _get(Object.getPrototypeOf(AutoFill.prototype), "constructor", this).apply(this, arguments);
+    _get(Object.getPrototypeOf(AutoFill.prototype), "constructor", this).apply(this, arguments);
+  }
+
+  _createClass(AutoFill, [{
+    key: "render",
+    value: function render() {
+      return _react2["default"].createElement(
+        "svg",
+        { viewBox: "0 -2 16 20" },
+        _react2["default"].createElement("path", { d: "M 2.2510028,2.3999952 14.134355,13.976932", style: { strokeWidth: 2 } }),
+        _react2["default"].createElement("path", { d: "M 0.17726274,4.8389082 0.0558895,0.07290967 4.6198279,0.27222077", style: { strokeWidth: 0 } }),
+        _react2["default"].createElement("path", {
+          d: "m 15.925831,11.287935 0.121374,4.765999 -4.563938,-0.199312",
+
+          style: { strokeWidth: 0 }
+        }),
+        _react2["default"].createElement("path", {
+          d: "M 13.731112,2.2550713 2.1257829,14.110698",
+
+          style: { strokeWidth: 2 } }),
+        _react2["default"].createElement("path", {
+          d: "M 11.297166,0.17550349 16.063441,0.06553063 15.853214,4.6289791",
+
+          style: { strokeWidth: 0 }
+        }),
+        _react2["default"].createElement("path", {
+          d: "M 4.8104871,15.908601 0.0442114,16.018574 0.2544395,11.455126",
+
+          style: { strokeWidth: 0 }
+        })
+      );
     }
+  }]);
 
-    _createClass(AutoFill, [{
-        key: "render",
-        value: function render() {
-            return _react2["default"].createElement(
-                "svg",
-                {
-                    style: { stroke: "#000000", strokeWidth: "1px", strokeOpacity: "1", width: "10px" },
-                    viewBox: "0 0 16 16" },
-                _react2["default"].createElement(
-                    "g",
-                    { transform: "rotate(90,8,8)" },
-                    _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
-                    _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
-                    _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
-                    _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
-                    _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
-                    _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
-                    _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
-                ),
-                _react2["default"].createElement(
-                    "g",
-                    null,
-                    _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
-                    _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
-                    _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
-                    _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
-                    _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
-                    _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
-                    _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
-                )
-            );
-        }
-    }]);
-
-    return AutoFill;
+  return AutoFill;
 })(_react2["default"].Component);
 
 exports["default"] = AutoFill;
@@ -2051,19 +2048,13 @@ var HeightFill = (function (_React$Component) {
     value: function render() {
       return _react2["default"].createElement(
         "svg",
-        {
-          style: { stroke: "#000000", strokeWidth: "1px", strokeOpacity: "1", width: "10px" },
-          viewBox: "0 0 16 16" },
+        { viewBox: "0 0 18 17" },
         _react2["default"].createElement(
           "g",
-          { transform: "rotate(90,8,8)" },
-          _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
-          _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
-          _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
-          _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
-          _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
-          _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
-          _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
+          null,
+          _react2["default"].createElement("path", { d: "m 7.8735657,3.2305929 0.088125,9.1793421", style: { strokeWidth: 2 } }),
+          _react2["default"].createElement("path", { d: "M 4.6336281,3.641452 7.9449077,0.21145225 11.004625,3.6037073", style: { strokeWidth: 0 } }),
+          _react2["default"].createElement("path", { d: "m 11.229771,12.149816 -3.3112819,3.43 -3.0597154,-3.392255", style: { strokeWidth: 0 } })
         )
       );
     }
@@ -2079,7 +2070,7 @@ module.exports = exports["default"];
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2097,38 +2088,32 @@ var _react = _dereq_("react");
 var _react2 = _interopRequireDefault(_react);
 
 var WidthFill = (function (_React$Component) {
-  _inherits(WidthFill, _React$Component);
+    _inherits(WidthFill, _React$Component);
 
-  function WidthFill() {
-    _classCallCheck(this, WidthFill);
+    function WidthFill() {
+        _classCallCheck(this, WidthFill);
 
-    _get(Object.getPrototypeOf(WidthFill.prototype), "constructor", this).apply(this, arguments);
-  }
-
-  _createClass(WidthFill, [{
-    key: "render",
-    value: function render() {
-      return _react2["default"].createElement(
-        "svg",
-        {
-          style: { stroke: "#000000", strokeWidth: "1px", strokeOpacity: "1", width: "10px" },
-          viewBox: "0 0 16 16" },
-        _react2["default"].createElement(
-          "g",
-          null,
-          _react2["default"].createElement("path", { d: "M 2.1,8.5 13.876786,8.5" }),
-          _react2["default"].createElement("path", { d: "M 14.2895,8.8224 10.876793,5.4933" }),
-          _react2["default"].createElement("path", { d: "M 1.5196504,8.7867 4.9323574,5.4576" }),
-          _react2["default"].createElement("path", { d: "M 14.27524,8.1261353 11.216057,11.258414" }),
-          _react2["default"].createElement("path", { d: "M 1.5503841,8.1252136 4.3668137,11.302078" }),
-          _react2["default"].createElement("path", { d: "m 15.386755,4.3822 0.01012,8.1302" }),
-          _react2["default"].createElement("path", { d: "m 0.58963983,4.3191 0.010124,8.1302" })
-        )
-      );
+        _get(Object.getPrototypeOf(WidthFill.prototype), "constructor", this).apply(this, arguments);
     }
-  }]);
 
-  return WidthFill;
+    _createClass(WidthFill, [{
+        key: "render",
+        value: function render() {
+            return _react2["default"].createElement(
+                "svg",
+                { viewBox: "0 0 24 17" },
+                _react2["default"].createElement(
+                    "g",
+                    null,
+                    _react2["default"].createElement("path", { d: "m 3.2525423,8.5338983 16.5903457,0", style: { strokeWidth: 2 } }),
+                    _react2["default"].createElement("path", { d: "M 3.4690633,11.727926 0.0563563,8.3988265 3.4645013,5.3568195", style: { strokeWidth: 0 } }),
+                    _react2["default"].createElement("path", { d: "m 19.249675,5.3577067 3.412707,3.3291 -3.408145,3.0420063", style: { strokeWidth: 0 } })
+                )
+            );
+        }
+    }]);
+
+    return WidthFill;
 })(_react2["default"].Component);
 
 exports["default"] = WidthFill;
@@ -2195,6 +2180,7 @@ var Minimap = (function (_React$Component) {
 		this.mouseState = MOUSE_UP;
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
+		this.touchMoveListener = this.onTouchMove.bind(this);
 	}
 
 	_createClass(Minimap, [{
@@ -2208,6 +2194,8 @@ var Minimap = (function (_React$Component) {
 			window.addEventListener("resize", this.resizeListener);
 			window.addEventListener("mousemove", this.mousemoveListener);
 			window.addEventListener("mouseup", this.mouseupListener);
+			window.addEventListener("touchend", this.mouseupListener);
+			window.addEventListener("touchmove", this.touchMoveListener);
 			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 
 			this.unsubscribe = _apiStore2["default"].subscribe(function () {
@@ -2233,6 +2221,8 @@ var Minimap = (function (_React$Component) {
 			window.removeEventListener("resize", this.resizeListener);
 			window.removeEventListener("mousemove", this.mousemoveListener);
 			window.removeEventListener("mouseup", this.mouseupListener);
+			window.addEventListener("touchend", this.mouseupListener);
+			window.removeEventListener("touchmove", this.touchMoveListener);
 			(0, _utilRequestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
 			this.unsubscribe();
 		}
@@ -2298,13 +2288,22 @@ var Minimap = (function (_React$Component) {
 			_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
 				x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
 				y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
-				reposition: true
+				reposition: true,
+				applyZoom: false
 			}));
+		}
+	}, {
+		key: "onTouchStart",
+		value: function onTouchStart(ev) {
+			this.mouseState = MOUSE_DOWN;
+			this.dispatchReposition({ pageX: ev.touches[0].pageX, pageY: ev.touches[0].pageY });
+			return ev.preventDefault();
 		}
 	}, {
 		key: "onMouseDown",
 		value: function onMouseDown(ev) {
 			this.mouseState = MOUSE_DOWN;
+			this.dispatchReposition(ev);
 		}
 	}, {
 		key: "onMouseMove",
@@ -2315,11 +2314,16 @@ var Minimap = (function (_React$Component) {
 			}
 		}
 	}, {
+		key: "onTouchMove",
+		value: function onTouchMove(ev) {
+			if (this.mouseState === MOUSE_DOWN) {
+				this.dispatchReposition({ pageX: ev.touches[0].pageX, pageY: ev.touches[0].pageY });
+				return ev.preventDefault();
+			}
+		}
+	}, {
 		key: "onMouseUp",
 		value: function onMouseUp(ev) {
-			if (this.mouseState === MOUSE_DOWN) {
-				this.dispatchReposition(ev);
-			}
 			this.mouseState = MOUSE_UP;
 		}
 	}, {
@@ -2331,7 +2335,7 @@ var Minimap = (function (_React$Component) {
 	}, {
 		key: "onTouchEnd",
 		value: function onTouchEnd(ev) {
-			this.dispatchReposition({ pageX: ev.touches[0].pageX, pageY: ev.touches[0].pageY });
+			this.mouseState = MOUSE_UP;
 		}
 	}, {
 		key: "render",
@@ -2343,7 +2347,7 @@ var Minimap = (function (_React$Component) {
 				_react2["default"].createElement("canvas", { className: "interaction",
 					height: this.state.height,
 					onMouseDown: this.onMouseDown.bind(this),
-					onTouchEnd: this.onTouchEnd.bind(this),
+					onTouchStart: this.onTouchStart.bind(this),
 					onWheel: this.onWheel.bind(this),
 					width: this.state.width })
 			);
@@ -2362,7 +2366,7 @@ Minimap.propTypes = {
 
 Minimap.defaultProps = {
 	rectFill: "rgba(128,128,255,0.1)",
-	rectStroke: "rgba(189,164,126,0.3)"
+	rectStroke: "rgba(255,255,255,0.8)"
 };
 
 exports["default"] = Minimap;
@@ -2408,6 +2412,7 @@ var Zoom = (function (_React$Component) {
 		this.state = _apiStore2["default"].getState();
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.mousemoveListener = this.onMouseMove.bind(this);
+		this.touchMoveListener = this.onTouchMove.bind(this);
 	}
 
 	_createClass(Zoom, [{
@@ -2417,7 +2422,8 @@ var Zoom = (function (_React$Component) {
 
 			window.addEventListener("mouseup", this.mouseupListener);
 			window.addEventListener("mousemove", this.mousemoveListener);
-
+			window.addEventListener("touchend", this.mouseupListener);
+			window.addEventListener("touchmove", this.touchMoveListener);
 			this.unsubscribe = _apiStore2["default"].subscribe(function () {
 				return _this.setState(_apiStore2["default"].getState());
 			});
@@ -2425,23 +2431,18 @@ var Zoom = (function (_React$Component) {
 	}, {
 		key: "componentWillUnmount",
 		value: function componentWillUnmount() {
-			window.addEventListener("mouseup", this.mouseupListener);
+			window.removeEventListener("mouseup", this.mouseupListener);
 			window.removeEventListener("mousemove", this.mousemoveListener);
-
+			window.removeEventListener("touchend", this.mouseupListener);
+			window.removeEventListener("touchmove", this.touchMoveListener);
 			this.unsubscribe();
 		}
 	}, {
-		key: "onMouseDown",
-		value: function onMouseDown(ev) {
-			this.mouseState = MOUSE_DOWN;
-			this.dispatchRealScale(ev);
-		}
-	}, {
 		key: "dispatchRealScale",
-		value: function dispatchRealScale(ev) {
+		value: function dispatchRealScale(pageX) {
 			var rect = _react2["default"].findDOMNode(this).children[0].getBoundingClientRect();
 			if (rect.width > 0 && !this.state.realViewPort.applyZoom) {
-				var zoom = (ev.pageX - rect.left) / rect.width * 2;
+				var zoom = (pageX - rect.left) / rect.width * 2;
 				if (zoom < 0.01) {
 					zoom = 0.01;
 				} else if (zoom > 2.0) {
@@ -2454,16 +2455,31 @@ var Zoom = (function (_React$Component) {
 			}
 		}
 	}, {
-		key: "onWheel",
-		value: function onWheel(ev) {
-			_apiStore2["default"].dispatch((0, _apiActions.sendMouseWheel)({ deltaY: ev.deltaY }));
+		key: "onMouseDown",
+		value: function onMouseDown(ev) {
+			this.mouseState = MOUSE_DOWN;
+			this.dispatchRealScale(ev.pageX);
+		}
+	}, {
+		key: "onTouchStart",
+		value: function onTouchStart(ev) {
+			this.mouseState = MOUSE_DOWN;
+			this.dispatchRealScale(ev.touches[0].pageX);
 			return ev.preventDefault();
 		}
 	}, {
 		key: "onMouseMove",
 		value: function onMouseMove(ev) {
 			if (this.mouseState === MOUSE_DOWN) {
-				this.dispatchRealScale(ev);
+				this.dispatchRealScale(ev.pageX);
+				return ev.preventDefault();
+			}
+		}
+	}, {
+		key: "onTouchMove",
+		value: function onTouchMove(ev) {
+			if (this.mouseState === MOUSE_DOWN) {
+				this.dispatchRealScale(ev.touches[0].pageX);
 				return ev.preventDefault();
 			}
 		}
@@ -2471,6 +2487,12 @@ var Zoom = (function (_React$Component) {
 		key: "onMouseUp",
 		value: function onMouseUp(ev) {
 			this.mouseState = MOUSE_UP;
+		}
+	}, {
+		key: "onWheel",
+		value: function onWheel(ev) {
+			_apiStore2["default"].dispatch((0, _apiActions.sendMouseWheel)({ deltaY: ev.deltaY }));
+			return ev.preventDefault();
 		}
 	}, {
 		key: "render",
@@ -2481,7 +2503,9 @@ var Zoom = (function (_React$Component) {
 				{ className: "hire-zoom-bar", onWheel: this.onWheel.bind(this) },
 				_react2["default"].createElement(
 					"svg",
-					{ onMouseDown: this.onMouseDown.bind(this),
+					{
+						onMouseDown: this.onMouseDown.bind(this),
+						onTouchStart: this.onTouchStart.bind(this),
 						viewBox: "-12 0 224 24" },
 					_react2["default"].createElement("path", { d: "M0 12 L 200 12 Z" }),
 					_react2["default"].createElement("circle", { cx: zoom > 200 ? 200 : zoom, cy: "12", r: "12" })
@@ -2547,7 +2571,7 @@ var _componentsFillButton2 = _interopRequireDefault(_componentsFillButton);
 
 
 
-var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0=","base64");
+var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0KCi5oaXJlLWZpbGwtYnV0dG9uIHsKCW1hcmdpbjogMDsKCXBhZGRpbmc6IDA7Cglib3JkZXI6IDA7CgliYWNrZ3JvdW5kOiB0cmFuc3BhcmVudDsKCWZvbnQtZmFtaWx5OiBpbmhlcml0OwoJY3Vyc29yOiBwb2ludGVyOwoJb3V0bGluZTogMDsKCXdpZHRoOiA1MHB4OwoJaGVpZ2h0OiAyNHB4OwoJcGFkZGluZzogMCA2cHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjQkRBNDdFOwoJbWFyZ2luLXJpZ2h0OiA2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7Cgljb2xvcjogI0YxRUJFNjsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cgp9CgoKLmhpcmUtZmlsbC1idXR0b246Oi1tb3otZm9jdXMtaW5uZXJ7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwp9CgouaGlyZS1maWxsLWJ1dHRvbiBzdmcgewoJc3Ryb2tlOiAjRjFFQkU2OwoJc3Ryb2tlLXdpZHRoOiAxcHg7CglmaWxsOiAjRjFFQkU2OwoKCXN0cm9rZS1vcGFjaXR5OiAxOwoJaGVpZ2h0OiAxMDAlCn0K","base64");
 (0, _insertCss2["default"])(css, { prepend: true });
 
 _react2["default"].initializeTouchEvents(true);

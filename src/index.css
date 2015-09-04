@@ -55,3 +55,37 @@
 .hire-zoom-bar svg circle {
 	stroke-width: 0;
 }
+
+.hire-fill-button {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	font-family: inherit;
+	cursor: pointer;
+	outline: 0;
+	width: 50px;
+	height: 24px;
+	padding: 0 6px;
+	background-color: #BDA47E;
+	margin-right: 6px;
+	border-radius: 3px;
+	color: #F1EBE6;
+	vertical-align: top;
+
+}
+
+
+.hire-fill-button::-moz-focus-inner{
+	padding: 0;
+	border: 0;
+}
+
+.hire-fill-button svg {
+	stroke: #F1EBE6;
+	stroke-width: 1px;
+	fill: #F1EBE6;
+
+	stroke-opacity: 1;
+	height: 100%
+}

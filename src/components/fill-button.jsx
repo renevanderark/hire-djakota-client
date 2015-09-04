@@ -22,7 +22,7 @@ class FillButton extends React.Component {
     renderIcon() {
         switch(this.props.scaleMode) {
             case "fullZoom": 
-                return "1:1";
+                return "100%";
             case "autoFill":
                 return <AutoFillIcon />
             case "heightFill":
@@ -39,7 +39,7 @@ class FillButton extends React.Component {
 
     render() {
         return (
-            <button onClick={this.onClick.bind(this)}>
+            <button className="hire-fill-button" onClick={this.onClick.bind(this)}>
                 {this.renderIcon()}
             </button>
         )
