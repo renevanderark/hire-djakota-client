@@ -9,9 +9,9 @@ class Api {
 		this.service = service;
 		this.config = config;
 		this.params = {
-			rft_id: this.config.identifier,
-			url_ver: "Z39.88-2004",
-			svc_val_fmt: "info:ofi/fmt:kev:mtx:jpeg2000",
+			"rft_id": this.config.identifier,
+			"url_ver": "Z39.88-2004",
+			"svc_val_fmt": "info:ofi/fmt:kev:mtx:jpeg2000",
 			"svc.format": "image/jpeg"
 		};
 		this.levels = parseInt(this.config.dwtLevels);
@@ -33,7 +33,7 @@ class Api {
 	findLevel(dim, idx)	{
 		let i;
 		for(i = 0; i < this.resolutions.length; i++) {
-			if(this.resolutions[i][idx] > dim) { 
+			if(this.resolutions[i][idx] > dim) {
 				return i + 1;
 			}
 		}
@@ -84,29 +84,20 @@ class Api {
 		return n;
 	}
 
-	makeTiles(opts, level, scale, onTile) {
+	makeTiles(opts, level, scale) {
 		let upscaleFactor = this.resolutions.length - level;
 		let yStart = this.getStart(opts.position.y);
 		let xStart = this.getStart(opts.position.x);
 
-		for(let y = yStart; 
-				((y - yStart) * scale) - TILE_SIZE * 2 + opts.position.y < opts.viewport.h  && 
-				this.upScale(y, upscaleFactor) < this.fullHeight ;
+		for(let y = yStart;
+				((y - yStart) * scale) - TILE_SIZE * 2 + opts.position.y < opts.viewport.h &&
+				this.upScale(y, upscaleFactor) < this.fullHeight;
 				y += TILE_SIZE) {
 
-			for(let x = xStart; 
-				((x - xStart) * scale) - TILE_SIZE * 2 + opts.position.x < opts.viewport.w && 
-				this.upScale(x, upscaleFactor) < this.fullWidth ; 
+			for(let x = xStart;
+				((x - xStart) * scale) - TILE_SIZE * 2 + opts.position.x < opts.viewport.w &&
+				this.upScale(x, upscaleFactor) < this.fullWidth;
 				x += TILE_SIZE) {
-
-
-				let realTileW =  this.upScale(x, upscaleFactor) + this.upScale(TILE_SIZE, upscaleFactor) > this.fullWidth ?
-					parseInt(this.downScale(this.fullWidth - this.upScale(x, upscaleFactor), upscaleFactor)) :
-					TILE_SIZE;
-
-				let realTileH = this.upScale(y, upscaleFactor) + this.upScale(TILE_SIZE, upscaleFactor) > this.fullHeight ?
-					parseInt(this.downScale(this.fullHeight - this.upScale(y, upscaleFactor), upscaleFactor)) :
-					TILE_SIZE;
 
 				this.fetchTile({
 					realX: x,
@@ -117,7 +108,7 @@ class Api {
 						y: y
 					},
 					level: level,
-					url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE,TILE_SIZE])
+					url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
 				}, opts.onTile, opts.onTileInit);
 			}
 		}
@@ -158,7 +149,7 @@ class Api {
 			y: Math.floor(this.upScale(position.y, upscaleFactor) * this.getRealScale(scale, level)),
 			w: Math.ceil(this.fullWidth * this.getRealScale(scale, level)),
 			h: Math.ceil(this.fullHeight * this.getRealScale(scale, level))
-		}
+		};
 	}
 
 	widthFill(opts) {
@@ -200,7 +191,7 @@ class Api {
 
 
 
-	loadImage(opts, onScale) {
+	loadImage(opts) {
 		if(opts.scaleMode) {
 			this[opts.scaleMode](opts);
 		} else {

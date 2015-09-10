@@ -1133,9 +1133,9 @@ var Api = (function () {
 		this.service = service;
 		this.config = config;
 		this.params = {
-			rft_id: this.config.identifier,
-			url_ver: "Z39.88-2004",
-			svc_val_fmt: "info:ofi/fmt:kev:mtx:jpeg2000",
+			"rft_id": this.config.identifier,
+			"url_ver": "Z39.88-2004",
+			"svc_val_fmt": "info:ofi/fmt:kev:mtx:jpeg2000",
 			"svc.format": "image/jpeg"
 		};
 		this.levels = parseInt(this.config.dwtLevels);
@@ -1216,7 +1216,7 @@ var Api = (function () {
 		}
 	}, {
 		key: "makeTiles",
-		value: function makeTiles(opts, level, scale, onTile) {
+		value: function makeTiles(opts, level, scale) {
 			var upscaleFactor = this.resolutions.length - level;
 			var yStart = this.getStart(opts.position.y);
 			var xStart = this.getStart(opts.position.x);
@@ -1224,10 +1224,6 @@ var Api = (function () {
 			for (var y = yStart; (y - yStart) * scale - TILE_SIZE * 2 + opts.position.y < opts.viewport.h && this.upScale(y, upscaleFactor) < this.fullHeight; y += TILE_SIZE) {
 
 				for (var x = xStart; (x - xStart) * scale - TILE_SIZE * 2 + opts.position.x < opts.viewport.w && this.upScale(x, upscaleFactor) < this.fullWidth; x += TILE_SIZE) {
-
-					var realTileW = this.upScale(x, upscaleFactor) + this.upScale(TILE_SIZE, upscaleFactor) > this.fullWidth ? parseInt(this.downScale(this.fullWidth - this.upScale(x, upscaleFactor), upscaleFactor)) : TILE_SIZE;
-
-					var realTileH = this.upScale(y, upscaleFactor) + this.upScale(TILE_SIZE, upscaleFactor) > this.fullHeight ? parseInt(this.downScale(this.fullHeight - this.upScale(y, upscaleFactor), upscaleFactor)) : TILE_SIZE;
 
 					this.fetchTile({
 						realX: x,
@@ -1337,7 +1333,7 @@ var Api = (function () {
 		}
 	}, {
 		key: "loadImage",
-		value: function loadImage(opts, onScale) {
+		value: function loadImage(opts) {
 			if (opts.scaleMode) {
 				this[opts.scaleMode](opts);
 			} else {
