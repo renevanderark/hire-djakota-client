@@ -1966,21 +1966,17 @@ var AutoFill = (function (_React$Component) {
         _react2["default"].createElement("path", { d: "M 0.17726274,4.8389082 0.0558895,0.07290967 4.6198279,0.27222077", style: { strokeWidth: 0 } }),
         _react2["default"].createElement("path", {
           d: "m 15.925831,11.287935 0.121374,4.765999 -4.563938,-0.199312",
-
           style: { strokeWidth: 0 }
         }),
         _react2["default"].createElement("path", {
           d: "M 13.731112,2.2550713 2.1257829,14.110698",
-
           style: { strokeWidth: 2 } }),
         _react2["default"].createElement("path", {
           d: "M 11.297166,0.17550349 16.063441,0.06553063 15.853214,4.6289791",
-
           style: { strokeWidth: 0 }
         }),
         _react2["default"].createElement("path", {
           d: "M 4.8104871,15.908601 0.0442114,16.018574 0.2544395,11.455126",
-
           style: { strokeWidth: 0 }
         })
       );
@@ -1997,7 +1993,7 @@ module.exports = exports["default"];
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2015,32 +2011,32 @@ var _react = _dereq_("react");
 var _react2 = _interopRequireDefault(_react);
 
 var HeightFill = (function (_React$Component) {
-  _inherits(HeightFill, _React$Component);
+    _inherits(HeightFill, _React$Component);
 
-  function HeightFill() {
-    _classCallCheck(this, HeightFill);
+    function HeightFill() {
+        _classCallCheck(this, HeightFill);
 
-    _get(Object.getPrototypeOf(HeightFill.prototype), "constructor", this).apply(this, arguments);
-  }
-
-  _createClass(HeightFill, [{
-    key: "render",
-    value: function render() {
-      return _react2["default"].createElement(
-        "svg",
-        { viewBox: "0 0 18 17" },
-        _react2["default"].createElement(
-          "g",
-          null,
-          _react2["default"].createElement("path", { d: "m 7.8735657,3.2305929 0.088125,9.1793421", style: { strokeWidth: 2 } }),
-          _react2["default"].createElement("path", { d: "M 4.6336281,3.641452 7.9449077,0.21145225 11.004625,3.6037073", style: { strokeWidth: 0 } }),
-          _react2["default"].createElement("path", { d: "m 11.229771,12.149816 -3.3112819,3.43 -3.0597154,-3.392255", style: { strokeWidth: 0 } })
-        )
-      );
+        _get(Object.getPrototypeOf(HeightFill.prototype), "constructor", this).apply(this, arguments);
     }
-  }]);
 
-  return HeightFill;
+    _createClass(HeightFill, [{
+        key: "render",
+        value: function render() {
+            return _react2["default"].createElement(
+                "svg",
+                { viewBox: "0 0 18 17" },
+                _react2["default"].createElement(
+                    "g",
+                    null,
+                    _react2["default"].createElement("path", { d: "m 7.8735657,3.2305929 0.088125,9.1793421", style: { strokeWidth: 2 } }),
+                    _react2["default"].createElement("path", { d: "M 4.6336281,3.641452 7.9449077,0.21145225 11.004625,3.6037073", style: { strokeWidth: 0 } }),
+                    _react2["default"].createElement("path", { d: "m 11.229771,12.149816 -3.3112819,3.43 -3.0597154,-3.392255", style: { strokeWidth: 0 } })
+                )
+            );
+        }
+    }]);
+
+    return HeightFill;
 })(_react2["default"].Component);
 
 exports["default"] = HeightFill;
