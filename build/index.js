@@ -2130,7 +2130,7 @@ var _apiStore = _dereq_("../api/store");
 
 var _apiStore2 = _interopRequireDefault(_apiStore);
 
-var _utilRequestAnimationFrame = _dereq_('../util/request-animation-frame');
+var _utilRequestAnimationFrame = _dereq_("../util/request-animation-frame");
 
 var RESIZE_DELAY = 5;
 
@@ -2168,8 +2168,8 @@ var Minimap = (function (_React$Component) {
 			var _this = this;
 
 			this.onResize();
-			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext('2d');
-			this.interactionCtx = _react2["default"].findDOMNode(this).children[1].getContext('2d');
+			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext("2d");
+			this.interactionCtx = _react2["default"].findDOMNode(this).children[1].getContext("2d");
 			window.addEventListener("resize", this.resizeListener);
 			window.addEventListener("mousemove", this.mousemoveListener);
 			window.addEventListener("mouseup", this.mouseupListener);
@@ -2212,7 +2212,7 @@ var Minimap = (function (_React$Component) {
 				this.commitResize();
 				this.resizeDelay = -1;
 			} else if (this.resizeDelay > 0) {
-				this.resizeDelay--;
+				this.resizeDelay -= 1;
 			}
 
 			this.interactionCtx.strokeStyle = this.props.rectStroke;
@@ -2302,7 +2302,7 @@ var Minimap = (function (_React$Component) {
 		}
 	}, {
 		key: "onMouseUp",
-		value: function onMouseUp(ev) {
+		value: function onMouseUp() {
 			this.mouseState = MOUSE_UP;
 		}
 	}, {
@@ -2313,7 +2313,7 @@ var Minimap = (function (_React$Component) {
 		}
 	}, {
 		key: "onTouchEnd",
-		value: function onTouchEnd(ev) {
+		value: function onTouchEnd() {
 			this.mouseState = MOUSE_UP;
 		}
 	}, {

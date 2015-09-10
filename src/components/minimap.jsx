@@ -2,7 +2,7 @@ import React from "react";
 import Api from "../api/api";
 import { setRealViewPort, sendMouseWheel } from "../api/actions";
 import store from "../api/store";
-import { requestAnimationFrame, cancelAnimationFrame } from '../util/request-animation-frame';
+import { requestAnimationFrame, cancelAnimationFrame } from "../util/request-animation-frame";
 
 const RESIZE_DELAY = 5;
 
@@ -17,7 +17,7 @@ class Minimap extends React.Component {
 
 		this.state = {
 			width: null,
-			height: null,
+			height: null
 		};
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
@@ -34,8 +34,8 @@ class Minimap extends React.Component {
 
 	componentDidMount() {
 		this.onResize();
-		this.imageCtx = React.findDOMNode(this).children[0].getContext('2d');
-		this.interactionCtx = React.findDOMNode(this).children[1].getContext('2d');
+		this.imageCtx = React.findDOMNode(this).children[0].getContext("2d");
+		this.interactionCtx = React.findDOMNode(this).children[1].getContext("2d");
 		window.addEventListener("resize", this.resizeListener);
 		window.addEventListener("mousemove", this.mousemoveListener);
 		window.addEventListener("mouseup", this.mouseupListener);
@@ -56,7 +56,7 @@ class Minimap extends React.Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.state.width !== nextState.width || 
+		return this.state.width !== nextState.width ||
 			this.state.height !== nextState.height ||
 			this.props.config.identifier !== nextProps.config.identifier;
 	}
@@ -78,12 +78,12 @@ class Minimap extends React.Component {
 			this.commitResize();
 			this.resizeDelay = -1;
 		} else if(this.resizeDelay > 0) {
-			this.resizeDelay--;
+			this.resizeDelay -= 1;
 		}
 
 		this.interactionCtx.strokeStyle = this.props.rectStroke;
 		this.interactionCtx.fillStyle = this.props.rectFill;
-		this.interactionCtx.clearRect(0,0,this.state.width, this.state.height);
+		this.interactionCtx.clearRect(0, 0, this.state.width, this.state.height);
 		this.interactionCtx.fillRect(
 			Math.floor(this.state.realViewPort.x * this.state.width),
 			Math.floor(this.state.realViewPort.y * this.state.height),
@@ -123,16 +123,16 @@ class Minimap extends React.Component {
 	setScale(s, l) {
 		this.scale = s;
 		this.level = l;
-		let dims = this.api.getRealImagePos({x:0,y:0}, this.scale, this.level);
+		let dims = this.api.getRealImagePos({x: 0, y: 0}, this.scale, this.level);
 		this.setState({width: dims.w, height: dims.h});
 	}
 
 	renderTile(tileIm, tile) {
 		this.imageCtx.drawImage(...[
-			tileIm, 
-			parseInt(Math.floor(tile.pos.x * this.scale)), 
-			parseInt(Math.floor(tile.pos.y * this.scale)), 
-			parseInt(Math.ceil(tileIm.width * this.scale)), 
+			tileIm,
+			parseInt(Math.floor(tile.pos.x * this.scale)),
+			parseInt(Math.floor(tile.pos.y * this.scale)),
+			parseInt(Math.ceil(tileIm.width * this.scale)),
 			parseInt(Math.ceil(tileIm.height * this.scale))
 		]);
 	}
@@ -173,7 +173,7 @@ class Minimap extends React.Component {
 		}
 	}
 
-	onMouseUp(ev) {
+	onMouseUp() {
 		this.mouseState = MOUSE_UP;
 	}
 
@@ -182,7 +182,7 @@ class Minimap extends React.Component {
 		return ev.preventDefault();
 	}
 
-	onTouchEnd(ev) {
+	onTouchEnd() {
 		this.mouseState = MOUSE_UP;
 	}
 
@@ -190,9 +190,9 @@ class Minimap extends React.Component {
 		return (
 			<div className="hire-djakota-minimap">
 				<canvas className="image" height={this.state.height} width={this.state.width} />
-				<canvas className="interaction" 
-					height={this.state.height} 
-					onMouseDown={this.onMouseDown.bind(this)} 
+				<canvas className="interaction"
+					height={this.state.height}
+					onMouseDown={this.onMouseDown.bind(this)}
 					onTouchStart={this.onTouchStart.bind(this)}
 					onWheel={this.onWheel.bind(this)}
 					width={this.state.width} />
@@ -211,6 +211,6 @@ Minimap.propTypes = {
 Minimap.defaultProps = {
 	rectFill: "rgba(128,128,255,0.1)",
 	rectStroke: "rgba(255,255,255,0.8)"
-}
+};
 
 export default Minimap;
