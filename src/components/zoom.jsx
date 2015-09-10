@@ -45,7 +45,6 @@ class Zoom extends React.Component {
 				zoom: zoom,
 				applyZoom: true
 			}));
-			
 		}
 
 	}
@@ -75,7 +74,7 @@ class Zoom extends React.Component {
 		}
 	}
 
-	onMouseUp(ev) {
+	onMouseUp() {
 		this.mouseState = MOUSE_UP;
 	}
 
@@ -84,7 +83,7 @@ class Zoom extends React.Component {
 		return ev.preventDefault();
 	}
 	render() {
-		let zoom = parseInt(this.state.realViewPort.zoom * 100)
+		let zoom = parseInt(this.state.realViewPort.zoom * 100);
 		return (
 			<span className="hire-zoom-bar" onWheel={this.onWheel.bind(this)}>
 				<svg
@@ -92,11 +91,11 @@ class Zoom extends React.Component {
 					onTouchStart={this.onTouchStart.bind(this)}
 					viewBox="-12 0 224 24">
 						<path d="M0 12 L 200 12 Z" />
-						<circle	cx={zoom > 200 ? 200 : zoom} cy="12" r="12"  />
+						<circle	cx={zoom > 200 ? 200 : zoom} cy="12" r="12" />
 				</svg>
 				<label>{zoom}%</label>
 			</span>
-		)
+		);
 	}
 }
 
@@ -107,7 +106,7 @@ Zoom.propTypes = {
 
 Zoom.defaultProps = {
 	fill: "rgba(0,0,0, 0.7)",
-	stroke: "rgba(0,0,0, 1)",
+	stroke: "rgba(0,0,0, 1)"
 };
 
 export default Zoom;

@@ -2464,7 +2464,7 @@ var Zoom = (function (_React$Component) {
 		}
 	}, {
 		key: "onMouseUp",
-		value: function onMouseUp(ev) {
+		value: function onMouseUp() {
 			this.mouseState = MOUSE_UP;
 		}
 	}, {
