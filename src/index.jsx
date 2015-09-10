@@ -8,7 +8,7 @@ React.initializeTouchEvents(true);
 import DjakotaClient from "./components/djakota-client";
 import Minimap from "./components/minimap";
 import Zoom from "./components/zoom";
-import FillButton from "./components/fill-button"
+import FillButton from "./components/fill-button";
 
 export {DjakotaClient as DjakotaClient, Minimap as Minimap, Zoom as Zoom, FillButton as FillButton};
 export default DjakotaClient;

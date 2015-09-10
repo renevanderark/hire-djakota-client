@@ -2,12 +2,12 @@ import React from "react";
 import Api from "../api/api";
 import { setRealViewPort, sendMouseWheel, setFill } from "../api/actions";
 import store from "../api/store";
-import { requestAnimationFrame, cancelAnimationFrame } from '../util/request-animation-frame';
+import { requestAnimationFrame, cancelAnimationFrame } from "../util/request-animation-frame";
 
 const MOUSE_UP = 0;
 const MOUSE_DOWN = 1;
 
-const TOUCH_END = 0
+const TOUCH_END = 0;
 const TOUCH_START = 1;
 
 const RESIZE_DELAY = 5;
@@ -28,7 +28,7 @@ class DjakotaClient extends React.Component {
 
 		this.state = {
 			width: null,
-			height: null,
+			height: null
 		};
 
 		this.movement = {x: 0, y: 0};
@@ -49,12 +49,12 @@ class DjakotaClient extends React.Component {
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.frameBuffer = [];
 		this.repaintDelay = -1;
-		this.touchmap = {startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0};		
+		this.touchmap = {startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0};
 	}
 
 	componentDidMount() {
 		this.commitResize();
-		this.imageCtx = React.findDOMNode(this).children[0].getContext('2d');
+		this.imageCtx = React.findDOMNode(this).children[0].getContext("2d");
 		window.addEventListener("resize", this.resizeListener);
 		window.addEventListener("mousemove", this.mousemoveListener);
 		window.addEventListener("mouseup", this.mouseupListener);
@@ -74,7 +74,7 @@ class DjakotaClient extends React.Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.state.width !== nextState.width || 
+		return this.state.width !== nextState.width ||
 			this.state.height !== nextState.height ||
 			this.props.config.identifier !== nextProps.config.identifier;
 	}
@@ -103,7 +103,6 @@ class DjakotaClient extends React.Component {
 	}
 
 	receiveNewState() {
-		
 		if(this.state.realViewPort.reposition) {
 			let {w, h} = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
 			this.imagePos.x = -(w * this.state.realViewPort.x / this.scale);
@@ -135,11 +134,11 @@ class DjakotaClient extends React.Component {
 		for(let i = 0; i < this.frameBuffer.length; i++) {
 			this.imageCtx.drawImage(...this.frameBuffer[i]);
 		}
-		
+
 		if(this.resizeDelay === 0 && this.resizing) {
 			this.commitResize();
 		} else if(this.resizeDelay > 0) {
-			this.resizeDelay--;
+			this.resizeDelay -= 1;
 		}
 		requestAnimationFrame(this.animationFrameListener);
 	}
@@ -188,10 +187,10 @@ class DjakotaClient extends React.Component {
 
 	renderTile(tileIm, tile) {
 		this.frameBuffer.push([
-			tileIm, 
-			parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)), 
-			parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)), 
-			parseInt(Math.ceil(tileIm.width * this.scale)), 
+			tileIm,
+			parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)),
+			parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)),
+			parseInt(Math.ceil(tileIm.width * this.scale)),
 			parseInt(Math.ceil(tileIm.height * this.scale))
 		]);
 	}
@@ -199,14 +198,14 @@ class DjakotaClient extends React.Component {
 	onMouseDown(ev) {
 		this.mousePos.x = ev.clientX;
 		this.mousePos.y = ev.clientY;
-		this.movement = {x: 0, y:0};
+		this.movement = {x: 0, y: 0};
 		this.mouseState = MOUSE_DOWN;
 	}
 
 	onTouchStart(ev) {
 		this.touchPos.x = ev.touches[0].pageX;
 		this.touchPos.y = ev.touches[0].pageY;
-		this.movement = {x: 0, y:0};
+		this.movement = {x: 0, y: 0};
 		this.touchState = TOUCH_START;
 	}
 
@@ -260,11 +259,11 @@ class DjakotaClient extends React.Component {
 		ev.stopPropagation();
 	}
 
-	onTouchEnd(ev) {
+	onTouchEnd() {
 		this.touchState = TOUCH_END;
 	}
 
-	onMouseUp(ev) {
+	onMouseUp() {
 		if(this.mouseState === MOUSE_DOWN) {
 			this.loadImage({scale: this.scale, level: this.level});
 		}
@@ -272,21 +271,21 @@ class DjakotaClient extends React.Component {
 	}
 
 	center(w, h) {
-		if(w > this.state.width) {			
+		if(w > this.state.width) {
 			this.imagePos.x = -parseInt((w - this.state.width) / 2) / this.scale;
 		} else if(w < this.state.width) {
 			this.imagePos.x = parseInt((this.state.width - w) / 2) / this.scale;
 		}
 
 		if(h > this.state.height) {
-			this.imagePos.y = -parseInt((h - this.state.height) / 2) / this.scale;	
+			this.imagePos.y = -parseInt((h - this.state.height) / 2) / this.scale;
 		} else if(h < this.state.width) {
 			this.imagePos.y = parseInt((this.state.height - h) / 2) / this.scale;
 		}
 	}
 
 	onDimensions(s, l, w, h) {
-		this.setDimensions(w, h)
+		this.setDimensions(w, h);
 		this.setScale(s, l);
 		this.center(w, h);
 		this.notifyRealImagePos();
@@ -298,24 +297,24 @@ class DjakotaClient extends React.Component {
 		let origW = this.width;
 		let origH = this.height;
 
-		this.setDimensions(w, h)
+		this.setDimensions(w, h);
 		this.setScale(s, l);
 
 
-		if(origW === null || origH === null) { 
+		if(origW === null || origH === null) {
 			this.center(w, h);
 		} else {
 			let diffX = Math.floor((origW - this.width) / 2);
 			let diffY = Math.floor((origH - this.height) / 2);
-			this.imagePos.x  = (origX + diffX) / this.scale;
+			this.imagePos.x = (origX + diffX) / this.scale;
 			this.imagePos.y = (origY + diffY) / this.scale;
 		}
 		this.loadImage({scale: this.scale, level: this.level});
 	}
 
 	determineZoomFactor(delta) {
-		let rev = delta > 0  ? -1 : 1;
-		let rs = this.api.getRealScale(this.scale, this.level)
+		let rev = delta > 0 ? -1 : 1;
+		let rs = this.api.getRealScale(this.scale, this.level);
 		if(rs >= 0.6) { return 0.04 * rev; }
 		else if(rs >= 0.3) { return 0.02 * rev; }
 		else { return 0.01 * rev; }
@@ -330,15 +329,15 @@ class DjakotaClient extends React.Component {
 	render() {
 		return (
 			<div className="hire-djakota-client">
-				<canvas 
-					className="image" 
+				<canvas
+					className="image"
 					height={this.state.height}
 					width={this.state.width}
 					/>
-				<canvas 
+				<canvas
 					className="interaction"
 					height={this.state.height}
-					onMouseDown={this.onMouseDown.bind(this)} 
+					onMouseDown={this.onMouseDown.bind(this)}
 					onTouchEnd={this.onTouchEnd.bind(this)}
 					onTouchMove={this.onTouchMove.bind(this)}
 					onTouchStart={this.onTouchStart.bind(this)}
@@ -346,13 +345,13 @@ class DjakotaClient extends React.Component {
 					width={this.state.width}
 					/>
 			</div>
-		)
+		);
 	}
 }
 
 DjakotaClient.propTypes = {
 	config: React.PropTypes.object.isRequired,
-	scaleMode: function(props, propName, componentName) {
+	scaleMode: function(props, propName) {
 		if(SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
 			let msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
 			props[propName] = "heightFill";

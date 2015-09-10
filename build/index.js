@@ -1441,7 +1441,7 @@ var _apiStore = _dereq_("../api/store");
 
 var _apiStore2 = _interopRequireDefault(_apiStore);
 
-var _utilRequestAnimationFrame = _dereq_('../util/request-animation-frame');
+var _utilRequestAnimationFrame = _dereq_("../util/request-animation-frame");
 
 var MOUSE_UP = 0;
 var MOUSE_DOWN = 1;
@@ -1494,7 +1494,7 @@ var DjakotaClient = (function (_React$Component) {
 			var _this = this;
 
 			this.commitResize();
-			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext('2d');
+			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext("2d");
 			window.addEventListener("resize", this.resizeListener);
 			window.addEventListener("mousemove", this.mousemoveListener);
 			window.addEventListener("mouseup", this.mouseupListener);
@@ -1544,7 +1544,6 @@ var DjakotaClient = (function (_React$Component) {
 	}, {
 		key: "receiveNewState",
 		value: function receiveNewState() {
-
 			if (this.state.realViewPort.reposition) {
 				var _api$getRealImagePos = this.api.getRealImagePos(this.imagePos, this.scale, this.level);
 
@@ -1586,7 +1585,7 @@ var DjakotaClient = (function (_React$Component) {
 			if (this.resizeDelay === 0 && this.resizing) {
 				this.commitResize();
 			} else if (this.resizeDelay > 0) {
-				this.resizeDelay--;
+				this.resizeDelay -= 1;
 			}
 			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
 		}
@@ -1704,12 +1703,12 @@ var DjakotaClient = (function (_React$Component) {
 		}
 	}, {
 		key: "onTouchEnd",
-		value: function onTouchEnd(ev) {
+		value: function onTouchEnd() {
 			this.touchState = TOUCH_END;
 		}
 	}, {
 		key: "onMouseUp",
-		value: function onMouseUp(ev) {
+		value: function onMouseUp() {
 			if (this.mouseState === MOUSE_DOWN) {
 				this.loadImage({ scale: this.scale, level: this.level });
 			}
@@ -1809,7 +1808,7 @@ var DjakotaClient = (function (_React$Component) {
 
 DjakotaClient.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
-	scaleMode: function scaleMode(props, propName, componentName) {
+	scaleMode: function scaleMode(props, propName) {
 		if (SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
 			var msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
 			props[propName] = "heightFill";
@@ -2170,7 +2169,6 @@ var Minimap = (function (_React$Component) {
 			width: null,
 			height: null
 		};
-
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
 

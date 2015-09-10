@@ -19,7 +19,6 @@ class Minimap extends React.Component {
 			width: null,
 			height: null,
 		};
-
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
 
