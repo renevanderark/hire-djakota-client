@@ -5,10 +5,10 @@ insertCss(css, {prepend: true});
 
 import React from "react";
 React.initializeTouchEvents(true);
-import DjakotaClient from "./components/djakota-client";
+import DjatokaClient from "./components/djatoka-client";
 import Minimap from "./components/minimap";
 import Zoom from "./components/zoom";
 import FillButton from "./components/fill-button";
 
-export {DjakotaClient as DjakotaClient, Minimap as Minimap, Zoom as Zoom, FillButton as FillButton};
-export default DjakotaClient;
+export {DjatokaClient as DjatokaClient, Minimap as Minimap, Zoom as Zoom, FillButton as FillButton};
+export default DjatokaClient;

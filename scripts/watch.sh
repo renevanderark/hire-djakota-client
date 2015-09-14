@@ -5,7 +5,7 @@ node_modules/.bin/watchify src/index.jsx \
   --extension=.jsx \
   --external react \
   --outfile 'node_modules/.bin/derequire > build/index.js' \
-  --standalone DjakotaClient \
+  --standalone DjatokaClient \
   --transform [ babelify ] \
   -t brfs \
   --verbose

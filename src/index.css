@@ -1,18 +1,18 @@
-.hire-djakota-client,
-.hire-djakota-minimap {
+.hire-djatoka-client,
+.hire-djatoka-minimap {
 	width: 100%;
 	height: 100%;
 }
 
-.hire-djakota-client > .interaction,
-.hire-djakota-client > .image,
-.hire-djakota-minimap > .interaction,
-.hire-djakota-minimap > .image {
+.hire-djatoka-client > .interaction,
+.hire-djatoka-client > .image,
+.hire-djatoka-minimap > .interaction,
+.hire-djatoka-minimap > .image {
 	position: absolute;
 }
 
-.hire-djakota-client > .interaction,
-.hire-djakota-minimap > .interaction {
+.hire-djatoka-client > .interaction,
+.hire-djatoka-minimap > .interaction {
 	z-index: 1;
 }
 

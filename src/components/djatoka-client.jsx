@@ -20,7 +20,7 @@ const SUPPORTED_SCALE_MODES = [
 ];
 
 
-class DjakotaClient extends React.Component {
+class DjatokaClient extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -328,7 +328,7 @@ class DjakotaClient extends React.Component {
 
 	render() {
 		return (
-			<div className="hire-djakota-client">
+			<div className="hire-djatoka-client">
 				<canvas
 					className="image"
 					height={this.state.height}
@@ -349,7 +349,7 @@ class DjakotaClient extends React.Component {
 	}
 }
 
-DjakotaClient.propTypes = {
+DjatokaClient.propTypes = {
 	config: React.PropTypes.object.isRequired,
 	scaleMode: function(props, propName) {
 		if(SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
@@ -361,8 +361,8 @@ DjakotaClient.propTypes = {
 	service: React.PropTypes.string.isRequired
 };
 
-DjakotaClient.defaultProps = {
+DjatokaClient.defaultProps = {
 	scaleMode: "heightFill"
 };
 
-export default DjakotaClient;
+export default DjatokaClient;

@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.DjakotaClient = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.DjatokaClient = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 var inserted = {};
 
 module.exports = function (css, options) {
@@ -1447,13 +1447,13 @@ var RESIZE_DELAY = 5;
 
 var SUPPORTED_SCALE_MODES = ["heightFill", "widthFill", "autoFill", "fullZoom"];
 
-var DjakotaClient = (function (_React$Component) {
-	_inherits(DjakotaClient, _React$Component);
+var DjatokaClient = (function (_React$Component) {
+	_inherits(DjatokaClient, _React$Component);
 
-	function DjakotaClient(props) {
-		_classCallCheck(this, DjakotaClient);
+	function DjatokaClient(props) {
+		_classCallCheck(this, DjatokaClient);
 
-		_get(Object.getPrototypeOf(DjakotaClient.prototype), "constructor", this).call(this, props);
+		_get(Object.getPrototypeOf(DjatokaClient.prototype), "constructor", this).call(this, props);
 		this.api = new _apiApi2["default"](this.props.service, this.props.config);
 
 		this.state = {
@@ -1482,7 +1482,7 @@ var DjakotaClient = (function (_React$Component) {
 		this.touchmap = { startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0 };
 	}
 
-	_createClass(DjakotaClient, [{
+	_createClass(DjatokaClient, [{
 		key: "componentDidMount",
 		value: function componentDidMount() {
 			var _this = this;
@@ -1777,7 +1777,7 @@ var DjakotaClient = (function (_React$Component) {
 		value: function render() {
 			return _react2["default"].createElement(
 				"div",
-				{ className: "hire-djakota-client" },
+				{ className: "hire-djatoka-client" },
 				_react2["default"].createElement("canvas", {
 					className: "image",
 					height: this.state.height,
@@ -1797,10 +1797,10 @@ var DjakotaClient = (function (_React$Component) {
 		}
 	}]);
 
-	return DjakotaClient;
+	return DjatokaClient;
 })(_react2["default"].Component);
 
-DjakotaClient.propTypes = {
+DjatokaClient.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
 	scaleMode: function scaleMode(props, propName) {
 		if (SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
@@ -1812,11 +1812,11 @@ DjakotaClient.propTypes = {
 	service: _react2["default"].PropTypes.string.isRequired
 };
 
-DjakotaClient.defaultProps = {
+DjatokaClient.defaultProps = {
 	scaleMode: "heightFill"
 };
 
-exports["default"] = DjakotaClient;
+exports["default"] = DjatokaClient;
 module.exports = exports["default"];
 
 },{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":27,"react":"react"}],20:[function(_dereq_,module,exports){
@@ -2311,7 +2311,7 @@ var Minimap = (function (_React$Component) {
 		value: function render() {
 			return _react2["default"].createElement(
 				"div",
-				{ className: "hire-djakota-minimap" },
+				{ className: "hire-djatoka-minimap" },
 				_react2["default"].createElement("canvas", { className: "image", height: this.state.height, width: this.state.width }),
 				_react2["default"].createElement("canvas", { className: "interaction",
 					height: this.state.height,
@@ -2522,9 +2522,9 @@ var _react = _dereq_("react");
 
 var _react2 = _interopRequireDefault(_react);
 
-var _componentsDjakotaClient = _dereq_("./components/djakota-client");
+var _componentsDjatokaClient = _dereq_("./components/djatoka-client");
 
-var _componentsDjakotaClient2 = _interopRequireDefault(_componentsDjakotaClient);
+var _componentsDjatokaClient2 = _interopRequireDefault(_componentsDjatokaClient);
 
 var _componentsMinimap = _dereq_("./components/minimap");
 
@@ -2540,17 +2540,17 @@ var _componentsFillButton2 = _interopRequireDefault(_componentsFillButton);
 
 
 
-var css = Buffer("LmhpcmUtZGpha290YS1jbGllbnQsCi5oaXJlLWRqYWtvdGEtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGpha290YS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYWtvdGEtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYWtvdGEtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamFrb3RhLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0KCi5oaXJlLWZpbGwtYnV0dG9uIHsKCW1hcmdpbjogMDsKCXBhZGRpbmc6IDA7Cglib3JkZXI6IDA7CgliYWNrZ3JvdW5kOiB0cmFuc3BhcmVudDsKCWZvbnQtZmFtaWx5OiBpbmhlcml0OwoJY3Vyc29yOiBwb2ludGVyOwoJb3V0bGluZTogMDsKCXdpZHRoOiA1MHB4OwoJaGVpZ2h0OiAyNHB4OwoJcGFkZGluZzogMCA2cHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjQkRBNDdFOwoJbWFyZ2luLXJpZ2h0OiA2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7Cgljb2xvcjogI0YxRUJFNjsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cgp9CgoKLmhpcmUtZmlsbC1idXR0b246Oi1tb3otZm9jdXMtaW5uZXJ7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwp9CgouaGlyZS1maWxsLWJ1dHRvbiBzdmcgewoJc3Ryb2tlOiAjRjFFQkU2OwoJc3Ryb2tlLXdpZHRoOiAxcHg7CglmaWxsOiAjRjFFQkU2OwoKCXN0cm9rZS1vcGFjaXR5OiAxOwoJaGVpZ2h0OiAxMDAlCn0K","base64");
+var css = Buffer("LmhpcmUtZGphdG9rYS1jbGllbnQsCi5oaXJlLWRqYXRva2EtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGphdG9rYS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0KCi5oaXJlLWZpbGwtYnV0dG9uIHsKCW1hcmdpbjogMDsKCXBhZGRpbmc6IDA7Cglib3JkZXI6IDA7CgliYWNrZ3JvdW5kOiB0cmFuc3BhcmVudDsKCWZvbnQtZmFtaWx5OiBpbmhlcml0OwoJY3Vyc29yOiBwb2ludGVyOwoJb3V0bGluZTogMDsKCXdpZHRoOiA1MHB4OwoJaGVpZ2h0OiAyNHB4OwoJcGFkZGluZzogMCA2cHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjQkRBNDdFOwoJbWFyZ2luLXJpZ2h0OiA2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7Cgljb2xvcjogI0YxRUJFNjsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cgp9CgoKLmhpcmUtZmlsbC1idXR0b246Oi1tb3otZm9jdXMtaW5uZXJ7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwp9CgouaGlyZS1maWxsLWJ1dHRvbiBzdmcgewoJc3Ryb2tlOiAjRjFFQkU2OwoJc3Ryb2tlLXdpZHRoOiAxcHg7CglmaWxsOiAjRjFFQkU2OwoKCXN0cm9rZS1vcGFjaXR5OiAxOwoJaGVpZ2h0OiAxMDAlCn0K","base64");
 (0, _insertCss2["default"])(css, { prepend: true });
 
 _react2["default"].initializeTouchEvents(true);
-exports.DjakotaClient = _componentsDjakotaClient2["default"];
+exports.DjatokaClient = _componentsDjatokaClient2["default"];
 exports.Minimap = _componentsMinimap2["default"];
 exports.Zoom = _componentsZoom2["default"];
 exports.FillButton = _componentsFillButton2["default"];
-exports["default"] = _componentsDjakotaClient2["default"];
+exports["default"] = _componentsDjatokaClient2["default"];
 
-},{"./components/djakota-client":19,"./components/fill-button":20,"./components/minimap":24,"./components/zoom":25,"insert-css":1,"react":"react"}],27:[function(_dereq_,module,exports){
+},{"./components/djatoka-client":19,"./components/fill-button":20,"./components/minimap":24,"./components/zoom":25,"insert-css":1,"react":"react"}],27:[function(_dereq_,module,exports){
 /*
 The MIT License (MIT)
 

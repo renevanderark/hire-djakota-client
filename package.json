@@ -1,7 +1,7 @@
 {
-  "name": "hire-djakota-client",
+  "name": "hire-djatoka-client",
   "version": "0.0.0",
-  "description": "Hire djakota client",
+  "description": "Hire djatoka client",
   "main": "build/index.js",
   "scripts": {
     "start": "scripts/watch.sh",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HuygensING/hire-djakota-client.git"
+    "url": "git+https://github.com/HuygensING/hire-djatoka-client.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/HuygensING/hire-djakota-client/issues"
+    "url": "https://github.com/HuygensING/hire-djatoka-client/issues"
   },
-  "homepage": "https://github.com/HuygensING/hire-djakota-client#readme",
+  "homepage": "https://github.com/HuygensING/hire-djatoka-client#readme",
   "devDependencies": {
     "babel": "^5.8.21",
     "babel-eslint": "^4.1.1",

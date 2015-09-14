@@ -188,7 +188,7 @@ class Minimap extends React.Component {
 
 	render() {
 		return (
-			<div className="hire-djakota-minimap">
+			<div className="hire-djatoka-minimap">
 				<canvas className="image" height={this.state.height} width={this.state.width} />
 				<canvas className="interaction"
 					height={this.state.height}
