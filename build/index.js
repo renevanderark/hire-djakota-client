@@ -2253,10 +2253,12 @@ var Minimap = (function (_React$Component) {
 	}, {
 		key: "dispatchReposition",
 		value: function dispatchReposition(ev) {
+			var doc = document.documentElement;
+			var scrollTop = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
 			var rect = _react2["default"].findDOMNode(this).getBoundingClientRect();
 			_apiStore2["default"].dispatch((0, _apiActions.setRealViewPort)({
 				x: (ev.pageX - rect.left) / this.state.width - this.state.realViewPort.w / 2,
-				y: (ev.pageY - rect.top) / this.state.height - this.state.realViewPort.h / 2,
+				y: (ev.pageY - rect.top - scrollTop) / this.state.height - this.state.realViewPort.h / 2,
 				reposition: true,
 				applyZoom: false
 			}));

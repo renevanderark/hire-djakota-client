@@ -138,10 +138,12 @@ class Minimap extends React.Component {
 	}
 
 	dispatchReposition(ev) {
+		let doc = document.documentElement;
+		let scrollTop = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
 		let rect = React.findDOMNode(this).getBoundingClientRect();
 		store.dispatch(setRealViewPort({
 			x: (ev.pageX - rect.left) / this.state.width - (this.state.realViewPort.w / 2),
-			y: (ev.pageY - rect.top) / this.state.height - (this.state.realViewPort.h / 2),
+			y: (ev.pageY - rect.top - scrollTop) / this.state.height - (this.state.realViewPort.h / 2),
 			reposition: true,
 			applyZoom: false
 		}));
