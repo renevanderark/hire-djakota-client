@@ -9,6 +9,7 @@ const MOUSE_DOWN = 1;
 
 const TOUCH_END = 0;
 const TOUCH_START = 1;
+const TOUCH_PINCH = 2;
 
 const RESIZE_DELAY = 5;
 
@@ -203,10 +204,14 @@ class DjatokaClient extends React.Component {
 	}
 
 	onTouchStart(ev) {
-		this.touchPos.x = ev.touches[0].pageX;
-		this.touchPos.y = ev.touches[0].pageY;
-		this.movement = {x: 0, y: 0};
-		this.touchState = TOUCH_START;
+		if(ev.touches.length > 1) {
+			this.touchState = TOUCH_PINCH;
+		} else {
+			this.touchPos.x = ev.touches[0].pageX;
+			this.touchPos.y = ev.touches[0].pageY;
+			this.movement = {x: 0, y: 0};
+			this.touchState = TOUCH_START;
+		}
 	}
 
 	onMouseMove(ev) {
@@ -230,8 +235,7 @@ class DjatokaClient extends React.Component {
 			let cur = {x: ev.touches[i].pageX, y: ev.touches[i].pageY};
 			this.touchmap.positions[i] = cur;
 		}
-		// TODO use TOUCH_STATE PINCH and TOUCH_STATE TOUCH
-		if (ev.touches.length === 2) {
+		if (ev.touches.length === 2 && this.touchState === TOUCH_PINCH) {
 			let oldD = this.touchmap.pinchDistance;
 			this.touchmap.pinchDistance = parseInt(Math.sqrt(
 				(
@@ -246,7 +250,7 @@ class DjatokaClient extends React.Component {
 			if (this.touchmap.pinchDelta < 50 && this.touchmap.pinchDelta > -50) {
 				this.api.zoomBy(this.determineZoomFactor(this.touchmap.pinchDelta), this.scale, this.level, this.zoom.bind(this));
 			}
-		} else {
+		} else if(this.touchState === TOUCH_START) {
 			this.movement.x = this.touchPos.x - ev.touches[0].pageX;
 			this.movement.y = this.touchPos.y - ev.touches[0].pageY;
 			this.imagePos.x -= this.movement.x / this.scale;
