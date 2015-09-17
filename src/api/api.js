@@ -14,7 +14,7 @@ class Api {
 			"svc_val_fmt": "info:ofi/fmt:kev:mtx:jpeg2000",
 			"svc.format": "image/jpeg"
 		};
-		this.levels = parseInt(this.config.dwtLevels);
+		this.levels = parseInt(this.config.levels);
 		this.fullWidth = parseInt(this.config.width);
 		this.fullHeight = parseInt(this.config.height);
 		this.resolutions = [];
