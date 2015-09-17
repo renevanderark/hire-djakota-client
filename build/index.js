@@ -1547,6 +1547,7 @@ var DjatokaClient = (function (_React$Component) {
 
 				this.imagePos.x = -(w * this.state.realViewPort.x / this.scale);
 				this.imagePos.y = -(h * this.state.realViewPort.y / this.scale);
+				this.correctBounds();
 				this.loadImage({ scale: this.scale, level: this.level });
 			}
 
@@ -1667,6 +1668,7 @@ var DjatokaClient = (function (_React$Component) {
 					this.imagePos.y -= this.movement.y / this.scale;
 					this.mousePos.x = ev.clientX;
 					this.mousePos.y = ev.clientY;
+					this.correctBounds();
 					this.loadImage({ scale: this.scale, level: this.level });
 					return ev.preventDefault();
 				case MOUSE_UP:
@@ -1684,7 +1686,7 @@ var DjatokaClient = (function (_React$Component) {
 				var oldD = this.touchmap.pinchDistance;
 				this.touchmap.pinchDistance = parseInt(Math.sqrt((this.touchmap.positions[0].x - this.touchmap.positions[1].x) * (this.touchmap.positions[0].x - this.touchmap.positions[1].x) + (this.touchmap.positions[0].y - this.touchmap.positions[1].y) * (this.touchmap.positions[0].y - this.touchmap.positions[1].y)), 10);
 				this.touchmap.pinchDelta = oldD - this.touchmap.pinchDistance;
-				if (this.touchmap.pinchDelta < 50 && this.touchmap.pinchDelta > -50) {
+				if (this.touchmap.pinchDelta < 60 && this.touchmap.pinchDelta > -60) {
 					this.api.zoomBy(this.determineZoomFactor(this.touchmap.pinchDelta), this.scale, this.level, this.zoom.bind(this));
 				}
 			} else if (this.touchState === TOUCH_START) {
@@ -1694,6 +1696,7 @@ var DjatokaClient = (function (_React$Component) {
 				this.imagePos.y -= this.movement.y / this.scale;
 				this.touchPos.x = ev.touches[0].pageX;
 				this.touchPos.y = ev.touches[0].pageY;
+				this.correctBounds();
 				this.loadImage({ scale: this.scale, level: this.level });
 			}
 			ev.preventDefault();
@@ -1728,6 +1731,41 @@ var DjatokaClient = (function (_React$Component) {
 			}
 		}
 	}, {
+		key: "correctBounds",
+		value: function correctBounds() {
+			if (this.width <= this.state.width) {
+				if (this.imagePos.x < 0) {
+					this.imagePos.x = 0;
+				}
+				if (this.imagePos.x * this.scale + this.width > this.state.width) {
+					this.imagePos.x = (this.state.width - this.width) / this.scale;
+				}
+			} else if (this.width > this.state.width) {
+				if (this.imagePos.x > 0) {
+					this.imagePos.x = 0;
+				}
+				if (this.imagePos.x * this.scale + this.width < this.state.width) {
+					this.imagePos.x = (this.state.width - this.width) / this.scale;
+				}
+			}
+
+			if (this.height <= this.state.height) {
+				if (this.imagePos.y < 0) {
+					this.imagePos.y = 0;
+				}
+				if (this.imagePos.y * this.scale + this.height > this.state.height) {
+					this.imagePos.y = (this.state.height - this.height) / this.scale;
+				}
+			} else if (this.height > this.state.height) {
+				if (this.imagePos.y > 0) {
+					this.imagePos.y = 0;
+				}
+				if (this.imagePos.y * this.scale + this.height < this.state.height) {
+					this.imagePos.y = (this.state.height - this.height) / this.scale;
+				}
+			}
+		}
+	}, {
 		key: "onDimensions",
 		value: function onDimensions(s, l, w, h) {
 			this.setDimensions(w, h);
@@ -1753,6 +1791,7 @@ var DjatokaClient = (function (_React$Component) {
 				var diffY = Math.floor((origH - this.height) / 2);
 				this.imagePos.x = (origX + diffX) / this.scale;
 				this.imagePos.y = (origY + diffY) / this.scale;
+				this.correctBounds();
 			}
 			this.loadImage({ scale: this.scale, level: this.level });
 		}
@@ -1765,8 +1804,12 @@ var DjatokaClient = (function (_React$Component) {
 				return 0.04 * rev;
 			} else if (rs >= 0.3) {
 				return 0.02 * rev;
-			} else {
+			} else if (rs >= 0.1) {
 				return 0.01 * rev;
+			} else if (rs >= 0.05) {
+				return 0.005 * rev;
+			} else {
+				return 0.0025 * rev;
 			}
 		}
 	}, {
