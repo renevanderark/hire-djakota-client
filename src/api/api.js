@@ -109,7 +109,7 @@ class Api {
 					},
 					level: level,
 					url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
-				}, opts.onTile, opts.onTileInit);
+				}, opts.onTile);
 			}
 		}
 	}

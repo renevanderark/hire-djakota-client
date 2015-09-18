@@ -5,7 +5,9 @@
   "main": "build/index.js",
   "scripts": {
     "start": "scripts/watch.sh",
-    "bump": "hi-bump"
+    "bump": "hi-bump",
+    "test": "mocha --compilers js:babel/register --recursive test",
+    "test:watch": "nodemon -x \"mocha --compilers js:babel/register --recursive --watch test\" -w test -w build"
   },
   "repository": {
     "type": "git",
@@ -25,8 +27,11 @@
     "derequire": "^2.0.0",
     "eslint": "^0.23.0",
     "eslint-plugin-react": "^2.4.0",
+    "expect": "^1.10.0",
     "hi-bump": "^1.1.1",
     "insert-css": "^0.2.0",
+    "mocha": "^2.3.2",
+    "nodemon": "^1.5.1",
     "react": "^0.13.3",
     "watchify": "^3.3.1"
   },
