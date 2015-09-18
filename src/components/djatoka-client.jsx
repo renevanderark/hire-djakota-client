@@ -230,9 +230,10 @@ class DjatokaClient extends React.Component {
 				this.loadImage({scale: this.scale, level: this.level});
 				return ev.preventDefault();
 			case MOUSE_UP:
+				let rect = React.findDOMNode(this).getBoundingClientRect();
 				this.focalPoint = {
-					x: ev.clientX,
-					y: ev.clientY
+					x: ev.clientX - rect.left,
+					y: ev.clientY - rect.top
 				};
 				break;
 			default:
