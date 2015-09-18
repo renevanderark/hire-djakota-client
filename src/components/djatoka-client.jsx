@@ -43,7 +43,7 @@ class DjatokaClient extends React.Component {
 		this.level = null;
 		this.width = null;
 		this.height = null;
-
+		this.focalPoint = null;
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
 		this.mousemoveListener = this.onMouseMove.bind(this);
@@ -113,11 +113,13 @@ class DjatokaClient extends React.Component {
 		}
 
 		if(this.state.realViewPort.applyZoom) {
+			this.focalPoint = null;
 			this.api.zoomTo(this.state.realViewPort.zoom, this.scale, this.level, this.zoom.bind(this));
 		}
 
 
 		if(this.state.mousewheel) {
+			this.focalPoint = null;
 			store.dispatch(sendMouseWheel(false));
 			this.api.zoomBy(this.determineZoomFactor(this.state.mousewheel.deltaY), this.scale, this.level, this.zoom.bind(this));
 		}
@@ -228,6 +230,11 @@ class DjatokaClient extends React.Component {
 				this.loadImage({scale: this.scale, level: this.level});
 				return ev.preventDefault();
 			case MOUSE_UP:
+				this.focalPoint = {
+					x: ev.clientX,
+					y: ev.clientY
+				};
+				break;
 			default:
 		}
 	}
@@ -319,7 +326,7 @@ class DjatokaClient extends React.Component {
 	}
 
 	zoom(s, l, w, h) {
-		let focalPoint = {
+		let focalPoint = this.focalPoint || {
 			x: this.state.width / 2,
 			y: this.state.height / 2
 		};
