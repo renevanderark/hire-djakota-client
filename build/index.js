@@ -1733,6 +1733,9 @@ var DjatokaClient = (function (_React$Component) {
 	}, {
 		key: "correctBounds",
 		value: function correctBounds() {
+			if (this.props.freeMovement) {
+				return;
+			}
 			if (this.width <= this.state.width) {
 				if (this.imagePos.x < 0) {
 					this.imagePos.x = 0;
@@ -1776,21 +1779,22 @@ var DjatokaClient = (function (_React$Component) {
 	}, {
 		key: "zoom",
 		value: function zoom(s, l, w, h) {
-			var origX = this.imagePos.x * this.scale;
-			var origY = this.imagePos.y * this.scale;
-			var origW = this.width;
-			var origH = this.height;
+			var focalPoint = {
+				x: this.state.width / 2,
+				y: this.state.height / 2
+			};
+
+			var dX = (focalPoint.x - this.imagePos.x * this.scale) / this.width;
+			var dY = (focalPoint.y - this.imagePos.y * this.scale) / this.height;
 
 			this.setDimensions(w, h);
 			this.setScale(s, l);
 
-			if (origW === null || origH === null) {
+			if (this.width === null || this.height === null) {
 				this.center(w, h);
 			} else {
-				var diffX = Math.floor((origW - this.width) / 2);
-				var diffY = Math.floor((origH - this.height) / 2);
-				this.imagePos.x = (origX + diffX) / this.scale;
-				this.imagePos.y = (origY + diffY) / this.scale;
+				this.imagePos.x = (focalPoint.x - dX * this.width) / this.scale;
+				this.imagePos.y = (focalPoint.y - dY * this.height) / this.scale;
 				this.correctBounds();
 			}
 			this.loadImage({ scale: this.scale, level: this.level });
@@ -1849,6 +1853,7 @@ var DjatokaClient = (function (_React$Component) {
 
 DjatokaClient.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
+	freeMovement: _react2["default"].PropTypes.bool,
 	scaleMode: function scaleMode(props, propName) {
 		if (SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
 			var msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
@@ -1860,7 +1865,8 @@ DjatokaClient.propTypes = {
 };
 
 DjatokaClient.defaultProps = {
-	scaleMode: "heightFill"
+	scaleMode: "heightFill",
+	freeMovement: true
 };
 
 exports["default"] = DjatokaClient;

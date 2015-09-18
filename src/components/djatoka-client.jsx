@@ -292,6 +292,7 @@ class DjatokaClient extends React.Component {
 	}
 
 	correctBounds() {
+		if(this.props.freeMovement) { return; }
 		if(this.width <= this.state.width) {
 			if(this.imagePos.x < 0) { this.imagePos.x = 0; }
 			if(this.imagePos.x * this.scale + this.width > this.state.width) { this.imagePos.x = (this.state.width - this.width) / this.scale; }
@@ -318,22 +319,22 @@ class DjatokaClient extends React.Component {
 	}
 
 	zoom(s, l, w, h) {
-		let origX = this.imagePos.x * this.scale;
-		let origY = this.imagePos.y * this.scale;
-		let origW = this.width;
-		let origH = this.height;
+		let focalPoint = {
+			x: this.state.width / 2,
+			y: this.state.height / 2
+		};
+
+		let dX = (focalPoint.x - (this.imagePos.x * this.scale)) / this.width;
+		let dY = (focalPoint.y - (this.imagePos.y * this.scale)) / this.height;
 
 		this.setDimensions(w, h);
 		this.setScale(s, l);
 
-
-		if(origW === null || origH === null) {
+		if(this.width === null || this.height === null) {
 			this.center(w, h);
 		} else {
-			let diffX = Math.floor((origW - this.width) / 2);
-			let diffY = Math.floor((origH - this.height) / 2);
-			this.imagePos.x = (origX + diffX) / this.scale;
-			this.imagePos.y = (origY + diffY) / this.scale;
+			this.imagePos.x = (focalPoint.x - (dX * this.width)) / this.scale;
+			this.imagePos.y = (focalPoint.y - (dY * this.height)) / this.scale;
 			this.correctBounds();
 		}
 		this.loadImage({scale: this.scale, level: this.level});
@@ -380,6 +381,7 @@ class DjatokaClient extends React.Component {
 
 DjatokaClient.propTypes = {
 	config: React.PropTypes.object.isRequired,
+	freeMovement: React.PropTypes.bool,
 	scaleMode: function(props, propName) {
 		if(SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
 			let msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
@@ -391,7 +393,8 @@ DjatokaClient.propTypes = {
 };
 
 DjatokaClient.defaultProps = {
-	scaleMode: "heightFill"
+	scaleMode: "heightFill",
+	freeMovement: true
 };
 
 export default DjatokaClient;
