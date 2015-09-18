@@ -114,7 +114,8 @@ class Api {
 		}
 	}
 
-	findLevelForScale(s, level, current = 1) {
+	findLevelForScale(s, level = this.levels, current = 1) {
+		console.log(level);
 		if(s > current / 2 || level === 1) {
 			return level;
 		}
@@ -122,7 +123,7 @@ class Api {
 	}
 
 	zoomTo(zoom, scale, level, onScale) {
-		let newLevel = this.findLevelForScale(zoom, this.levels);
+		let newLevel = this.findLevelForScale(zoom);
 		let newScale = this.upScale(zoom, this.resolutions.length - newLevel);
 		onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * zoom)), parseInt(Math.ceil(this.fullHeight * zoom)));
 	}
@@ -131,7 +132,7 @@ class Api {
 	zoomBy(factor, scale, level, onScale) {
 		let viewportScale = this.getRealScale(scale, level) + factor;
 		if(viewportScale < 0.01) { viewportScale = 0.01; }
-		let newLevel = this.findLevelForScale(viewportScale, this.levels);
+		let newLevel = this.findLevelForScale(viewportScale);
 		let newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
 
 		onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));

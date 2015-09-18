@@ -13,4 +13,5 @@ describe("api", () => {
 	it("should cache an image tile in the tileMap and call onTileLoad with fetchTile");
 	it("should always call onTile with fetchTile, whether its image is complete or not");
 	it("should return the left/top position of the start tile based on a negative value for x/y respectively with getStart");
+	it("should determine which image tiles to fetch based on a given top/left position, viewport dimensions scale and level and call fetchTile with makeTiles");
 });

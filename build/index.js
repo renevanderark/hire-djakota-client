@@ -1241,9 +1241,11 @@ var Api = (function () {
 		}
 	}, {
 		key: "findLevelForScale",
-		value: function findLevelForScale(s, level) {
+		value: function findLevelForScale(s) {
+			var level = arguments.length <= 1 || arguments[1] === undefined ? this.levels : arguments[1];
 			var current = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
 
+			console.log(level);
 			if (s > current / 2 || level === 1) {
 				return level;
 			}
@@ -1252,7 +1254,7 @@ var Api = (function () {
 	}, {
 		key: "zoomTo",
 		value: function zoomTo(zoom, scale, level, onScale) {
-			var newLevel = this.findLevelForScale(zoom, this.levels);
+			var newLevel = this.findLevelForScale(zoom);
 			var newScale = this.upScale(zoom, this.resolutions.length - newLevel);
 			onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * zoom)), parseInt(Math.ceil(this.fullHeight * zoom)));
 		}
@@ -1263,7 +1265,7 @@ var Api = (function () {
 			if (viewportScale < 0.01) {
 				viewportScale = 0.01;
 			}
-			var newLevel = this.findLevelForScale(viewportScale, this.levels);
+			var newLevel = this.findLevelForScale(viewportScale);
 			var newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
 
 			onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
