@@ -1252,10 +1252,10 @@ var Api = (function () {
 		}
 	}, {
 		key: "zoomTo",
-		value: function zoomTo(zoom, scale, level, onScale) {
+		value: function zoomTo(zoom, onScale) {
 			var newLevel = this.findLevelForScale(zoom);
 			var newScale = this.upScale(zoom, this.resolutions.length - newLevel);
-			onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * zoom)), parseInt(Math.ceil(this.fullHeight * zoom)));
+			onScale(newScale, newLevel, Math.ceil(this.fullWidth * zoom), Math.ceil(this.fullHeight * zoom));
 		}
 	}, {
 		key: "zoomBy",
@@ -1267,7 +1267,7 @@ var Api = (function () {
 			var newLevel = this.findLevelForScale(viewportScale);
 			var newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
 
-			onScale(newScale, newLevel, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
+			onScale(newScale, newLevel, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 		}
 	}, {
 		key: "getRealScale",
@@ -1294,7 +1294,7 @@ var Api = (function () {
 			var viewportScale = this.downScale(scale, upscaleFactor);
 
 			if (opts.onScale) {
-				opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
+				opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 			}
 			this.makeTiles(opts, level, scale);
 		}
@@ -1318,7 +1318,7 @@ var Api = (function () {
 			var viewportScale = this.downScale(scale, upscaleFactor);
 
 			if (opts.onScale) {
-				opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth * viewportScale)), parseInt(Math.ceil(this.fullHeight * viewportScale)));
+				opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 			}
 
 			this.makeTiles(opts, level, scale);
@@ -1554,7 +1554,7 @@ var DjatokaClient = (function (_React$Component) {
 
 			if (this.state.realViewPort.applyZoom) {
 				this.focalPoint = null;
-				this.api.zoomTo(this.state.realViewPort.zoom, this.scale, this.level, this.zoom.bind(this));
+				this.api.zoomTo(this.state.realViewPort.zoom, this.zoom.bind(this));
 			}
 
 			if (this.state.mousewheel) {

@@ -114,7 +114,7 @@ class DjatokaClient extends React.Component {
 
 		if(this.state.realViewPort.applyZoom) {
 			this.focalPoint = null;
-			this.api.zoomTo(this.state.realViewPort.zoom, this.scale, this.level, this.zoom.bind(this));
+			this.api.zoomTo(this.state.realViewPort.zoom, this.zoom.bind(this));
 		}
 
 

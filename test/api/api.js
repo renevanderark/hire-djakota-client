@@ -28,9 +28,53 @@ describe("Api", () => {
 	it("should return the left/top position of the start tile based on a negative value for x/y respectively with getStart");
 	it("should determine which image tiles to fetch based on a given top/left position, viewport dimensions scale and level and call fetchTile with makeTiles");
 	it("should find the correct resolution level based on a given scale, dividing reference scale by 2 per level with findLevelForScale");
-	it("should determine scale, resolution level and dimensions for the full image based on a desired zoom at full resolution with zoomTo");
-	it("should determine scale, resolution level and dimensions for the full image based on the current full scale + a given factor with zoomBy");
-	it("should return the full image scale based on current scale and resolution level with getRealScale");
+	it("should determine scale, resolution level and dimensions for the full image based on a desired zoom at full resolution with zoomTo", () => {
+		let onScaleCalled = false;
+		let zoom = 0.4;
+		let expectedScale = zoom * 2;
+		let expectedLevel = apiConfig.levels - 1;
+		let onScale = function(s, l, w, h) {
+			expect(s).toEqual(expectedScale);
+			expect(l).toEqual(expectedLevel);
+			expect(w).toEqual(apiConfig.width * zoom);
+			expect(h).toEqual(apiConfig.height * zoom);
+		};
+		api.zoomTo(zoom, onScale);
+	});
+
+
+	it("should determine scale, resolution level and dimensions for the full image based on the current full scale + a given factor with zoomBy", () => {
+		let onScaleCalled = false;
+		let l = 4;
+		let s = 0.4;
+		let f = 1.1;
+		let sToVpS = s / 2 + f;
+		let expectedLevel = 5;
+		let onScale = function(s1, l1, w, h) {
+			onScaleCalled = true;
+			expect(s1).toEqual(sToVpS);
+			expect(l1).toEqual(expectedLevel);
+			expect(w).toEqual(apiConfig.width * sToVpS);
+			expect(h).toEqual(apiConfig.height * sToVpS);
+		};
+		api.zoomBy(f, s, l, onScale);
+		expect(onScaleCalled).toBe(true);
+	});
+
+
+	it("should return the full image scale based on current scale and resolution level with getRealScale", () => {
+		let s1 = 2;
+		let l1 = 5;
+		expect(api.getRealScale(s1, l1)).toEqual(s1);
+		let s2 = 0.4;
+		let l2 = 4;
+		expect(api.getRealScale(s2, l2)).toEqual(s2 / 2);
+		let s3 = 0.1;
+		let l3 = 1;
+		expect(api.getRealScale(s3, l3)).toEqual(s3 / 2 / 2 / 2 / 2);
+	});
+
+
 	it("should return the real image position based on the current scaled position, scale and resolution level with getRealImagePos", () => {
 		let s1 = 1;
 		let l1 = apiConfig.levels;
