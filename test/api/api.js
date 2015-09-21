@@ -2,12 +2,16 @@ import Api from "../../src/api/api";
 import expect from "expect";
 import sinon from "sinon";
 import jsdom from "mocha-jsdom";
+import qs from "qs";
 
+const IDX_WIDTH = 1;
+const IDX_HEIGHT = 0;
 const TILE_SIZE = 512;
 
 describe("Api", () => {
 	jsdom();
 	let api = null;
+	let serviceUrl = ":service_url:";
 	let apiConfig = {
 		identifier: ":identifier:",
 		levels: 5,
@@ -15,18 +19,93 @@ describe("Api", () => {
 		height: 10000
 	};
 	before(() => {
-		api = new Api(":service_url:", apiConfig);
+		api = new Api(serviceUrl, apiConfig);
 	});
 
 	it("should determine which image tiles to fetch based on a given top/left position, viewport dimensions scale and level and call fetchTile with makeTiles");
-	it("should handle an image error properly with onTileLoad");
 
-	it("should construct properly");
-	it("should recursively initialize resolution levels from config with initializeResolutions");
-	it("should find the correct resolution level based on a given width or height with findLevel");
-	it("should generate a valid djatoka image URL based on a valid tile spec with makeTileUrl");
-	it("should divide a given value val by 2 a given amount of times with downScale");
-	it("should multiply a given value val by 2 a given amount of times with upScale");
+
+	it("should construct properly", () => {
+		expect(api.service).toEqual(serviceUrl);
+		expect(api.config).toEqual(apiConfig);
+		expect(api.params).toEqual({
+			"rft_id": apiConfig.identifier,
+			"url_ver": "Z39.88-2004",
+			"svc_val_fmt": "info:ofi/fmt:kev:mtx:jpeg2000",
+			"svc.format": "image/jpeg"
+		});
+		expect(api.levels).toBe(5);
+		expect(api.fullWidth).toBe(5000);
+		expect(api.fullHeight).toBe(10000);
+
+		expect(api.tileMap).toEqual({});
+
+		expect(api.resolutions).toEqual([
+			[10000, 5000],
+			[5000, 2500],
+			[2500, 1250],
+			[1250, 625],
+			[625, 312]
+		].reverse());
+	});
+
+	it("should recursively initialize resolution levels from config with initializeResolutions", () => {
+		api.resolutions = [];
+		api.initializeResolutions();
+		expect(api.resolutions).toEqual([
+			[10000, 5000],
+			[5000, 2500],
+			[2500, 1250],
+			[1250, 625],
+			[625, 312]
+		].reverse());
+	});
+
+
+	it("should find the correct resolution level based on a given width or height with findLevel", () => {
+		expect(api.findLevel(apiConfig.width * 2, IDX_WIDTH)).toEqual(apiConfig.levels);
+		expect(api.findLevel(apiConfig.width / 2, IDX_WIDTH)).toEqual(apiConfig.levels);
+		expect(api.findLevel(apiConfig.width / 2 - 1, IDX_WIDTH)).toEqual(apiConfig.levels - 1);
+		expect(api.findLevel(apiConfig.width / 2 / 2 / 2 - 1, IDX_WIDTH)).toEqual(apiConfig.levels - 3);
+		expect(api.findLevel(apiConfig.width / 2 / 2 / 2 / 2 - 1, IDX_WIDTH)).toEqual(apiConfig.levels - 4);
+		expect(api.findLevel(apiConfig.width / 2 / 2 / 2 / 2 / 2 - 1, IDX_WIDTH)).toEqual(apiConfig.levels - 4);
+
+		expect(api.findLevel(apiConfig.height * 2, IDX_HEIGHT)).toEqual(apiConfig.levels);
+		expect(api.findLevel(apiConfig.height / 2, IDX_HEIGHT)).toEqual(apiConfig.levels);
+		expect(api.findLevel(apiConfig.height/ 2 - 1, IDX_HEIGHT)).toEqual(apiConfig.levels - 1);
+		expect(api.findLevel(apiConfig.height / 2 / 2 / 2 - 1, IDX_HEIGHT)).toEqual(apiConfig.levels - 3);
+		expect(api.findLevel(apiConfig.height / 2 / 2 / 2 / 2 - 1, IDX_HEIGHT)).toEqual(apiConfig.levels - 4);
+		expect(api.findLevel(apiConfig.height / 2 / 2 / 2 / 2 / 2 - 1, IDX_HEIGHT)).toEqual(apiConfig.levels - 4);
+
+		expect(api.findLevel(apiConfig.width - 1, IDX_HEIGHT)).toNotEqual(apiConfig.levels);
+		expect(api.findLevel(apiConfig.height - 1, IDX_HEIGHT)).toEqual(apiConfig.levels);
+	});
+
+
+	it("should generate a valid djatoka image URL based on a valid tile spec with makeTileUrl", () => {
+		let [base, q] = api.makeTileUrl(3, [11, 22, 33, 43]).split("?");
+		expect(base).toEqual(serviceUrl);
+		expect(qs.parse(q)).toEqual({
+			"rft_id": ":identifier:",
+			svc: { format: "image/jpeg", level: "3", region: "11,22,33,43"},
+			"svc_id": "info:lanl-repo/svc/getRegion",
+			"svc_val_fmt": "info:ofi/fmt:kev:mtx:jpeg2000",
+			"url_ver": "Z39.88-2004"
+		});
+	});
+
+
+	it("should divide a given value val by 2 a given amount of times with downScale", () => {
+		expect(api.downScale(1, 3)).toEqual(0.125);
+		expect(api.downScale(1, 4)).toEqual(0.0625);
+	});
+
+	it("should multiply a given value val by 2 a given amount of times with upScale", () => {
+		expect(api.upScale(1, 3)).toEqual(8);
+		expect(api.upScale(1, 4)).toEqual(16);
+	});
+
+
 	it("should wait for the property complete on the image object to be true and call onTile on complete with onTileLoad", (done) => {
 		let tileIm = {complete: false, src: "mock:data"};
 		let tileSpec = "mock:data";

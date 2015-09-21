@@ -1148,7 +1148,11 @@ var Api = (function () {
 
 	_createClass(Api, [{
 		key: "initializeResolutions",
-		value: function initializeResolutions(level, w, h) {
+		value: function initializeResolutions() {
+			var level = arguments.length <= 0 || arguments[0] === undefined ? this.levels - 1 : arguments[0];
+			var w = arguments.length <= 1 || arguments[1] === undefined ? this.fullWidth : arguments[1];
+			var h = arguments.length <= 2 || arguments[2] === undefined ? this.fullHeight : arguments[2];
+
 			this.resolutions.unshift([h, w]);
 			if (level > 0) {
 				this.initializeResolutions(--level, parseInt(Math.floor(w / 2)), parseInt(Math.floor(h / 2)));

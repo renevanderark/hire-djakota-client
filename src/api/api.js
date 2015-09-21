@@ -22,7 +22,7 @@ class Api {
 		this.tileMap = {};
 	}
 
-	initializeResolutions(level, w, h) {
+	initializeResolutions(level = this.levels - 1, w = this.fullWidth, h = this.fullHeight) {
 		this.resolutions.unshift([h, w]);
 		if(level > 0) {
 			this.initializeResolutions(--level, parseInt(Math.floor(w / 2)), parseInt(Math.floor(h / 2)));
