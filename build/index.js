@@ -1305,7 +1305,7 @@ var Api = (function () {
 			var scale = 1;
 
 			if (opts.onScale) {
-				opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth)), parseInt(Math.ceil(this.fullHeight)));
+				opts.onScale(scale, level, this.fullWidth, this.fullHeight);
 			}
 			this.makeTiles(opts, level, scale);
 		}

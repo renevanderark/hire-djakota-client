@@ -32,7 +32,32 @@ describe("Api", () => {
 	it("should determine scale, resolution level and dimensions for the full image based on the current full scale + a given factor with zoomBy");
 	it("should return the full image scale based on current scale and resolution level with getRealScale");
 	it("should return the real image position based on the current scaled position, scale and resolution level with getRealImagePos");
-	it("should build up the image at 100% scale using makeTiles with fullZoom, optionally calling onScale");
+	it("should build up the image at 100% scale using makeTiles with fullZoom, optionally calling onScale",  () => {
+		let onScaleCalled = false;
+		let expectedLevel = 5;
+		let expectedScale = 1;
+		let opts = {
+			viewport: {h: 1000, w: 500},
+			onScale: function(scale, level, w, h) {
+				onScaleCalled = true;
+				expect(scale).toBe(expectedScale);
+				expect(level).toBe(expectedLevel);
+				expect(w).toBe(apiConfig.width);
+				expect(h).toBe(apiConfig.height);
+			}
+		};
+
+		sinon.stub(api, "makeTiles", function(cOpts, level, scale) {
+			expect(cOpts).toEqual(opts);
+			expect(level).toBe(expectedLevel);
+			expect(scale).toBe(expectedScale);
+		});
+
+		api.fullZoom(opts);
+		sinon.assert.calledOnce(api.makeTiles);
+		api.makeTiles.restore();
+		expect(onScaleCalled).toBe(true);
+	});
 
 	it("should build up the image at full viewport width using makeTiles with widthFill, optionally calling onScale with level, scale and scaled dimensions",  () => {
 		let onScaleCalled = false;

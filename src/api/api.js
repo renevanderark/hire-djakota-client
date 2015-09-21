@@ -166,7 +166,7 @@ class Api {
 		let level = this.levels;
 		let scale = 1;
 
-		if(opts.onScale) { opts.onScale(scale, level, parseInt(Math.ceil(this.fullWidth)), parseInt(Math.ceil(this.fullHeight))); }
+		if(opts.onScale) { opts.onScale(scale, level, this.fullWidth, this.fullHeight); }
 		this.makeTiles(opts, level, scale);
 	}
 
