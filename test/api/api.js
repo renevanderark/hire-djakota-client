@@ -28,6 +28,8 @@ describe("Api", () => {
 	it("should return the left/top position of the start tile based on a negative value for x/y respectively with getStart");
 	it("should determine which image tiles to fetch based on a given top/left position, viewport dimensions scale and level and call fetchTile with makeTiles");
 	it("should find the correct resolution level based on a given scale, dividing reference scale by 2 per level with findLevelForScale");
+
+
 	it("should determine scale, resolution level and dimensions for the full image based on a desired zoom at full resolution with zoomTo", () => {
 		let onScaleCalled = false;
 		let zoom = 0.4;
@@ -42,6 +44,21 @@ describe("Api", () => {
 		};
 		api.zoomTo(zoom, onScale);
 		expect(onScaleCalled).toBe(true);
+
+		onScaleCalled = false;
+		zoom = 0.2;
+		expectedScale = zoom * 2 * 2;
+		expectedLevel = apiConfig.levels - 2;
+		onScale = function(s, l, w, h) {
+			onScaleCalled = true;
+			expect(s).toEqual(expectedScale);
+			expect(l).toEqual(expectedLevel);
+			expect(w).toEqual(apiConfig.width * zoom);
+			expect(h).toEqual(apiConfig.height * zoom);
+		};
+		api.zoomTo(zoom, onScale);
+		expect(onScaleCalled).toBe(true);
+
 	});
 
 
