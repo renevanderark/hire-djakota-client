@@ -34,12 +34,14 @@ describe("Api", () => {
 		let expectedScale = zoom * 2;
 		let expectedLevel = apiConfig.levels - 1;
 		let onScale = function(s, l, w, h) {
+			onScaleCalled = true;
 			expect(s).toEqual(expectedScale);
 			expect(l).toEqual(expectedLevel);
 			expect(w).toEqual(apiConfig.width * zoom);
 			expect(h).toEqual(apiConfig.height * zoom);
 		};
 		api.zoomTo(zoom, onScale);
+		expect(onScaleCalled).toBe(true);
 	});
 
 
