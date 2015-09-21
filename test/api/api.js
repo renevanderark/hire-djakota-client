@@ -2,8 +2,11 @@ import Api from "../../src/api/api";
 import expect from "expect";
 import sinon from "sinon";
 
+const TILE_SIZE = 512;
+
 describe("Api", () => {
 	let api = null;
+
 	let apiConfig = {
 		identifier: ":identifier:",
 		levels: 5,
@@ -14,6 +17,7 @@ describe("Api", () => {
 		api = new Api(":service_url:", apiConfig);
 	});
 
+	it("should determine which image tiles to fetch based on a given top/left position, viewport dimensions scale and level and call fetchTile with makeTiles");
 
 	it("should construct properly");
 	it("should recursively initialize resolution levels from config with initializeResolutions");
@@ -25,8 +29,14 @@ describe("Api", () => {
 	it("should handle an image error properly with onTileLoad");
 	it("should cache an image tile in the tileMap and call onTileLoad with fetchTile");
 	it("should always call onTile with fetchTile, whether its image is complete or not");
-	it("should return the left/top position of the start tile based on a negative value for x/y respectively with getStart");
-	it("should determine which image tiles to fetch based on a given top/left position, viewport dimensions scale and level and call fetchTile with makeTiles");
+	it("should return the left/top position of the start tile based on a negative value for x/y respectively with getStart", () => {
+		let xy = -TILE_SIZE * 3 - 1;
+		let xy1 = 3;
+		let xy2 = -TILE_SIZE * 2;
+		expect(api.getStart(xy)).toEqual(TILE_SIZE * 3);
+		expect(api.getStart(xy1)).toEqual(0);
+		expect(api.getStart(xy2)).toEqual(TILE_SIZE);
+	});
 
 	it("should find the correct resolution level based on a given scale, dividing reference scale by 2 per level with findLevelForScale", () => {
 		expect(api.findLevelForScale(5)).toEqual(5);
