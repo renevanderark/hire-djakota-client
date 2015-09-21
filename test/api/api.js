@@ -1,12 +1,13 @@
 import Api from "../../src/api/api";
 import expect from "expect";
 import sinon from "sinon";
+import jsdom from "mocha-jsdom";
 
 const TILE_SIZE = 512;
 
 describe("Api", () => {
+	jsdom();
 	let api = null;
-
 	let apiConfig = {
 		identifier: ":identifier:",
 		levels: 5,
@@ -27,8 +28,35 @@ describe("Api", () => {
 	it("should multiply a given value val by 2 a given amount of times with upScale");
 	it("should wait for the property complete on the image object and call onTile on complete with onTileLoad");
 	it("should handle an image error properly with onTileLoad");
-	it("should cache an image tile in the tileMap and call onTileLoad with fetchTile");
-	it("should always call onTile with fetchTile, whether its image is complete or not");
+	it("should cache an image tile in the tileMap and call onTileLoad with fetchTile", () => {
+		let tile = {realX: 1, realY: 2, pos: {x: 3, y: 4}, level: 5, url: ":url:"};
+		let onTileCalled = false;
+		let onTile = function(tileIm, tileObj) {
+			onTileCalled = true;
+			expect(tileIm.onload).toBeA(Function);
+			expect(tileIm.src).toEqual(":url:");
+			expect(tileObj).toEqual(tile);
+		};
+
+		api.fetchTile(tile, onTile);
+
+		expect(onTileCalled).toBe(true);
+		delete api.tileMap["1-2-5-:url:"];
+
+	});
+
+
+	it("should always call onTile with fetchTile, whether its image is complete / in cache or not", () => {
+		api.tileMap["1-2-5-:url:"] = "in cache";
+		let tile = {realX: 1, realY: 2, pos: {x: 3, y: 4}, level: 5, url: ":url:"};
+		let onTileCalled = false;
+		let onTile = function(tileIm) { onTileCalled = true; expect(tileIm).toEqual("in cache"); };
+		api.fetchTile(tile, onTile);
+		expect(onTileCalled).toBe(true);
+		delete api.tileMap["1-2-5-:url:"];
+	});
+
+
 	it("should return the left/top position of the start tile based on a negative value for x/y respectively with getStart", () => {
 		let xy = -TILE_SIZE * 3 - 1;
 		let xy1 = 3;

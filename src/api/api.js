@@ -102,7 +102,6 @@ class Api {
 				this.fetchTile({
 					realX: x,
 					realY: y,
-					timeStamp: opts.timeStamp,
 					pos: {
 						x: x,
 						y: y
