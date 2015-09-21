@@ -31,8 +31,33 @@ describe("Api", () => {
 	it("should determine scale, resolution level and dimensions for the full image based on a desired zoom at full resolution with zoomTo");
 	it("should determine scale, resolution level and dimensions for the full image based on the current full scale + a given factor with zoomBy");
 	it("should return the full image scale based on current scale and resolution level with getRealScale");
-	it("should return the real image position based on the current scaled position, scale and resolution level with getRealImagePos");
-	it("should build up the image at 100% scale using makeTiles with fullZoom, optionally calling onScale",  () => {
+	it("should return the real image position based on the current scaled position, scale and resolution level with getRealImagePos", () => {
+		let s1 = 1;
+		let l1 = apiConfig.levels;
+		let position1 = { x: apiConfig.width / 2, y: -apiConfig.height / 2};
+		let expectedDims1 = {
+			x: position1.x, y: position1.y, w: apiConfig.width, h: apiConfig.height
+		};
+		expect(api.getRealImagePos(position1, s1, l1)).toEqual(expectedDims1);
+
+		let s2 = 0.75;
+		let l2 = 3;
+		let position2 = {
+			x: 25,
+			y: 30
+		};
+		let expectedDims2 = {
+			x: Math.floor(position2.x * s2),
+			y: Math.floor(position2.y * s2),
+			w: Math.ceil(apiConfig.width * (s2 / 2 / 2)),
+			h: Math.ceil(apiConfig.height * (s2 / 2 / 2))
+		};
+		expect(api.getRealImagePos(position2, s2, l2)).toEqual(expectedDims2);
+
+	});
+
+
+	it("should build up the image at 100% scale using makeTiles with fullZoom, optionally calling onScale", () => {
 		let onScaleCalled = false;
 		let expectedLevel = 5;
 		let expectedScale = 1;
@@ -59,7 +84,7 @@ describe("Api", () => {
 		expect(onScaleCalled).toBe(true);
 	});
 
-	it("should build up the image at full viewport width using makeTiles with widthFill, optionally calling onScale with level, scale and scaled dimensions",  () => {
+	it("should build up the image at full viewport width using makeTiles with widthFill, optionally calling onScale with level, scale and scaled dimensions", () => {
 		let onScaleCalled = false;
 		let expectedLevel = 2;
 		let expectedScale = 0.8;
@@ -136,7 +161,7 @@ describe("Api", () => {
 			"autoFill"
 		];
 		let opts = { confirm: true, level: 2, scale: 0.2};
-		let cb = function(opts) { expect(opts.confirm).toBe(true); };
+		let cb = function(opts1) { expect(opts1.confirm).toBe(true); };
 		for(let i in scaleMethods) {
 			sinon.stub(api, scaleMethods[i], cb);
 		}
@@ -146,8 +171,8 @@ describe("Api", () => {
 			api[scaleMethods[i]].restore();
 		}
 
-		sinon.stub(api, "makeTiles", function(opts, level, scale) {
-			expect(opts).toEqual({confirm: true, level: 2, scale: 0.2});
+		sinon.stub(api, "makeTiles", function(opts1, level, scale) {
+			expect(opts1).toEqual({confirm: true, level: 2, scale: 0.2});
 			expect(level).toBe(2);
 			expect(scale).toBe(0.2);
 		});
