@@ -22,7 +22,59 @@ describe("Api", () => {
 		api = new Api(serviceUrl, apiConfig);
 	});
 
-	it("should determine which image tiles to fetch based on a given top/left position, viewport dimensions scale and level and call fetchTile with makeTiles");
+	it("should generate all tiles at full scale with makeTiles", () => {
+		let level = 5;
+		let scale = 1;
+		let opts = {
+			position: {x: 0, y: 0},
+			viewport: {w: 5000, h: 10000},
+			onTile: ":onTile:"
+		};
+		sinon.stub(api, "fetchTile", function(tile, cb) { expect(cb).toEqual(opts.onTile); });
+		api.makeTiles(opts, level, scale);
+		sinon.assert.callCount(api.fetchTile, 200);
+		api.fetchTile.restore();
+	});
+
+	it("should generate the correct tiles with makeTiles at full resolution, scale=2, with safety margin around viewport ", () => {
+		let output = [];
+		let scale = 2;
+		let level = 5;
+		let opts = {
+			position: {x: 0, y: 0},
+			viewport: {w: 1024, h: 1024},
+			onTile: ":onTile:"
+		};
+		sinon.stub(api, "fetchTile", function(tile) { output.push(tile); });
+		api.makeTiles(opts, level, scale);
+		sinon.assert.callCount(api.fetchTile, 4);
+		api.fetchTile.restore();
+		expect(output).toEqual([
+			{ realX: 0, realY: 0, pos: { x: 0, y: 0 }, level: 5, url: ":service_url:?rft_id=%3Aidentifier%3A&url_ver=Z39.88-2004&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.region=0%2C0%2C512%2C512&svc.level=5&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion" },
+			{ realX: 512, realY: 0, pos: { x: 512, y: 0 }, level: 5, url: ":service_url:?rft_id=%3Aidentifier%3A&url_ver=Z39.88-2004&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.region=0%2C512%2C512%2C512&svc.level=5&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion" },
+			{ realX: 0, realY: 512, pos: { x: 0, y: 512 }, level: 5, url: ":service_url:?rft_id=%3Aidentifier%3A&url_ver=Z39.88-2004&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.region=512%2C0%2C512%2C512&svc.level=5&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion" },
+			{ realX: 512, realY: 512, pos: { x: 512, y: 512 }, level: 5, url: ":service_url:?rft_id=%3Aidentifier%3A&url_ver=Z39.88-2004&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.region=512%2C512%2C512%2C512&svc.level=5&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion"}
+		]);
+	});
+
+	it("should generate the correct repositioned tiles with makeTiles", () => {
+		let output = [];
+		let scale = 1;
+		let level = 2;
+		let opts = {
+			position: {x: -1000, y: -1000},
+			viewport: {w: 30, h: 30},
+			onTile: ":onTile:"
+		};
+		sinon.stub(api, "fetchTile", function(tile) { output.push(tile); });
+		api.makeTiles(opts, level, scale);
+		sinon.assert.calledTwice(api.fetchTile);
+		api.fetchTile.restore();
+		expect(output).toEqual([
+			{ realX: 512, realY: 512, pos: { x: 512, y: 512 }, level: 2, url: ":service_url:?rft_id=%3Aidentifier%3A&url_ver=Z39.88-2004&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.region=4096%2C4096%2C512%2C512&svc.level=2&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion" },
+			{ realX: 512, realY: 1024, pos: { x: 512, y: 1024 }, level: 2, url: ":service_url:?rft_id=%3Aidentifier%3A&url_ver=Z39.88-2004&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.region=8192%2C4096%2C512%2C512&svc.level=2&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion" }
+		]);
+	});
 
 
 	it("should construct properly", () => {

@@ -43,11 +43,11 @@ class Api {
 	makeTileUrl(level, dims) {
 
 		return this.service + "?" +
-			qs.stringify(Object.assign(this.params, {
+			qs.stringify({...this.params, ...{
 				"svc.region": dims.join(","),
 				"svc.level": level,
 				"svc_id": "info:lanl-repo/svc/getRegion"
-			}));
+			}});
 	}
 
 	downScale(val, times) {
