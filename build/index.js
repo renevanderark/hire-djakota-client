@@ -1245,7 +1245,6 @@ var Api = (function () {
 			var level = arguments.length <= 1 || arguments[1] === undefined ? this.levels : arguments[1];
 			var current = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
 
-			console.log(level);
 			if (s > current / 2 || level === 1) {
 				return level;
 			}

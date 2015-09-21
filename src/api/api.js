@@ -115,7 +115,6 @@ class Api {
 	}
 
 	findLevelForScale(s, level = this.levels, current = 1) {
-		console.log(level);
 		if(s > current / 2 || level === 1) {
 			return level;
 		}
