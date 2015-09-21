@@ -4,30 +4,17 @@ import sinon from "sinon";
 
 describe("Api", () => {
 	let api = null;
+	let apiConfig = {
+		identifier: ":identifier:",
+		levels: 5,
+		width: 5000,
+		height: 10000
+	};
 	before(() => {
-		api = new Api(":service_url:", {
-			identifier: ":identifier:",
-			levels: 5,
-			width: 5000,
-			height: 10000
-		});
-/*
-		this.service = service;
-		this.config = config;
-		this.params = {
-			"rft_id": this.config.identifier,
-			"url_ver": "Z39.88-2004",
-			"svc_val_fmt": "info:ofi/fmt:kev:mtx:jpeg2000",
-			"svc.format": "image/jpeg"
-		};
-		this.levels = parseInt(this.config.levels);
-		this.fullWidth = parseInt(this.config.width);
-		this.fullHeight = parseInt(this.config.height);
-		this.resolutions = [];
-		this.initializeResolutions(this.levels - 1, this.fullWidth, this.fullHeight);
-		this.tileMap = {};
-*/
+		api = new Api(":service_url:", apiConfig);
 	});
+
+
 	it("should construct properly");
 	it("should recursively initialize resolution levels from config with initializeResolutions");
 	it("should find the correct resolution level based on a given width or height with findLevel");
@@ -45,10 +32,76 @@ describe("Api", () => {
 	it("should determine scale, resolution level and dimensions for the full image based on the current full scale + a given factor with zoomBy");
 	it("should return the full image scale based on current scale and resolution level with getRealScale");
 	it("should return the real image position based on the current scaled position, scale and resolution level with getRealImagePos");
-	it("should build up the image at full viewport width using makeTiles with widthFill, optionally calling onScale");
 	it("should build up the image at 100% scale using makeTiles with fullZoom, optionally calling onScale");
-	it("should build up the image at full viewport height using makeTiles with heightFill, optionally calling onScale");
-	it("should call either widthFill or heightFill based on the viewport dimensions with autoFill");
+
+	it("should build up the image at full viewport width using makeTiles with widthFill, optionally calling onScale with level, scale and scaled dimensions",  () => {
+		let onScaleCalled = false;
+		let expectedLevel = 2;
+		let expectedScale = 0.8;
+		let opts = {
+			viewport: {h: 1000, w: 500},
+			onScale: function(scale, level, w, h) {
+				onScaleCalled = true;
+				expect(scale).toBe(expectedScale);
+				expect(level).toBe(expectedLevel);
+				expect(w).toBe(apiConfig.width / 2 / 2 / 2 * expectedScale);
+				expect(h).toBe(apiConfig.height / 2 / 2 / 2 * expectedScale);
+			}
+		};
+
+		sinon.stub(api, "makeTiles", function(cOpts, level, scale) {
+			expect(cOpts).toEqual(opts);
+			expect(level).toBe(expectedLevel);
+			expect(scale).toBe(expectedScale);
+		});
+
+		api.widthFill(opts);
+		sinon.assert.calledOnce(api.makeTiles);
+		api.makeTiles.restore();
+		expect(onScaleCalled).toBe(true);
+	});
+
+
+	it("should build up the image at full viewport height using makeTiles with heightFill, optionally calling onScale with level, scale and scaled dimensions", () => {
+		let onScaleCalled = false;
+		let expectedLevel = 1;
+		let expectedScale = 0.8;
+		let opts = {
+			viewport: {h: 500, w: 250},
+			onScale: function(scale, level, w, h) {
+				onScaleCalled = true;
+				expect(scale).toBe(expectedScale);
+				expect(level).toBe(expectedLevel);
+				expect(w).toBe(apiConfig.width / 2 / 2 / 2 / 2 * expectedScale);
+				expect(h).toBe(apiConfig.height / 2 / 2 / 2 / 2 * expectedScale);
+			}
+		};
+
+		sinon.stub(api, "makeTiles", function(cOpts, level, scale) {
+			expect(cOpts).toEqual(opts);
+			expect(level).toBe(expectedLevel);
+			expect(scale).toBe(expectedScale);
+		});
+
+		api.heightFill(opts);
+		sinon.assert.calledOnce(api.makeTiles);
+		api.makeTiles.restore();
+		expect(onScaleCalled).toBe(true);
+	});
+
+
+	it("should call either widthFill or heightFill based on the viewport dimensions with autoFill", () => {
+		let optsA = {viewport: {h: 100, w: 200}};
+		let optsB = {viewport: {h: 200, w: 100}};
+		sinon.stub(api, "heightFill", function(opts) { expect(opts.viewport).toEqual({h: 100, w: 200});	});
+		sinon.stub(api, "widthFill", function(opts) { expect(opts.viewport).toEqual({h: 200, w: 100}); });
+		api.autoFill(optsA);
+		api.autoFill(optsB);
+		sinon.assert.calledOnce(api.heightFill);
+		sinon.assert.calledOnce(api.widthFill);
+		api.heightFill.restore();
+		api.widthFill.restore();
+	});
 
 	it("should should call the method in scaleMode if given, else build up the image based on opts using makeTiles with loadImage", () => {
 		let scaleMethods = [
