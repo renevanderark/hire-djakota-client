@@ -1,5 +1,7 @@
 # React Djatoka client module
 
+[![build status](https://travis-ci.org/HuygensING/hire-djatoka-client.svg?branch=master "Build status")](https://travis-ci.org/HuygensING/hire-djatoka-client)
+
 
 ```javascript
 import React from "react";
