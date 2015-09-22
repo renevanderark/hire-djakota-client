@@ -6,8 +6,8 @@
   "scripts": {
     "start": "scripts/watch.sh",
     "bump": "hi-bump",
-    "test": "mocha --compilers js:babel/register --recursive test",
-    "test:watch": "nodemon -x \"mocha --compilers js:babel/register --recursive --watch test\" -w test -w build"
+    "test": "mocha --compilers js:babel/register --recursive test/unit",
+    "test:watch": "nodemon -x \"mocha --compilers js:babel/register --recursive --watch test/unit\" -w test -w build"
   },
   "repository": {
     "type": "git",
@@ -35,6 +35,7 @@
     "mocha-jsdom": "^1.0.0",
     "nodemon": "^1.5.1",
     "react": "^0.13.3",
+    "selenium-webdriver": "^2.47.0",
     "sinon": "^1.16.1",
     "watchify": "^3.3.1"
   },
