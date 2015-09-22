@@ -1,4 +1,4 @@
-import Api from "../../src/api/api";
+import Api from "../../../src/api/api";
 import expect from "expect";
 import sinon from "sinon";
 import jsdom from "mocha-jsdom";

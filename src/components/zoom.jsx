@@ -85,7 +85,7 @@ class Zoom extends React.Component {
 	render() {
 		let zoom = parseInt(this.state.realViewPort.zoom * 100);
 		return (
-			<span className="hire-zoom-bar" onWheel={this.onWheel.bind(this)}>
+			<span style={{display: "inline-block", width: "400px", height: "10px"}} className="hire-zoom-bar" onWheel={this.onWheel.bind(this)}>
 				<svg
 					onMouseDown={this.onMouseDown.bind(this)}
 					onTouchStart={this.onTouchStart.bind(this)}
