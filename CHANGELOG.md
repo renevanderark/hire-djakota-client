@@ -1,3 +1,6 @@
+### v1.5.0	(2015/9/24 14:20)
+* autoFill now uses image dimensions
+
 ### v1.4.0	(2015/9/24 14:6)
 
 
