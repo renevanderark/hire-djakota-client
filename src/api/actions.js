@@ -19,4 +19,11 @@ export function setFill(mode) {
 	};
 }
 
+export function setFreeMovement(mode) {
+	return {
+		type: "SET_FREE_MOVEMENT",
+		mode: mode
+	};
+}
+
 

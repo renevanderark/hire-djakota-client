@@ -1083,6 +1083,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.setRealViewPort = setRealViewPort;
 exports.sendMouseWheel = sendMouseWheel;
 exports.setFill = setFill;
+exports.setFreeMovement = setFreeMovement;
 
 function setRealViewPort(realViewPort) {
 	return {
@@ -1101,6 +1102,13 @@ function sendMouseWheel(wheelState) {
 function setFill(mode) {
 	return {
 		type: "SET_FILL",
+		mode: mode
+	};
+}
+
+function setFreeMovement(mode) {
+	return {
+		type: "SET_FREE_MOVEMENT",
 		mode: mode
 	};
 }
@@ -1366,7 +1374,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var initialState = {
 	realViewPort: { x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false },
 	mousewheel: null,
-	fillMode: null
+	fillMode: null,
+	freeMovement: false
 };
 
 exports["default"] = function (state, action) {
@@ -1379,6 +1388,8 @@ exports["default"] = function (state, action) {
 			return _extends({}, state, { mousewheel: action.mousewheel });
 		case "SET_FILL":
 			return _extends({}, state, { fillMode: action.mode });
+		case "SET_FREE_MOVEMENT":
+			return _extends({}, state, { freeMovement: action.mode });
 		default:
 			return state;
 	}
@@ -1747,7 +1758,7 @@ var DjatokaClient = (function (_React$Component) {
 	}, {
 		key: "correctBounds",
 		value: function correctBounds() {
-			if (this.props.freeMovement) {
+			if (this.state.freeMovement) {
 				return;
 			}
 			if (this.width <= this.state.width) {
@@ -1867,7 +1878,6 @@ var DjatokaClient = (function (_React$Component) {
 
 DjatokaClient.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
-	freeMovement: _react2["default"].PropTypes.bool,
 	scaleMode: function scaleMode(props, propName) {
 		if (SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
 			var msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
@@ -1879,8 +1889,7 @@ DjatokaClient.propTypes = {
 };
 
 DjatokaClient.defaultProps = {
-	scaleMode: "heightFill",
-	freeMovement: true
+	scaleMode: "heightFill"
 };
 
 exports["default"] = DjatokaClient;
@@ -2309,6 +2318,9 @@ var Minimap = (function (_React$Component) {
 			this.level = l;
 			var dims = this.api.getRealImagePos({ x: 0, y: 0 }, this.scale, this.level);
 			this.setState({ width: dims.w, height: dims.h });
+			if (this.props.onDimensions) {
+				this.props.onDimensions(dims.w, dims.h);
+			}
 		}
 	}, {
 		key: "renderTile",
@@ -2397,6 +2409,7 @@ var Minimap = (function (_React$Component) {
 
 Minimap.propTypes = {
 	config: _react2["default"].PropTypes.object.isRequired,
+	onDimensions: _react2["default"].PropTypes.func,
 	rectFill: _react2["default"].PropTypes.string,
 	rectStroke: _react2["default"].PropTypes.string,
 	service: _react2["default"].PropTypes.string.isRequired
@@ -2538,7 +2551,7 @@ var Zoom = (function (_React$Component) {
 			var zoom = parseInt(this.state.realViewPort.zoom * 100);
 			return _react2["default"].createElement(
 				"span",
-				{ className: "hire-zoom-bar", onWheel: this.onWheel.bind(this) },
+				{ style: { display: "inline-block", width: "400px", height: "10px" }, className: "hire-zoom-bar", onWheel: this.onWheel.bind(this) },
 				_react2["default"].createElement(
 					"svg",
 					{

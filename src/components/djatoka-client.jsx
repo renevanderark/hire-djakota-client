@@ -300,7 +300,7 @@ class DjatokaClient extends React.Component {
 	}
 
 	correctBounds() {
-		if(this.props.freeMovement) { return; }
+		if(this.state.freeMovement) { return; }
 		if(this.width <= this.state.width) {
 			if(this.imagePos.x < 0) { this.imagePos.x = 0; }
 			if(this.imagePos.x * this.scale + this.width > this.state.width) { this.imagePos.x = (this.state.width - this.width) / this.scale; }
@@ -389,7 +389,6 @@ class DjatokaClient extends React.Component {
 
 DjatokaClient.propTypes = {
 	config: React.PropTypes.object.isRequired,
-	freeMovement: React.PropTypes.bool,
 	scaleMode: function(props, propName) {
 		if(SUPPORTED_SCALE_MODES.indexOf(props[propName]) < 0) {
 			let msg = "Scale mode '" + props[propName] + "' not supported. Modes: " + SUPPORTED_SCALE_MODES.join(", ");
@@ -402,7 +401,6 @@ DjatokaClient.propTypes = {
 
 DjatokaClient.defaultProps = {
 	scaleMode: "heightFill",
-	freeMovement: true
 };
 
 export default DjatokaClient;

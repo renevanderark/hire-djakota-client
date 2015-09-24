@@ -125,6 +125,7 @@ class Minimap extends React.Component {
 		this.level = l;
 		let dims = this.api.getRealImagePos({x: 0, y: 0}, this.scale, this.level);
 		this.setState({width: dims.w, height: dims.h});
+		if(this.props.onDimensions) { this.props.onDimensions(dims.w, dims.h); }
 	}
 
 	renderTile(tileIm, tile) {
@@ -205,6 +206,7 @@ class Minimap extends React.Component {
 
 Minimap.propTypes = {
 	config: React.PropTypes.object.isRequired,
+	onDimensions: React.PropTypes.func,
 	rectFill: React.PropTypes.string,
 	rectStroke: React.PropTypes.string,
 	service: React.PropTypes.string.isRequired
