@@ -400,7 +400,7 @@ DjatokaClient.propTypes = {
 };
 
 DjatokaClient.defaultProps = {
-	scaleMode: "heightFill",
+	scaleMode: "autoFill"
 };
 
 export default DjatokaClient;

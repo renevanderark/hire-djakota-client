@@ -1290,7 +1290,6 @@ var Api = (function () {
 	}, {
 		key: "getRealImagePos",
 		value: function getRealImagePos(position, scale, level) {
-			var upscaleFactor = this.resolutions.length - level;
 			return {
 				x: Math.floor(position.x * scale),
 				y: Math.floor(position.y * scale),
@@ -1339,7 +1338,7 @@ var Api = (function () {
 	}, {
 		key: "autoFill",
 		value: function autoFill(opts) {
-			if (opts.viewport.h < opts.viewport.w) {
+			if (this.fullHeight > this.fullWidth) {
 				this.heightFill(opts);
 			} else {
 				this.widthFill(opts);
@@ -1889,7 +1888,7 @@ DjatokaClient.propTypes = {
 };
 
 DjatokaClient.defaultProps = {
-	scaleMode: "heightFill"
+	scaleMode: "autoFill"
 };
 
 exports["default"] = DjatokaClient;

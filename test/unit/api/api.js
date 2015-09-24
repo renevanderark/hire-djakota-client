@@ -399,18 +399,7 @@ describe("Api", () => {
 	});
 
 
-	it("should call either widthFill or heightFill based on the viewport dimensions with autoFill", () => {
-		let optsA = {viewport: {h: 100, w: 200}};
-		let optsB = {viewport: {h: 200, w: 100}};
-		sinon.stub(api, "heightFill", function(opts) { expect(opts.viewport).toEqual({h: 100, w: 200});	});
-		sinon.stub(api, "widthFill", function(opts) { expect(opts.viewport).toEqual({h: 200, w: 100}); });
-		api.autoFill(optsA);
-		api.autoFill(optsB);
-		sinon.assert.calledOnce(api.heightFill);
-		sinon.assert.calledOnce(api.widthFill);
-		api.heightFill.restore();
-		api.widthFill.restore();
-	});
+	it("should call either widthFill or heightFill based on the image dimensions with autoFill");
 
 	it("should should call the method in scaleMode if given, else build up the image based on opts using makeTiles with loadImage", () => {
 		let scaleMethods = [

@@ -142,7 +142,6 @@ class Api {
 	}
 
 	getRealImagePos(position, scale, level) {
-		let upscaleFactor = this.resolutions.length - level;
 		return {
 			x: Math.floor(position.x * scale),
 			y: Math.floor(position.y * scale),
@@ -181,14 +180,12 @@ class Api {
 	}
 
 	autoFill(opts) {
-		if(opts.viewport.h < opts.viewport.w) {
+		if(this.fullHeight > this.fullWidth) {
 			this.heightFill(opts);
 		} else {
 			this.widthFill(opts);
 		}
 	}
-
-
 
 	loadImage(opts) {
 		if(opts.scaleMode) {
