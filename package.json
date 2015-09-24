@@ -1,6 +1,6 @@
 {
   "name": "hire-djatoka-client",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Hire djatoka client",
   "main": "build/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "bump": "hi-bump",
     "test": "mocha --compilers js:babel/register --recursive test/unit",
     "test:watch": "nodemon -x \"mocha --compilers js:babel/register --recursive --watch test/unit\" -w test -w build",
-    "release": "npm run bump && npm run build:standalone"
+    "release": "npm run bump minor && npm run build:standalone"
   },
   "repository": {
     "type": "git",
