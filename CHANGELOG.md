@@ -1,3 +1,7 @@
+### v1.7.0	(2015/9/24 15:48)
+* new standalone release 1.6.0
+* new standalone release 1.6.0
+
 ### v1.6.0	(2015/9/24 15:39)
 * trying out release
 
