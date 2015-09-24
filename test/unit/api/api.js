@@ -18,8 +18,10 @@ describe("Api", () => {
 		width: 5000,
 		height: 10000
 	};
-	before(() => {
+
+	before((done) => {
 		api = new Api(serviceUrl, apiConfig);
+		done();
 	});
 
 	it("should generate all tiles at full scale with makeTiles", () => {
