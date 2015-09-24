@@ -9,6 +9,7 @@ import DjatokaClient from "./components/djatoka-client";
 import Minimap from "./components/minimap";
 import Zoom from "./components/zoom";
 import FillButton from "./components/fill-button";
+import FreeMovementButton from "./components/free-movement-button";
 
-export {DjatokaClient as DjatokaClient, Minimap as Minimap, Zoom as Zoom, FillButton as FillButton};
+export {DjatokaClient as DjatokaClient, Minimap as Minimap, Zoom as Zoom, FillButton as FillButton, FreeMovementButton as FreeMovementButton};
 export default DjatokaClient;

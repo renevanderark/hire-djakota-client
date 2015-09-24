@@ -1895,7 +1895,7 @@ DjatokaClient.defaultProps = {
 exports["default"] = DjatokaClient;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":27,"react":"react"}],20:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":29,"react":"react"}],20:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1996,7 +1996,88 @@ FillButton.defaultProps = {
 exports["default"] = FillButton;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/store":18,"./icons/auto-fill":21,"./icons/height-fill":22,"./icons/width-fill":23,"react":"react"}],21:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/store":18,"./icons/auto-fill":22,"./icons/height-fill":24,"./icons/width-fill":25,"react":"react"}],21:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var _iconsFreeMovement = _dereq_("./icons/free-movement");
+
+var _iconsFreeMovement2 = _interopRequireDefault(_iconsFreeMovement);
+
+var _apiActions = _dereq_("../api/actions");
+
+var _apiStore = _dereq_("../api/store");
+
+var _apiStore2 = _interopRequireDefault(_apiStore);
+
+var FreeMovementButton = (function (_React$Component) {
+    _inherits(FreeMovementButton, _React$Component);
+
+    function FreeMovementButton(props) {
+        _classCallCheck(this, FreeMovementButton);
+
+        _get(Object.getPrototypeOf(FreeMovementButton.prototype), "constructor", this).call(this, props);
+        this.state = _apiStore2["default"].getState();
+    }
+
+    _createClass(FreeMovementButton, [{
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            var _this = this;
+
+            this.unsubscribe = _apiStore2["default"].subscribe(function () {
+                return _this.setState(_apiStore2["default"].getState());
+            });
+        }
+    }, {
+        key: "componentWillUnmount",
+        value: function componentWillUnmount() {
+            this.unsubscribe();
+        }
+    }, {
+        key: "onClick",
+        value: function onClick() {
+            _apiStore2["default"].dispatch((0, _apiActions.setFreeMovement)(!this.state.freeMovement));
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var c = "hire-free-movement-button";
+            if (!this.state.freeMovement) {
+                c += " active";
+            }
+            return _react2["default"].createElement(
+                "button",
+                { className: c, onClick: this.onClick.bind(this) },
+                _react2["default"].createElement(_iconsFreeMovement2["default"], null)
+            );
+        }
+    }]);
+
+    return FreeMovementButton;
+})(_react2["default"].Component);
+
+exports["default"] = FreeMovementButton;
+module.exports = exports["default"];
+
+},{"../api/actions":15,"../api/store":18,"./icons/free-movement":23,"react":"react"}],22:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2059,7 +2140,60 @@ var AutoFill = (function (_React$Component) {
 exports["default"] = AutoFill;
 module.exports = exports["default"];
 
-},{"react":"react"}],22:[function(_dereq_,module,exports){
+},{"react":"react"}],23:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _react = _dereq_("react");
+
+var _react2 = _interopRequireDefault(_react);
+
+var FreeMovement = (function (_React$Component) {
+  _inherits(FreeMovement, _React$Component);
+
+  function FreeMovement() {
+    _classCallCheck(this, FreeMovement);
+
+    _get(Object.getPrototypeOf(FreeMovement.prototype), "constructor", this).apply(this, arguments);
+  }
+
+  _createClass(FreeMovement, [{
+    key: "render",
+    value: function render() {
+      return _react2["default"].createElement(
+        "svg",
+        { viewBox: "0 0 480 480" },
+        _react2["default"].createElement(
+          "g",
+          { id: "key" },
+          _react2["default"].createElement("path", { d: "M294.399,196.875l10.574,10.579c2.627-3.028,4.703-6.688,6.27-10.579H294.399z" }),
+          _react2["default"].createElement("path", { d: "M310.743,163.658c0,0-5.346-10.467-35.785-44.875c-30.422-34.392-50.438-52.094-50.438-52.094   c-11.734-10.376-30.857-10.299-42.514,0.173c0,0-41.014,36.967-61.703,55.609c-20.688,18.626-51.484,55.873-51.484,55.873   c-9.984,12.08-10.346,32.143-0.799,44.564c0,0,13.281,17.327,50.109,48.594c36.828,31.28,47.08,37.157,47.08,37.157   c13.297,7.559,32.859,5.091,44.094-5.363l-23.5-23.842c-14.592-14.842-14.516-38.891,0.232-53.625l41.781-41.781   c7.158-7.171,16.705-11.123,26.861-11.123c10.158,0,19.719,3.952,26.875,11.123l23.42,23.405   C314.801,196.081,317.506,176.955,310.743,163.658z M160.27,196.5c-20.982,0-37.998-17.012-37.998-38.015   c0-20.981,17.016-37.998,37.998-37.998c20.984,0,38.002,17.017,38.002,37.998C198.272,179.488,181.254,196.5,160.27,196.5z" }),
+          _react2["default"].createElement("path", { d: "M416.598,359.407L261.397,204.206c-3.689-3.689-9.734-3.689-13.422,0l-6.283,6.247l160.033,158.609v20.223h-17.002   L223.805,228.346l-17.629,17.642c-3.703,3.685-3.703,9.764-0.061,13.482l144.625,146.767c3.654,3.749,10.938,6.796,16.172,6.796   h32.656c5.221,0,10.752-4.107,12.266-9.108l8.721-28.734C422.069,370.206,420.303,363.078,416.598,359.407z" })
+        )
+      );
+    }
+  }]);
+
+  return FreeMovement;
+})(_react2["default"].Component);
+
+exports["default"] = FreeMovement;
+module.exports = exports["default"];
+
+},{"react":"react"}],24:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2112,7 +2246,7 @@ var HeightFill = (function (_React$Component) {
 exports["default"] = HeightFill;
 module.exports = exports["default"];
 
-},{"react":"react"}],23:[function(_dereq_,module,exports){
+},{"react":"react"}],25:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2165,7 +2299,7 @@ var WidthFill = (function (_React$Component) {
 exports["default"] = WidthFill;
 module.exports = exports["default"];
 
-},{"react":"react"}],24:[function(_dereq_,module,exports){
+},{"react":"react"}],26:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2423,7 +2557,7 @@ Minimap.defaultProps = {
 exports["default"] = Minimap;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":27,"react":"react"}],25:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/api":16,"../api/store":18,"../util/request-animation-frame":29,"react":"react"}],27:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2587,7 +2721,7 @@ Zoom.defaultProps = {
 exports["default"] = Zoom;
 module.exports = exports["default"];
 
-},{"../api/actions":15,"../api/store":18,"react":"react"}],26:[function(_dereq_,module,exports){
+},{"../api/actions":15,"../api/store":18,"react":"react"}],28:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2620,9 +2754,13 @@ var _componentsFillButton = _dereq_("./components/fill-button");
 
 var _componentsFillButton2 = _interopRequireDefault(_componentsFillButton);
 
+var _componentsFreeMovementButton = _dereq_("./components/free-movement-button");
+
+var _componentsFreeMovementButton2 = _interopRequireDefault(_componentsFreeMovementButton);
 
 
-var css = Buffer("LmhpcmUtZGphdG9rYS1jbGllbnQsCi5oaXJlLWRqYXRva2EtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGphdG9rYS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0KCi5oaXJlLWZpbGwtYnV0dG9uIHsKCW1hcmdpbjogMDsKCXBhZGRpbmc6IDA7Cglib3JkZXI6IDA7CgliYWNrZ3JvdW5kOiB0cmFuc3BhcmVudDsKCWZvbnQtZmFtaWx5OiBpbmhlcml0OwoJY3Vyc29yOiBwb2ludGVyOwoJb3V0bGluZTogMDsKCXdpZHRoOiA1MHB4OwoJaGVpZ2h0OiAyNHB4OwoJcGFkZGluZzogMCA2cHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjQkRBNDdFOwoJbWFyZ2luLXJpZ2h0OiA2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7Cgljb2xvcjogI0YxRUJFNjsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cgp9CgoKLmhpcmUtZmlsbC1idXR0b246Oi1tb3otZm9jdXMtaW5uZXJ7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwp9CgouaGlyZS1maWxsLWJ1dHRvbiBzdmcgewoJc3Ryb2tlOiAjRjFFQkU2OwoJc3Ryb2tlLXdpZHRoOiAxcHg7CglmaWxsOiAjRjFFQkU2OwoKCXN0cm9rZS1vcGFjaXR5OiAxOwoJaGVpZ2h0OiAxMDAlCn0K","base64");
+
+var css = Buffer("LmhpcmUtZGphdG9rYS1jbGllbnQsCi5oaXJlLWRqYXRva2EtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGphdG9rYS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0KCi5oaXJlLWZpbGwtYnV0dG9uLAouaGlyZS1mcmVlLW1vdmVtZW50LWJ1dHRvbiB7CgltYXJnaW46IDA7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwoJYmFja2dyb3VuZDogdHJhbnNwYXJlbnQ7Cglmb250LWZhbWlseTogaW5oZXJpdDsKCWN1cnNvcjogcG9pbnRlcjsKCW91dGxpbmU6IDA7Cgl3aWR0aDogNTBweDsKCWhlaWdodDogMjRweDsKCXBhZGRpbmc6IDAgNnB4OwoJYmFja2dyb3VuZC1jb2xvcjogI0JEQTQ3RTsKCW1hcmdpbi1yaWdodDogNnB4OwoJYm9yZGVyLXJhZGl1czogM3B4OwoJY29sb3I6ICNGMUVCRTY7Cgl2ZXJ0aWNhbC1hbGlnbjogdG9wOwoKfQoKCi5oaXJlLWZpbGwtYnV0dG9uOjotbW96LWZvY3VzLWlubmVyLAouaGlyZS1mcmVlLW1vdmVtZW50LWJ1dHRvbjo6LW1vei1mb2N1cy1pbm5lciB7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwp9CgouaGlyZS1maWxsLWJ1dHRvbiBzdmcsCi5oaXJlLWZyZWUtbW92ZW1lbnQtYnV0dG9uIHN2ZyB7CglzdHJva2U6ICNGMUVCRTY7CglzdHJva2Utd2lkdGg6IDFweDsKCWZpbGw6ICNGMUVCRTY7CgoJc3Ryb2tlLW9wYWNpdHk6IDE7CgloZWlnaHQ6IDEwMCUKfQoKLmhpcmUtZnJlZS1tb3ZlbWVudC1idXR0b24uYWN0aXZlIHN2ZyB7CglmaWxsOiAjYWZhOwp9","base64");
 (0, _insertCss2["default"])(css, { prepend: true });
 
 _react2["default"].initializeTouchEvents(true);
@@ -2630,9 +2768,10 @@ exports.DjatokaClient = _componentsDjatokaClient2["default"];
 exports.Minimap = _componentsMinimap2["default"];
 exports.Zoom = _componentsZoom2["default"];
 exports.FillButton = _componentsFillButton2["default"];
+exports.FreeMovementButton = _componentsFreeMovementButton2["default"];
 exports["default"] = _componentsDjatokaClient2["default"];
 
-},{"./components/djatoka-client":19,"./components/fill-button":20,"./components/minimap":24,"./components/zoom":25,"insert-css":1,"react":"react"}],27:[function(_dereq_,module,exports){
+},{"./components/djatoka-client":19,"./components/fill-button":20,"./components/free-movement-button":21,"./components/minimap":26,"./components/zoom":27,"insert-css":1,"react":"react"}],29:[function(_dereq_,module,exports){
 /*
 The MIT License (MIT)
 
@@ -2683,5 +2822,5 @@ var cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ? f
 } : undefined;
 exports.cancelAnimationFrame = cancelAnimationFrame;
 
-},{}]},{},[26])(26)
+},{}]},{},[28])(28)
 });

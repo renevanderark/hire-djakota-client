@@ -56,7 +56,8 @@
 	stroke-width: 0;
 }
 
-.hire-fill-button {
+.hire-fill-button,
+.hire-free-movement-button {
 	margin: 0;
 	padding: 0;
 	border: 0;
@@ -76,16 +77,22 @@
 }
 
 
-.hire-fill-button::-moz-focus-inner{
+.hire-fill-button::-moz-focus-inner,
+.hire-free-movement-button::-moz-focus-inner {
 	padding: 0;
 	border: 0;
 }
 
-.hire-fill-button svg {
+.hire-fill-button svg,
+.hire-free-movement-button svg {
 	stroke: #F1EBE6;
 	stroke-width: 1px;
 	fill: #F1EBE6;
 
 	stroke-opacity: 1;
 	height: 100%
+}
+
+.hire-free-movement-button.active svg {
+	fill: #afa;
 }
