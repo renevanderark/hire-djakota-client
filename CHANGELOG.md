@@ -1,3 +1,6 @@
+### v1.3.0	(2015/9/24 14:2)
+* added free movement toggle
+
 ### v1.2.0	(2015/9/24 13:44)
 * fix before all hook
 * set freeMovement in internal state in stead of props; provide callback on minimap dimensions
