@@ -5,7 +5,7 @@
 echo "Exporting standalone for version: $npm_package_version"
 
 node_modules/.bin/browserify \
-	--require react > build/react-libs.js
+	--require react | node_modules/.bin/uglifyjs > build/react-libs.js
 
 node_modules/.bin/browserify src/standalone.jsx \
 	--extension=.jsx \
@@ -13,7 +13,7 @@ node_modules/.bin/browserify src/standalone.jsx \
 	 --transform [ babelify ] \
   	-t brfs \
   	--verbose \
-	--external react > build/pack.js
+	--external react | node_modules/.bin/uglifyjs > build/pack.js
 
 
 cat build/react-libs.js build/pack.js > build/hire-djatoka-client-$npm_package_version.js
