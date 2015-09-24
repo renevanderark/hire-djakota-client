@@ -5,9 +5,11 @@
   "main": "build/index.js",
   "scripts": {
     "start": "scripts/watch.sh",
+    "build:standalone": "scripts/build-cdn.sh",
     "bump": "hi-bump",
     "test": "mocha --compilers js:babel/register --recursive test/unit",
-    "test:watch": "nodemon -x \"mocha --compilers js:babel/register --recursive --watch test/unit\" -w test -w build"
+    "test:watch": "nodemon -x \"mocha --compilers js:babel/register --recursive --watch test/unit\" -w test -w build",
+    "release": "npm run bump && npm run build:standalone"
   },
   "repository": {
     "type": "git",
