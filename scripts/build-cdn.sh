@@ -16,9 +16,9 @@ node_modules/.bin/browserify src/standalone.jsx \
 	--external react | node_modules/.bin/uglifyjs > build/pack.js
 
 
-cat build/react-libs.js build/pack.js > build/hire-djatoka-client-$npm_package_version.js
+cat build/react-libs.js build/pack.js > build/hire-djatoka-client-$npm_package_version-standalone.js
 rm build/react-libs.js
-rm build/pack.js
+mv build/pack.js build/hire-djatoka-client-$npm_package_version.js
 
 git add build/hire-djatoka-client-$npm_package_version.js
 git commit -a -m "new standalone release $npm_package_version"
