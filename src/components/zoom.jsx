@@ -49,6 +49,7 @@ class Zoom extends React.Component {
 
 	}
 	onMouseDown(ev) {
+		alert("test");
 		this.mouseState = MOUSE_DOWN;
 		this.dispatchRealScale(ev.pageX);
 	}
@@ -85,7 +86,7 @@ class Zoom extends React.Component {
 	render() {
 		let zoom = parseInt(this.state.realViewPort.zoom * 100);
 		return (
-			<span style={{display: "inline-block", width: "400px", height: "10px"}} className="hire-zoom-bar" onWheel={this.onWheel.bind(this)}>
+			<span className="hire-zoom-bar" onWheel={this.onWheel.bind(this)}>
 				<svg
 					onMouseDown={this.onMouseDown.bind(this)}
 					onTouchStart={this.onTouchStart.bind(this)}
