@@ -1,3 +1,7 @@
+### v1.9.0	(2015/9/25 10:5)
+* removed alert whoopsie
+* new standalone release 1.8.0
+
 ### v1.8.0	(2015/9/25 9:56)
 * removed inline styling from zoom
 * release strategies
