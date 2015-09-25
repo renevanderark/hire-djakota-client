@@ -41,11 +41,9 @@ export default {
 	mountNode: function(config, service, node) {
 		React.render(<App config={config} service={service} />, node);
 	},
-	components: {
-		DjatokaClient: DjatokaClient,
-		Minimap: Minimap,
-		Zoom: Zoom,
-		FillButton: FillButton,
-		FreeMovementButton: FreeMovementButton
-	}
+	DjatokaClient: DjatokaClient,
+	Minimap: Minimap,
+	Zoom: Zoom,
+	FillButton: FillButton,
+	FreeMovementButton: FreeMovementButton
 };
