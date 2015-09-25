@@ -1,3 +1,13 @@
+### v1.8.0	(2015/9/25 9:56)
+* removed inline styling from zoom
+* release strategies
+* new standalone release 1.7.0
+* new standalone release 1.7.0
+* new standalone release 1.7.0
+* new standalone release 1.7.0
+* new standalone release 1.7.0
+* new standalone release 1.7.0
+
 ### v1.7.0	(2015/9/24 15:48)
 * new standalone release 1.6.0
 * new standalone release 1.6.0
