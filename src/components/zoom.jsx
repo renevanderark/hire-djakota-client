@@ -49,7 +49,6 @@ class Zoom extends React.Component {
 
 	}
 	onMouseDown(ev) {
-		alert("test");
 		this.mouseState = MOUSE_DOWN;
 		this.dispatchRealScale(ev.pageX);
 	}
