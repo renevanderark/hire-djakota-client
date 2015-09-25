@@ -149,17 +149,6 @@ describe("Api", () => {
 	});
 
 
-	it("should divide a given value val by 2 a given amount of times with downScale", () => {
-		expect(api.downScale(1, 3)).toEqual(0.125);
-		expect(api.downScale(1, 4)).toEqual(0.0625);
-	});
-
-	it("should multiply a given value val by 2 a given amount of times with upScale", () => {
-		expect(api.upScale(1, 3)).toEqual(8);
-		expect(api.upScale(1, 4)).toEqual(16);
-	});
-
-
 	it("should wait for the property complete on the image object to be true and call onTile on complete with onTileLoad", (done) => {
 		let tileIm = {complete: false, src: "mock:data"};
 		let tileSpec = "mock:data";

@@ -1136,6 +1136,41 @@ var IDX_WIDTH = 1;
 var IDX_HEIGHT = 0;
 var TILE_SIZE = 512;
 
+var downScale = function downScale(_x6, _x7) {
+	var _again = true;
+
+	_function: while (_again) {
+		var val = _x6,
+		    times = _x7;
+		_again = false;
+		if (times > 0) {
+			_x6 = val / 2;
+			_x7 = --times;
+			_again = true;
+			continue _function;
+		} else {
+			return val;
+		}
+	}
+};
+var upScale = function upScale(_x8, _x9) {
+	var _again2 = true;
+
+	_function2: while (_again2) {
+		var val = _x8,
+		    times = _x9;
+		_again2 = false;
+		if (times > 0) {
+			_x8 = val * 2;
+			_x9 = --times;
+			_again2 = true;
+			continue _function2;
+		} else {
+			return val;
+		}
+	}
+};
+
 var Api = (function () {
 	function Api(service, config) {
 		_classCallCheck(this, Api);
@@ -1190,16 +1225,6 @@ var Api = (function () {
 			}));
 		}
 	}, {
-		key: "downScale",
-		value: function downScale(val, times) {
-			return times > 0 ? this.downScale(val / 2, --times) : val;
-		}
-	}, {
-		key: "upScale",
-		value: function upScale(val, times) {
-			return times > 0 ? this.upScale(val * 2, --times) : val;
-		}
-	}, {
 		key: "onTileLoad",
 		value: function onTileLoad(tileIm, tile, onTile) {
 			if (!tileIm.complete) {
@@ -1235,9 +1260,9 @@ var Api = (function () {
 			var yStart = this.getStart(opts.position.y);
 			var xStart = this.getStart(opts.position.x);
 
-			for (var y = yStart; (y - yStart) * scale - TILE_SIZE * 2 + opts.position.y < opts.viewport.h && this.upScale(y, upscaleFactor) < this.fullHeight; y += TILE_SIZE) {
+			for (var y = yStart; (y - yStart) * scale - TILE_SIZE * 2 + opts.position.y < opts.viewport.h && upScale(y, upscaleFactor) < this.fullHeight; y += TILE_SIZE) {
 
-				for (var x = xStart; (x - xStart) * scale - TILE_SIZE * 2 + opts.position.x < opts.viewport.w && this.upScale(x, upscaleFactor) < this.fullWidth; x += TILE_SIZE) {
+				for (var x = xStart; (x - xStart) * scale - TILE_SIZE * 2 + opts.position.x < opts.viewport.w && upScale(x, upscaleFactor) < this.fullWidth; x += TILE_SIZE) {
 
 					this.fetchTile({
 						realX: x,
@@ -1247,7 +1272,7 @@ var Api = (function () {
 							y: y
 						},
 						level: level,
-						url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
+						url: this.makeTileUrl(level, [upScale(y, upscaleFactor), upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
 					}, opts.onTile);
 				}
 			}
@@ -1267,7 +1292,7 @@ var Api = (function () {
 		key: "zoomTo",
 		value: function zoomTo(zoom, onScale) {
 			var newLevel = this.findLevelForScale(zoom);
-			var newScale = this.upScale(zoom, this.resolutions.length - newLevel);
+			var newScale = upScale(zoom, this.resolutions.length - newLevel);
 			onScale(newScale, newLevel, Math.ceil(this.fullWidth * zoom), Math.ceil(this.fullHeight * zoom));
 		}
 	}, {
@@ -1278,14 +1303,14 @@ var Api = (function () {
 				viewportScale = 0.01;
 			}
 			var newLevel = this.findLevelForScale(viewportScale);
-			var newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
+			var newScale = upScale(viewportScale, this.resolutions.length - newLevel);
 
 			onScale(newScale, newLevel, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 		}
 	}, {
 		key: "getRealScale",
 		value: function getRealScale(scale, level) {
-			return this.downScale(scale, this.resolutions.length - level);
+			return downScale(scale, this.resolutions.length - level);
 		}
 	}, {
 		key: "getRealImagePos",
@@ -1303,7 +1328,7 @@ var Api = (function () {
 			var level = this.findLevel(opts.viewport.w, IDX_WIDTH);
 			var scale = opts.viewport.w / this.resolutions[level - 1][IDX_WIDTH];
 			var upscaleFactor = this.resolutions.length - level;
-			var viewportScale = this.downScale(scale, upscaleFactor);
+			var viewportScale = downScale(scale, upscaleFactor);
 
 			if (opts.onScale) {
 				opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
@@ -1327,7 +1352,7 @@ var Api = (function () {
 			var level = this.findLevel(opts.viewport.h, IDX_HEIGHT);
 			var scale = opts.viewport.h / this.resolutions[level - 1][IDX_HEIGHT];
 			var upscaleFactor = this.resolutions.length - level;
-			var viewportScale = this.downScale(scale, upscaleFactor);
+			var viewportScale = downScale(scale, upscaleFactor);
 
 			if (opts.onScale) {
 				opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
@@ -2684,7 +2709,7 @@ var Zoom = (function (_React$Component) {
 			var zoom = parseInt(this.state.realViewPort.zoom * 100);
 			return _react2["default"].createElement(
 				"span",
-				{ style: { display: "inline-block", width: "400px", height: "10px" }, className: "hire-zoom-bar", onWheel: this.onWheel.bind(this) },
+				{ className: "hire-zoom-bar", onWheel: this.onWheel.bind(this) },
 				_react2["default"].createElement(
 					"svg",
 					{

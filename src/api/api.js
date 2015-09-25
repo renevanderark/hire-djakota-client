@@ -4,6 +4,10 @@ const IDX_WIDTH = 1;
 const IDX_HEIGHT = 0;
 const TILE_SIZE = 512;
 
+const downScale = function(val, times) { return times > 0 ? downScale(val / 2, --times) : val; }
+const upScale = function(val, times) { return times > 0 ? upScale(val * 2, --times) : val; }
+
+
 class Api {
 	constructor(service, config) {
 		this.service = service;
@@ -20,6 +24,7 @@ class Api {
 		this.resolutions = [];
 		this.initializeResolutions(this.levels - 1, this.fullWidth, this.fullHeight);
 		this.tileMap = {};
+
 	}
 
 	initializeResolutions(level = this.levels - 1, w = this.fullWidth, h = this.fullHeight) {
@@ -50,13 +55,6 @@ class Api {
 			}});
 	}
 
-	downScale(val, times) {
-		return times > 0 ? this.downScale(val / 2, --times) : val;
-	}
-
-	upScale(val, times) {
-		return times > 0 ? this.upScale(val * 2, --times) : val;
-	}
 
 	onTileLoad(tileIm, tile, onTile) {
 		if(!tileIm.complete) {
@@ -91,12 +89,12 @@ class Api {
 
 		for(let y = yStart;
 				((y - yStart) * scale) - TILE_SIZE * 2 + opts.position.y < opts.viewport.h &&
-				this.upScale(y, upscaleFactor) < this.fullHeight;
+				upScale(y, upscaleFactor) < this.fullHeight;
 				y += TILE_SIZE) {
 
 			for(let x = xStart;
 				((x - xStart) * scale) - TILE_SIZE * 2 + opts.position.x < opts.viewport.w &&
-				this.upScale(x, upscaleFactor) < this.fullWidth;
+				upScale(x, upscaleFactor) < this.fullWidth;
 				x += TILE_SIZE) {
 
 				this.fetchTile({
@@ -107,7 +105,7 @@ class Api {
 						y: y
 					},
 					level: level,
-					url: this.makeTileUrl(level, [this.upScale(y, upscaleFactor), this.upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
+					url: this.makeTileUrl(level, [upScale(y, upscaleFactor), upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
 				}, opts.onTile);
 			}
 		}
@@ -122,7 +120,7 @@ class Api {
 
 	zoomTo(zoom, onScale) {
 		let newLevel = this.findLevelForScale(zoom);
-		let newScale = this.upScale(zoom, this.resolutions.length - newLevel);
+		let newScale = upScale(zoom, this.resolutions.length - newLevel);
 		onScale(newScale, newLevel, Math.ceil(this.fullWidth * zoom), Math.ceil(this.fullHeight * zoom));
 	}
 
@@ -131,14 +129,14 @@ class Api {
 		let viewportScale = this.getRealScale(scale, level) + factor;
 		if(viewportScale < 0.01) { viewportScale = 0.01; }
 		let newLevel = this.findLevelForScale(viewportScale);
-		let newScale = this.upScale(viewportScale, this.resolutions.length - newLevel);
+		let newScale = upScale(viewportScale, this.resolutions.length - newLevel);
 
 		onScale(newScale, newLevel, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 	}
 
 
 	getRealScale(scale, level) {
-		return this.downScale(scale, this.resolutions.length - level);
+		return downScale(scale, this.resolutions.length - level);
 	}
 
 	getRealImagePos(position, scale, level) {
@@ -154,7 +152,7 @@ class Api {
 		let level = this.findLevel(opts.viewport.w, IDX_WIDTH);
 		let scale = opts.viewport.w / this.resolutions[level - 1][IDX_WIDTH];
 		let upscaleFactor = this.resolutions.length - level;
-		let viewportScale = this.downScale(scale, upscaleFactor);
+		let viewportScale = downScale(scale, upscaleFactor);
 
 		if(opts.onScale) { opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale)); }
 		this.makeTiles(opts, level, scale);
@@ -172,7 +170,7 @@ class Api {
 		let level = this.findLevel(opts.viewport.h, IDX_HEIGHT);
 		let scale = opts.viewport.h / this.resolutions[level - 1][IDX_HEIGHT];
 		let upscaleFactor = this.resolutions.length - level;
-		let viewportScale = this.downScale(scale, upscaleFactor);
+		let viewportScale = downScale(scale, upscaleFactor);
 
 		if(opts.onScale) { opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale)); }
 
