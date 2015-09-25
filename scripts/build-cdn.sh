@@ -4,6 +4,7 @@
 
 echo "Exporting standalone for version: $npm_package_version"
 
+
 node_modules/.bin/browserify \
 	--require react | node_modules/.bin/uglifyjs > build/react-libs.js
 
@@ -21,5 +22,6 @@ rm build/react-libs.js
 mv build/pack.js build/hire-djatoka-client-$npm_package_version.js
 
 git add build/hire-djatoka-client-$npm_package_version.js
+git add build/hire-djatoka-client-$npm_package_version-standalone.js
 git commit -a -m "new standalone release $npm_package_version"
 git push origin master
