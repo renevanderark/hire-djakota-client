@@ -1,3 +1,9 @@
+### v1.10.0	(2015/9/28 10:0)
+* only draw to canvas when new image tiles are being loaded or new position is passed
+* moved upScale and downScale to utility functions
+* dropped some standalone releases
+* new standalone release 1.9.0
+
 ### v1.9.0	(2015/9/25 10:5)
 * removed alert whoopsie
 * new standalone release 1.8.0
