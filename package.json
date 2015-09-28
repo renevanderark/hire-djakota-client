@@ -9,7 +9,7 @@
     "bump": "hi-bump",
     "test": "mocha --compilers js:babel/register --recursive test/unit",
     "test:watch": "nodemon -x \"mocha --compilers js:babel/register --recursive --watch test/unit\" -w test -w build",
-    "release": "npm run bump minor && npm run build:standalone && scripts/release-standalone.sh"
+    "release": "npm run bump minor && npm run build:standalone"
   },
   "repository": {
     "type": "git",
