@@ -4,8 +4,8 @@ const IDX_WIDTH = 1;
 const IDX_HEIGHT = 0;
 const TILE_SIZE = 512;
 
-const downScale = function(val, times) { return times > 0 ? downScale(val / 2, --times) : val; }
-const upScale = function(val, times) { return times > 0 ? upScale(val * 2, --times) : val; }
+const downScale = function(val, times) { return times > 0 ? downScale(val / 2, --times) : val; };
+const upScale = function(val, times) { return times > 0 ? upScale(val * 2, --times) : val; };
 
 
 class Api {
@@ -46,7 +46,6 @@ class Api {
 	}
 
 	makeTileUrl(level, dims) {
-
 		return this.service + "?" +
 			qs.stringify({...this.params, ...{
 				"svc.region": dims.join(","),
@@ -56,22 +55,13 @@ class Api {
 	}
 
 
-	onTileLoad(tileIm, tile, onTile) {
-		if(!tileIm.complete) {
-			setTimeout(this.onTileLoad.bind(this, tileIm, tile, onTile), 15);
-		} else {
-			onTile(tileIm, tile);
-		}
-	}
-
-	fetchTile(tile, onTile) {
+	fetchTile(tile) {
 		let key = tile.realX + "-" + tile.realY + "-" + tile.level + "-" + tile.url;
 		if(!this.tileMap[key]) {
 			this.tileMap[key] = new Image();
-			this.tileMap[key].onload = this.onTileLoad.bind(this, this.tileMap[key], tile, onTile);
 			this.tileMap[key].src = tile.url;
 		}
-		onTile(this.tileMap[key], tile);
+		return [this.tileMap[key], tile];
 	}
 
 	getStart(dim) {
@@ -86,7 +76,7 @@ class Api {
 		let upscaleFactor = this.resolutions.length - level;
 		let yStart = this.getStart(opts.position.y);
 		let xStart = this.getStart(opts.position.x);
-
+		let tiles = [];
 		for(let y = yStart;
 				((y - yStart) * scale) - TILE_SIZE * 2 + opts.position.y < opts.viewport.h &&
 				upScale(y, upscaleFactor) < this.fullHeight;
@@ -97,7 +87,7 @@ class Api {
 				upScale(x, upscaleFactor) < this.fullWidth;
 				x += TILE_SIZE) {
 
-				this.fetchTile({
+				tiles.push(this.fetchTile({
 					realX: x,
 					realY: y,
 					pos: {
@@ -106,9 +96,10 @@ class Api {
 					},
 					level: level,
 					url: this.makeTileUrl(level, [upScale(y, upscaleFactor), upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
-				}, opts.onTile);
+				}));
 			}
 		}
+		return tiles;
 	}
 
 	findLevelForScale(s, level = this.levels, current = 1) {
@@ -130,7 +121,6 @@ class Api {
 		if(viewportScale < 0.01) { viewportScale = 0.01; }
 		let newLevel = this.findLevelForScale(viewportScale);
 		let newScale = upScale(viewportScale, this.resolutions.length - newLevel);
-
 		onScale(newScale, newLevel, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 	}
 
@@ -155,7 +145,7 @@ class Api {
 		let viewportScale = downScale(scale, upscaleFactor);
 
 		if(opts.onScale) { opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale)); }
-		this.makeTiles(opts, level, scale);
+		return this.makeTiles(opts, level, scale);
 	}
 
 	fullZoom(opts) {
@@ -163,7 +153,7 @@ class Api {
 		let scale = 1;
 
 		if(opts.onScale) { opts.onScale(scale, level, this.fullWidth, this.fullHeight); }
-		this.makeTiles(opts, level, scale);
+		return this.makeTiles(opts, level, scale);
 	}
 
 	heightFill(opts) {
@@ -174,22 +164,22 @@ class Api {
 
 		if(opts.onScale) { opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale)); }
 
-		this.makeTiles(opts, level, scale);
+		return this.makeTiles(opts, level, scale);
 	}
 
 	autoFill(opts) {
 		if(this.fullHeight > this.fullWidth) {
-			this.heightFill(opts);
+			return this.heightFill(opts);
 		} else {
-			this.widthFill(opts);
+			return this.widthFill(opts);
 		}
 	}
 
 	loadImage(opts) {
 		if(opts.scaleMode) {
-			this[opts.scaleMode](opts);
+			return this[opts.scaleMode](opts);
 		} else {
-			this.makeTiles(opts, opts.level, opts.scale);
+			return this.makeTiles(opts, opts.level, opts.scale);
 		}
 
 	}

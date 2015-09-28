@@ -30,9 +30,8 @@ describe("Api", () => {
 		let opts = {
 			position: {x: 0, y: 0},
 			viewport: {w: 5000, h: 10000},
-			onTile: ":onTile:"
 		};
-		sinon.stub(api, "fetchTile", function(tile, cb) { expect(cb).toEqual(opts.onTile); });
+		sinon.stub(api, "fetchTile");
 		api.makeTiles(opts, level, scale);
 		sinon.assert.callCount(api.fetchTile, 200);
 		api.fetchTile.restore();
@@ -149,48 +148,17 @@ describe("Api", () => {
 	});
 
 
-	it("should wait for the property complete on the image object to be true and call onTile on complete with onTileLoad", (done) => {
-		let tileIm = {complete: false, src: "mock:data"};
-		let tileSpec = "mock:data";
-		let onTile = function(im, tileObj) {
-			expect(im).toEqual(tileIm);
-			expect(tileObj).toEqual(tileSpec);
-			done();
-		};
-		setTimeout(() => { tileIm.complete = true; }, 100);
-		api.onTileLoad(tileIm, tileSpec, onTile);
-
-	});
 
 
-	it("should cache an image tile in the tileMap and call onTileLoad with fetchTile", () => {
+	it("should cache an image tile in the tileMap with fetchTile", () => {
 		let tile = {realX: 1, realY: 2, pos: {x: 3, y: 4}, level: 5, url: ":url:"};
-		let onTileCalled = false;
-		let onTile = function(tileIm, tileObj) {
-			onTileCalled = true;
-			expect(tileIm.onload).toBeA(Function);
-			expect(tileIm.src).toEqual(":url:");
-			expect(tileObj).toEqual(tile);
-		};
-
-		api.fetchTile(tile, onTile);
-
-		expect(onTileCalled).toBe(true);
+		let expectedImage = new Image();
+		expectedImage.src = ":url:";
+		api.fetchTile(tile);
+		expect(api.tileMap["1-2-5-:url:"].src).toEqual(expectedImage.src);
 		delete api.tileMap["1-2-5-:url:"];
 
 	});
-
-
-	it("should always call onTile with fetchTile, whether its image is complete / in cache or not", () => {
-		api.tileMap["1-2-5-:url:"] = "in cache";
-		let tile = {realX: 1, realY: 2, pos: {x: 3, y: 4}, level: 5, url: ":url:"};
-		let onTileCalled = false;
-		let onTile = function(tileIm) { onTileCalled = true; expect(tileIm).toEqual("in cache"); };
-		api.fetchTile(tile, onTile);
-		expect(onTileCalled).toBe(true);
-		delete api.tileMap["1-2-5-:url:"];
-	});
-
 
 	it("should return the left/top position of the start tile based on a negative value for x/y respectively with getStart", () => {
 		let xy = -TILE_SIZE * 3 - 1;

@@ -29,7 +29,7 @@ class Minimap extends React.Component {
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.touchMoveListener = this.onTouchMove.bind(this);
-
+		this.frameBuffer = [];
 	}
 
 	componentDidMount() {
@@ -74,6 +74,25 @@ class Minimap extends React.Component {
 
 
 	onAnimationFrame() {
+
+		if(this.frameBuffer.length) {
+			this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
+			for(let i = 0; i < this.frameBuffer.length; i++) {
+				let tileIm = this.frameBuffer[i][0];
+				let tile = this.frameBuffer[i][1];
+				this.imageCtx.drawImage(
+					tileIm,
+					parseInt(Math.floor((tile.pos.x) * this.scale)),
+					parseInt(Math.floor((tile.pos.y) * this.scale)),
+					parseInt(Math.ceil(tileIm.width * this.scale)),
+					parseInt(Math.ceil(tileIm.height * this.scale))
+				);
+			}
+			if(this.frameBuffer.filter((x) => x[0].complete && x[0].height > 0 && x[0].width > 0).length === this.frameBuffer.length) {
+				this.frameBuffer = [];
+			}
+		}
+
 		if(this.resizeDelay === 0) {
 			this.commitResize();
 			this.resizeDelay = -1;
@@ -111,9 +130,8 @@ class Minimap extends React.Component {
 		this.resizing = false;
 		this.resizeDelay = RESIZE_DELAY;
 		let node = React.findDOMNode(this);
-		this.api.loadImage({
+		this.frameBuffer = this.api.loadImage({
 			viewport: {w: node.clientWidth, h: node.clientHeight},
-			onTile: this.renderTile.bind(this),
 			onScale: this.setScale.bind(this),
 			scaleMode: "autoFill",
 			position: {x: 0, y: 0}
@@ -128,15 +146,7 @@ class Minimap extends React.Component {
 		if(this.props.onDimensions) { this.props.onDimensions(dims.w, dims.h); }
 	}
 
-	renderTile(tileIm, tile) {
-		this.imageCtx.drawImage(...[
-			tileIm,
-			parseInt(Math.floor(tile.pos.x * this.scale)),
-			parseInt(Math.floor(tile.pos.y * this.scale)),
-			parseInt(Math.ceil(tileIm.width * this.scale)),
-			parseInt(Math.ceil(tileIm.height * this.scale))
-		]);
-	}
+
 
 	dispatchReposition(ev) {
 		let doc = document.documentElement;

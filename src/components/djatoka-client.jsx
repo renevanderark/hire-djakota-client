@@ -133,10 +133,22 @@ class DjatokaClient extends React.Component {
 	}
 
 	onAnimationFrame() {
-		this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
-
-		for(let i = 0; i < this.frameBuffer.length; i++) {
-			this.imageCtx.drawImage(...this.frameBuffer[i]);
+		if(this.frameBuffer.length) {
+			this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
+			for(let i = 0; i < this.frameBuffer.length; i++) {
+				let tileIm = this.frameBuffer[i][0];
+				let tile = this.frameBuffer[i][1];
+				this.imageCtx.drawImage(
+					tileIm,
+					parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)),
+					parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)),
+					parseInt(Math.ceil(tileIm.width * this.scale)),
+					parseInt(Math.ceil(tileIm.height * this.scale))
+				);
+			}
+			if(this.frameBuffer.filter((x) => x[0].complete && x[0].height > 0 && x[0].width > 0).length === this.frameBuffer.length) {
+				this.frameBuffer = [];
+			}
 		}
 
 		if(this.resizeDelay === 0 && this.resizing) {
@@ -168,11 +180,9 @@ class DjatokaClient extends React.Component {
 
 	loadImage(opts = {scaleMode: this.props.scaleMode}) {
 		this.notifyRealImagePos();
-		this.frameBuffer = [];
-		this.api.loadImage({
+		this.frameBuffer = this.api.loadImage({
 			viewport: {w: this.state.width, h: this.state.height},
 			position: this.imagePos,
-			onTile: this.renderTile.bind(this),
 			onScale: this.onDimensions.bind(this),
 			...opts
 		});
@@ -188,16 +198,6 @@ class DjatokaClient extends React.Component {
 		this.height = h;
 	}
 
-
-	renderTile(tileIm, tile) {
-		this.frameBuffer.push([
-			tileIm,
-			parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)),
-			parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)),
-			parseInt(Math.ceil(tileIm.width * this.scale)),
-			parseInt(Math.ceil(tileIm.height * this.scale))
-		]);
-	}
 
 	onMouseDown(ev) {
 		this.mousePos.x = ev.clientX;

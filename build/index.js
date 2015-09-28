@@ -1217,7 +1217,6 @@ var Api = (function () {
 	}, {
 		key: "makeTileUrl",
 		value: function makeTileUrl(level, dims) {
-
 			return this.service + "?" + _qs2["default"].stringify(_extends({}, this.params, {
 				"svc.region": dims.join(","),
 				"svc.level": level,
@@ -1225,24 +1224,14 @@ var Api = (function () {
 			}));
 		}
 	}, {
-		key: "onTileLoad",
-		value: function onTileLoad(tileIm, tile, onTile) {
-			if (!tileIm.complete) {
-				setTimeout(this.onTileLoad.bind(this, tileIm, tile, onTile), 15);
-			} else {
-				onTile(tileIm, tile);
-			}
-		}
-	}, {
 		key: "fetchTile",
-		value: function fetchTile(tile, onTile) {
+		value: function fetchTile(tile) {
 			var key = tile.realX + "-" + tile.realY + "-" + tile.level + "-" + tile.url;
 			if (!this.tileMap[key]) {
 				this.tileMap[key] = new Image();
-				this.tileMap[key].onload = this.onTileLoad.bind(this, this.tileMap[key], tile, onTile);
 				this.tileMap[key].src = tile.url;
 			}
-			onTile(this.tileMap[key], tile);
+			return [this.tileMap[key], tile];
 		}
 	}, {
 		key: "getStart",
@@ -1259,12 +1248,12 @@ var Api = (function () {
 			var upscaleFactor = this.resolutions.length - level;
 			var yStart = this.getStart(opts.position.y);
 			var xStart = this.getStart(opts.position.x);
-
+			var tiles = [];
 			for (var y = yStart; (y - yStart) * scale - TILE_SIZE * 2 + opts.position.y < opts.viewport.h && upScale(y, upscaleFactor) < this.fullHeight; y += TILE_SIZE) {
 
 				for (var x = xStart; (x - xStart) * scale - TILE_SIZE * 2 + opts.position.x < opts.viewport.w && upScale(x, upscaleFactor) < this.fullWidth; x += TILE_SIZE) {
 
-					this.fetchTile({
+					tiles.push(this.fetchTile({
 						realX: x,
 						realY: y,
 						pos: {
@@ -1273,9 +1262,10 @@ var Api = (function () {
 						},
 						level: level,
 						url: this.makeTileUrl(level, [upScale(y, upscaleFactor), upScale(x, upscaleFactor), TILE_SIZE, TILE_SIZE])
-					}, opts.onTile);
+					}));
 				}
 			}
+			return tiles;
 		}
 	}, {
 		key: "findLevelForScale",
@@ -1304,7 +1294,6 @@ var Api = (function () {
 			}
 			var newLevel = this.findLevelForScale(viewportScale);
 			var newScale = upScale(viewportScale, this.resolutions.length - newLevel);
-
 			onScale(newScale, newLevel, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 		}
 	}, {
@@ -1333,7 +1322,7 @@ var Api = (function () {
 			if (opts.onScale) {
 				opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 			}
-			this.makeTiles(opts, level, scale);
+			return this.makeTiles(opts, level, scale);
 		}
 	}, {
 		key: "fullZoom",
@@ -1344,7 +1333,7 @@ var Api = (function () {
 			if (opts.onScale) {
 				opts.onScale(scale, level, this.fullWidth, this.fullHeight);
 			}
-			this.makeTiles(opts, level, scale);
+			return this.makeTiles(opts, level, scale);
 		}
 	}, {
 		key: "heightFill",
@@ -1358,24 +1347,24 @@ var Api = (function () {
 				opts.onScale(scale, level, Math.ceil(this.fullWidth * viewportScale), Math.ceil(this.fullHeight * viewportScale));
 			}
 
-			this.makeTiles(opts, level, scale);
+			return this.makeTiles(opts, level, scale);
 		}
 	}, {
 		key: "autoFill",
 		value: function autoFill(opts) {
 			if (this.fullHeight > this.fullWidth) {
-				this.heightFill(opts);
+				return this.heightFill(opts);
 			} else {
-				this.widthFill(opts);
+				return this.widthFill(opts);
 			}
 		}
 	}, {
 		key: "loadImage",
 		value: function loadImage(opts) {
 			if (opts.scaleMode) {
-				this[opts.scaleMode](opts);
+				return this[opts.scaleMode](opts);
 			} else {
-				this.makeTiles(opts, opts.level, opts.scale);
+				return this.makeTiles(opts, opts.level, opts.scale);
 			}
 		}
 	}]);
@@ -1455,8 +1444,6 @@ var _createClass = (function () { function defineProperties(target, props) { for
 var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1613,12 +1600,18 @@ var DjatokaClient = (function (_React$Component) {
 	}, {
 		key: "onAnimationFrame",
 		value: function onAnimationFrame() {
-			this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
-
-			for (var i = 0; i < this.frameBuffer.length; i++) {
-				var _imageCtx;
-
-				(_imageCtx = this.imageCtx).drawImage.apply(_imageCtx, _toConsumableArray(this.frameBuffer[i]));
+			if (this.frameBuffer.length) {
+				this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
+				for (var i = 0; i < this.frameBuffer.length; i++) {
+					var tileIm = this.frameBuffer[i][0];
+					var tile = this.frameBuffer[i][1];
+					this.imageCtx.drawImage(tileIm, parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)), parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale)));
+				}
+				if (this.frameBuffer.filter(function (x) {
+					return x[0].complete && x[0].height > 0 && x[0].width > 0;
+				}).length === this.frameBuffer.length) {
+					this.frameBuffer = [];
+				}
 			}
 
 			if (this.resizeDelay === 0 && this.resizing) {
@@ -1655,11 +1648,9 @@ var DjatokaClient = (function (_React$Component) {
 			var opts = arguments.length <= 0 || arguments[0] === undefined ? { scaleMode: this.props.scaleMode } : arguments[0];
 
 			this.notifyRealImagePos();
-			this.frameBuffer = [];
-			this.api.loadImage(_extends({
+			this.frameBuffer = this.api.loadImage(_extends({
 				viewport: { w: this.state.width, h: this.state.height },
 				position: this.imagePos,
-				onTile: this.renderTile.bind(this),
 				onScale: this.onDimensions.bind(this)
 			}, opts));
 		}
@@ -1674,11 +1665,6 @@ var DjatokaClient = (function (_React$Component) {
 		value: function setDimensions(w, h) {
 			this.width = w;
 			this.height = h;
-		}
-	}, {
-		key: "renderTile",
-		value: function renderTile(tileIm, tile) {
-			this.frameBuffer.push([tileIm, parseInt(Math.floor((tile.pos.x + this.imagePos.x) * this.scale)), parseInt(Math.floor((tile.pos.y + this.imagePos.y) * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
 		}
 	}, {
 		key: "onMouseDown",
@@ -2384,6 +2370,7 @@ var Minimap = (function (_React$Component) {
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.touchMoveListener = this.onTouchMove.bind(this);
+		this.frameBuffer = [];
 	}
 
 	_createClass(Minimap, [{
@@ -2432,6 +2419,21 @@ var Minimap = (function (_React$Component) {
 	}, {
 		key: "onAnimationFrame",
 		value: function onAnimationFrame() {
+
+			if (this.frameBuffer.length) {
+				this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
+				for (var i = 0; i < this.frameBuffer.length; i++) {
+					var tileIm = this.frameBuffer[i][0];
+					var tile = this.frameBuffer[i][1];
+					this.imageCtx.drawImage(tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale)));
+				}
+				if (this.frameBuffer.filter(function (x) {
+					return x[0].complete && x[0].height > 0 && x[0].width > 0;
+				}).length === this.frameBuffer.length) {
+					this.frameBuffer = [];
+				}
+			}
+
 			if (this.resizeDelay === 0) {
 				this.commitResize();
 				this.resizeDelay = -1;
@@ -2461,9 +2463,8 @@ var Minimap = (function (_React$Component) {
 			this.resizing = false;
 			this.resizeDelay = RESIZE_DELAY;
 			var node = _react2["default"].findDOMNode(this);
-			this.api.loadImage({
+			this.frameBuffer = this.api.loadImage({
 				viewport: { w: node.clientWidth, h: node.clientHeight },
-				onTile: this.renderTile.bind(this),
 				onScale: this.setScale.bind(this),
 				scaleMode: "autoFill",
 				position: { x: 0, y: 0 }
@@ -2479,13 +2480,6 @@ var Minimap = (function (_React$Component) {
 			if (this.props.onDimensions) {
 				this.props.onDimensions(dims.w, dims.h);
 			}
-		}
-	}, {
-		key: "renderTile",
-		value: function renderTile(tileIm, tile) {
-			var _imageCtx;
-
-			(_imageCtx = this.imageCtx).drawImage.apply(_imageCtx, [tileIm, parseInt(Math.floor(tile.pos.x * this.scale)), parseInt(Math.floor(tile.pos.y * this.scale)), parseInt(Math.ceil(tileIm.width * this.scale)), parseInt(Math.ceil(tileIm.height * this.scale))]);
 		}
 	}, {
 		key: "dispatchReposition",
