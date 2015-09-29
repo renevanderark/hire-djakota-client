@@ -42,10 +42,8 @@
     "karma-chrome-launcher": "^0.2.0",
     "karma-mocha": "^0.2.0",
     "mocha": "^2.3.2",
-    "mocha-jsdom": "^1.0.0",
     "nodemon": "^1.5.1",
     "react": "^0.13.3",
-    "selenium-webdriver": "^2.47.0",
     "sinon": "^1.16.1",
     "uglify-js": "^2.4.24",
     "watchify": "^3.3.1"

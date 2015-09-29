@@ -1,7 +1,6 @@
 import Api from "../../../src/api/api";
 import expect from "expect";
 import sinon from "sinon";
-import jsdom from "mocha-jsdom";
 import qs from "qs";
 
 const IDX_WIDTH = 1;
@@ -9,7 +8,6 @@ const IDX_HEIGHT = 0;
 const TILE_SIZE = 512;
 
 describe("Api", () => {
-	jsdom();
 	let api = null;
 	let serviceUrl = ":service_url:";
 	let apiConfig = {
@@ -21,6 +19,7 @@ describe("Api", () => {
 
 	before((done) => {
 		api = new Api(serviceUrl, apiConfig);
+		global.Image = function() {};
 		done();
 	});
 
@@ -153,9 +152,8 @@ describe("Api", () => {
 	it("should cache an image tile in the tileMap with fetchTile", () => {
 		let tile = {realX: 1, realY: 2, pos: {x: 3, y: 4}, level: 5, url: ":url:"};
 		let expectedImage = new Image();
-		expectedImage.src = ":url:";
 		api.fetchTile(tile);
-		expect(api.tileMap["1-2-5-:url:"].src).toEqual(expectedImage.src);
+		expect(api.tileMap["1-2-5-:url:"].src).toEqual(":url:");
 		delete api.tileMap["1-2-5-:url:"];
 
 	});
