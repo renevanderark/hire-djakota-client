@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'build/hire-djatoka-client-' + process.env.npm_package_version +   '.js',
+      'build/latest-standalone.js',
       'test/integration/**/*.js'
     ],
 
