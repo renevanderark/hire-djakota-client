@@ -10,12 +10,12 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['browserify', 'mocha', 'chai'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      'build/latest-standalone.js',
+      'src/standalone.jsx',
       'test/integration/**/*.js'
     ],
 
@@ -28,9 +28,15 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/integration/**/*.js': ['babel']
+      'src/standalone.jsx': 'browserify',
+      'test/integration/**/*.js': 'browserify'
     },
 
+    browserify : {
+      debug: true,
+      extensions: ['.js', '.jsx'],
+      transform : ['babelify', 'brfs']
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
