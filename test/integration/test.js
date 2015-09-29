@@ -10,27 +10,97 @@ const config = {
 	"levels": "6",
 	"compositingLayerCount": "1"
 };
-
 const service = "https://tomcat.tiler01.huygens.knaw.nl/adore-djatoka/resolver";
-const wrapper = document.createElement("div");
+const Zoom = djatokaClientApp.Zoom;
+const DjatokaClient = djatokaClientApp.DjatokaClient;
 const store = djatokaClientApp.store;
-document.body.appendChild(wrapper);
-wrapper.style.height = "400px";
-wrapper.style.width = "400px";
+const TestUtils = React.addons.TestUtils;
+
+const viewContainer = document.createElement("div");
+const zoomContainer = document.createElement("div");
+document.body.appendChild(zoomContainer);
+document.body.appendChild(viewContainer);
+viewContainer.style.height = "400px";
+viewContainer.style.width = "400px";
 
 
 describe("Integrated app", () => {
-
-	it("should have the correct initial state before and after intial render", function(done) {
-		expect(store.getState()).to.deep.equal({realViewPort: {x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false}, mousewheel: null, fillMode: null, freeMovement: false});
-		djatokaClientApp.mountNode(config, service, wrapper);
-		let {x, y, w, h} = store.getState().realViewPort;
-		expect(x).to.equal(0);
-		expect(y).to.be.above(-0.0757).and.be.below(-0.0755);
-		expect(w).to.be.above(0.996).and.be.below(1.001);
-		expect(h).to.be.above(1.15).and.be.below(1.152);
+	before(function(done) {
+		this.unsubscribeSpy = store.subscribe(() => {
+			console.log(store.getState());
+		});
 		done();
 	});
 
+	afterEach(function(done) {
+		
+		React.unmountComponentAtNode(zoomContainer);
+		React.unmountComponentAtNode(viewContainer);
+		done();
+	});
 
+	after(function() {
+		this.unsubscribeSpy();
+	})
+
+	it("should have the correct initial state before and after intial render", function(done) {
+		let calls = 0;
+		expect(store.getState()).to.deep.equal({realViewPort: {x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false}, mousewheel: null, fillMode: null, freeMovement: false});
+
+		this.unsubscribe = store.subscribe(() => {
+			calls++;
+			if(calls === 2) {
+				let {x, y, w, h} = store.getState().realViewPort;
+				expect(x).to.equal(0);
+				expect(y).to.be.above(-0.158);
+				expect(y).to.be.below(-0.156);
+				expect(w).to.be.above(0.996);
+				expect(w).to.be.below(0.998);
+				expect(h).to.be.above(1.314);
+				expect(h).to.be.below(1.316);
+				this.unsubscribe();
+				console.log('1');
+				done();
+			}
+		});
+
+		this.renderedZoom = React.render(<Zoom />, zoomContainer);
+		this.renderedViewer = React.render(<DjatokaClient config={config} service={service} />, viewContainer);
+	});
+
+	it("should zoom on mouse down and mouse move", function(done) {
+		let calls = 0;
+
+		this.unsubscribe = store.subscribe(() => {
+			calls++;
+			let state = store.getState();
+			if(calls === 3) {
+				expect(state.realViewPort.applyZoom).to.equal(true);
+				expect(state.realViewPort.zoom).to.be.above(0.99);
+				expect(state.realViewPort.zoom).to.be.below(1.01);
+			}
+			if(calls === 4) {
+				expect(state.realViewPort.applyZoom).to.equal(false);
+			}
+
+			if(calls === 5) {
+				expect(state.realViewPort.applyZoom).to.equal(true);
+				expect(state.realViewPort.zoom).to.be.below(0.5);
+			}
+
+			if(calls === 6) {
+				expect(state.realViewPort.applyZoom).to.equal(false);
+				this.unsubscribe();
+				console.log('2');
+				done();
+
+			}
+		});
+
+		this.renderedZoom = React.render(<Zoom />, zoomContainer);
+		this.renderedViewer = React.render(<DjatokaClient config={config} service={service} />, viewContainer, () => {
+			this.renderedZoom.onMouseDown({pageX: 178, pageY: 10});
+			setTimeout(() => { this.renderedZoom.onMouseMove({pageX: 10, pageY: 10}); }, 50);
+		});
+	});
 });
