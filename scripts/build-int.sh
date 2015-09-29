@@ -2,6 +2,7 @@
 
 echo "Exporting standalone for integration test"
 
+rm test/hire-djatoka-client.js
 
 node_modules/.bin/browserify \
 	--require react | node_modules/.bin/uglifyjs > build/react-libs.js
