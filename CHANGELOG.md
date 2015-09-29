@@ -1,3 +1,17 @@
+### v1.11.0	(2015/9/29 9:3)
+* prepare release
+* retry the travis thing
+* attempt 6
+* attempt 4 at travis
+* attempt 4 at travis
+* attempt 4 at travis
+* attempt 3 at travis
+* second attempt with karma
+* second attempt with karma
+* first attempt at karma runner on travis ci
+* fix release script
+* new standalone release 1.10.0
+
 ### v1.10.0	(2015/9/28 10:0)
 * only draw to canvas when new image tiles are being loaded or new position is passed
 * moved upScale and downScale to utility functions
