@@ -1614,8 +1614,9 @@ var DjatokaClient = (function (_React$Component) {
 				}
 			}
 
-			if (this.resizeDelay === 0 && this.resizing) {
+			if (this.resizeDelay === 0) {
 				this.commitResize();
+				this.resizeDelay = -1;
 			} else if (this.resizeDelay > 0) {
 				this.resizeDelay -= 1;
 			}
@@ -1625,13 +1626,11 @@ var DjatokaClient = (function (_React$Component) {
 		key: "onResize",
 		value: function onResize() {
 			this.resizeDelay = RESIZE_DELAY;
-			this.resizing = true;
 		}
 	}, {
 		key: "commitResize",
 		value: function commitResize() {
 			this.resizeDelay = RESIZE_DELAY;
-			this.resizing = false;
 			this.imagePos.x = 0;
 			this.imagePos.y = 0;
 			this.width = null;
@@ -2419,7 +2418,6 @@ var Minimap = (function (_React$Component) {
 	}, {
 		key: "onAnimationFrame",
 		value: function onAnimationFrame() {
-
 			if (this.frameBuffer.length) {
 				this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
 				for (var i = 0; i < this.frameBuffer.length; i++) {
@@ -2460,7 +2458,6 @@ var Minimap = (function (_React$Component) {
 	}, {
 		key: "commitResize",
 		value: function commitResize() {
-			this.resizing = false;
 			this.resizeDelay = RESIZE_DELAY;
 			var node = _react2["default"].findDOMNode(this);
 			this.frameBuffer = this.api.loadImage({

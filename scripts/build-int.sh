@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Exporting standalone for version: $npm_package_version"
+echo "Exporting standalone for integration test"
 
 
 node_modules/.bin/browserify \
@@ -15,10 +15,6 @@ node_modules/.bin/browserify src/standalone.jsx \
 	--external react | node_modules/.bin/uglifyjs > build/pack.js
 
 
-cat build/react-libs.js build/pack.js > build/hire-djatoka-client-$npm_package_version.js
+cat build/react-libs.js build/pack.js > test/hire-djatoka-client.js
 rm build/react-libs.js
 rm build/pack.js
-
-git add build/hire-djatoka-client-$npm_package_version.js
-git commit -a -m "new standalone release $npm_package_version"
-git push origin master

@@ -1,5 +1,6 @@
 .hire-djatoka-client,
-.hire-djatoka-minimap {
+.hire-djatoka-minimap,
+#hire-djatoka-client-app {
 	width: 100%;
 	height: 100%;
 }

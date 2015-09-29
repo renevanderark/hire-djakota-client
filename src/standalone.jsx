@@ -1,6 +1,6 @@
 import React from "react";
 import {DjatokaClient, Minimap, Zoom, FillButton, FreeMovementButton} from "./index";
-
+import store from "./api/store";
 
 class App extends React.Component {
 
@@ -45,5 +45,6 @@ export default {
 	Minimap: Minimap,
 	Zoom: Zoom,
 	FillButton: FillButton,
-	FreeMovementButton: FreeMovementButton
+	FreeMovementButton: FreeMovementButton,
+	store: store
 };

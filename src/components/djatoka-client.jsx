@@ -151,8 +151,9 @@ class DjatokaClient extends React.Component {
 			}
 		}
 
-		if(this.resizeDelay === 0 && this.resizing) {
+		if(this.resizeDelay === 0) {
 			this.commitResize();
+			this.resizeDelay = -1;
 		} else if(this.resizeDelay > 0) {
 			this.resizeDelay -= 1;
 		}
@@ -161,12 +162,10 @@ class DjatokaClient extends React.Component {
 
 	onResize() {
 		this.resizeDelay = RESIZE_DELAY;
-		this.resizing = true;
 	}
 
 	commitResize() {
 		this.resizeDelay = RESIZE_DELAY;
-		this.resizing = false;
 		this.imagePos.x = 0;
 		this.imagePos.y = 0;
 		this.width = null;

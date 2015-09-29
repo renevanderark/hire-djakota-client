@@ -74,7 +74,6 @@ class Minimap extends React.Component {
 
 
 	onAnimationFrame() {
-
 		if(this.frameBuffer.length) {
 			this.imageCtx.clearRect(0, 0, this.state.width, this.state.height);
 			for(let i = 0; i < this.frameBuffer.length; i++) {
@@ -127,7 +126,6 @@ class Minimap extends React.Component {
 	}
 
 	commitResize() {
-		this.resizing = false;
 		this.resizeDelay = RESIZE_DELAY;
 		let node = React.findDOMNode(this);
 		this.frameBuffer = this.api.loadImage({
