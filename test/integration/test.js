@@ -17,9 +17,9 @@ wrapper.style.height = "400px";
 wrapper.style.width = "400px";
 
 
-describe("Foo", () => {
+describe("Integrated app", () => {
 
-	it("should bar", function(done) {
+	it("should have the correct initial state before and after intial render", function(done) {
 		expect(store.getState()).to.deep.equal({realViewPort: {x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false}, mousewheel: null, fillMode: null, freeMovement: false});
 		djatokaClientApp.mountNode(config, service, wrapper);
 		let {x, y, w, h} = store.getState().realViewPort;
