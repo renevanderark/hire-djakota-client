@@ -180,4 +180,5 @@ describe("Zoom", () => {
 			viewComponent.onWheel({nativeEvent: {deltaY: -1}, preventDefault: function() {}});
 		}
 	});
+
 });
