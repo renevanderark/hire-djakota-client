@@ -17,7 +17,7 @@ describe("DjatokaClient", () => {
 		});
 
 		zoomComponent = React.render(<Zoom />, zoomContainer);
-		viewComponent = React.render(<DjatokaClient config={config} service={service} />, viewContainer);
+		viewComponent = React.render(<DjatokaClient scaleMode="fullZoom" config={config} service={service} />, viewContainer);
 
 	});
 
@@ -53,14 +53,62 @@ describe("DjatokaClient", () => {
 	});
 
 	it("should call onAnimationFrame as often as possible", function(done) {
-		this.timeout(2000);
+		this.timeout(1000);
 		let count = 0;
 		frameCallbacks.beforeRender = function() { count++; };
 
 		setTimeout(function() {
-			console.log("FPS: " + count);
-			expect(count).to.be.above(20);
+			console.log("FPS: " + count * 2);
+			expect(count).to.be.above(10);
 			done();
-		}, 1000);
+		}, 500);
+	});
+
+
+	it("should reposition the image on mouse drag", function(done) {
+		let {x, y} = store.getState().realViewPort;
+		let xBefore, yBefore;
+		let calls = 0;
+		let callExec = false;
+		let error;
+
+		function exec() {
+			viewComponent.onMouseDown({clientX: 100, clientY: 10});
+			viewComponent.onMouseMove({clientX: 80, clientY: 20, preventDefault: function() {}});
+			viewComponent.onMouseUp();
+		}
+
+		frameCallbacks.beforeRender = function() { 
+			if(!callExec) {
+				exec();
+				callExec = true;
+				xBefore = this.imagePos.x;
+				yBefore = this.imagePos.y;
+			} else if(calls === 2) {
+				try {
+					expect(this.imagePos.x).to.be.below(xBefore);
+					expect(this.imagePos.y).to.be.below(yBefore)
+				} catch(e) {
+					done(e);
+				}
+				done();
+			}
+		};
+
+		let unsubscribe = store.subscribe(() => {
+			let state = store.getState().realViewPort;
+			calls++;
+			if(calls === 2) {
+				try {
+					expect(state.x).to.be.above(x);
+					expect(state.y).to.be.below(y);
+				} catch(e) {
+					unsubscribe();
+					done(e);
+				}
+				unsubscribe();
+			}
+		});
+
 	});
 });
