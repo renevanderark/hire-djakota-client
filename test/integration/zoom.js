@@ -59,7 +59,7 @@ describe("Zoom", () => {
 			calls++;
 			let state = store.getState().realViewPort;
 			if(calls === 2) {
-				try { expect(state.zoom).to.be.below(0.1); } catch(e) { finalize(e); }
+				try { expect(state.zoom).to.be.below(0.3); } catch(e) { finalize(e); }
 			}
 			if(calls === 4) {
 				try {
@@ -86,7 +86,7 @@ describe("Zoom", () => {
 			let state = store.getState().realViewPort;
 			if(calls === 2) {
 				lastZoom = state.zoom;
-				try { expect(state.zoom).to.be.below(0.1); } catch(e) { finalize(e); }
+				try { expect(state.zoom).to.be.below(0.3); } catch(e) { finalize(e); }
 			}
 			if(calls === 5) {
 				try { expect(state.zoom).to.be.above(lastZoom); } catch(e) { finalize(e); }
