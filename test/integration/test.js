@@ -23,25 +23,18 @@ document.body.appendChild(viewContainer);
 viewContainer.style.height = "400px";
 viewContainer.style.width = "400px";
 
+djatokaClientApp.Api.prototype.makeTileUrl = function() {
+	return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wkeBwUxu4ykfQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAxSURBVCjPY2AYgYARq+j///+h0oyMxJoE0QPXSb46Jvx6MHUyEbSNsKeR1ZHg6eEMAGNKHe/rFCIdAAAAAElFTkSuQmCC";
+};
 
 describe("Integrated app", () => {
-	before(function(done) {
-		this.unsubscribeSpy = store.subscribe(() => {
-			console.log(store.getState());
-		});
-		done();
-	});
 
 	afterEach(function(done) {
-		
 		React.unmountComponentAtNode(zoomContainer);
 		React.unmountComponentAtNode(viewContainer);
 		done();
 	});
 
-	after(function() {
-		this.unsubscribeSpy();
-	})
 
 	it("should have the correct initial state before and after intial render", function(done) {
 		let calls = 0;
@@ -64,8 +57,8 @@ describe("Integrated app", () => {
 			}
 		});
 
-		this.renderedZoom = React.render(<Zoom />, zoomContainer);
-		this.renderedViewer = React.render(<DjatokaClient config={config} service={service} />, viewContainer);
+		React.render(<Zoom />, zoomContainer);
+		React.render(<DjatokaClient config={config} service={service} />, viewContainer);
 	});
 
 	it("should zoom on mouse down and mouse move", function(done) {
@@ -91,16 +84,21 @@ describe("Integrated app", () => {
 			if(calls === 6) {
 				expect(state.realViewPort.applyZoom).to.equal(false);
 				this.unsubscribe();
-				console.log('2');
+				console.log("2");
 				done();
-
 			}
 		});
 
-		this.renderedZoom = React.render(<Zoom />, zoomContainer);
-		this.renderedViewer = React.render(<DjatokaClient config={config} service={service} />, viewContainer, () => {
-			this.renderedZoom.onMouseDown({pageX: 178, pageY: 10});
-			setTimeout(() => { this.renderedZoom.onMouseMove({pageX: 10, pageY: 10}); }, 50);
+		let renderedZoom = React.render(<Zoom />, zoomContainer);
+		React.render(<DjatokaClient config={config} service={service} />, viewContainer, () => {
+			renderedZoom.onMouseDown({pageX: 178, pageY: 10});
+			setTimeout(() => { renderedZoom.onMouseMove({pageX: 10, pageY: 10, preventDefault: function() { }}); }, 50);
 		});
+	});
+
+	it("try something else", function(done) {
+		React.render(<Zoom />, zoomContainer);
+		React.render(<DjatokaClient config={config} service={service} />, viewContainer);
+		done();
 	});
 });
