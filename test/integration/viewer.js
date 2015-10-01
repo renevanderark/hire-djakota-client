@@ -2,7 +2,7 @@ import React from "react/addons";
 import djatokaClientApp from "../../src/standalone.jsx";
 import {viewContainer, zoomContainer, service, store, config, frameCallbacks} from "./setup";
 
-
+const TILE_SIZE = 512;
 describe("DjatokaClient", () => {
 	const Zoom = djatokaClientApp.Zoom;
 	const DjatokaClient = djatokaClientApp.DjatokaClient;
@@ -30,19 +30,53 @@ describe("DjatokaClient", () => {
 	afterEach(function() {
 		frameCallbacks.beforeRender = function() { };
 		frameCallbacks.afterRender = function() { };
+		frameCallbacks.onDrawImage = function() { };
+		frameCallbacks.onClearRect = function() { };
 	});
 
-	it("should flush the frameBuffer of complete images after render if all images were complete", function(done) {
+	it("should draw the tiles to the canvas after loadImage", function(done) {
 		let prepared = false;
 		let lastLength = 0;
+		let canvasCleared = false;
+		let tilesDrawn = 0;
 		frameCallbacks.beforeRender = function() {
 			prepared = this.frameBuffer.length === this.frameBuffer.filter((x) => x[0].complete && x[0].height > 0 && x[0].width > 0).length;
 			lastLength = this.frameBuffer.length;
 		};
+
+		frameCallbacks.onClearRect = function(x, y, w, h) {
+			canvasCleared = true;
+			try {
+				expect(x).to.equal(0);
+				expect(y).to.equal(0);
+				expect(w).to.equal(1000);
+				expect(h).to.equal(1000);
+				expect(this.frameBuffer.length).to.equal(30);
+				tilesDrawn = 0;
+			} catch(e) {
+				done(e);
+			}
+		};
+
+		frameCallbacks.onDrawImage = function(im, x, y, w, h) {
+			try {
+				expect(canvasCleared).to.equal(true);
+				expect(Math.floor((x - this.imagePos.x) / this.scale) % TILE_SIZE).to.equal(0);
+				expect(Math.floor((y - this.imagePos.y) / this.scale) % TILE_SIZE).to.equal(0);
+				expect(w).to.equal(Math.ceil(im.width * this.scale));
+				expect(h).to.equal(Math.ceil(im.height * this.scale));
+				tilesDrawn++;
+			} catch(e) {
+				done(e);
+			}
+		};
+
 		frameCallbacks.afterRender = function() {
+			canvasCleared = false;
 			if(prepared && lastLength > 0) {
 				try {
 					expect(this.frameBuffer.length).to.equal(0);
+					expect(tilesDrawn).to.equal(lastLength);
 				} catch(e) {
 					done(e);
 				}
