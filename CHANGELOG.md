@@ -1,3 +1,20 @@
+### v1.12.0	(2015/10/1 12:51)
+* fixed superfluous calls to onAnimationFrame when component is unmounted by aborting new calls of requestAnimationFrame
+* added canvas rendering spy to viewer test
+* test mouse drag on viewer
+* 2nd attempt framerate test for viewer
+* added tests for viewer
+* added tests for viewer
+* tests for touch events on zoom component and rerendering on zoom component
+* more integration tests
+* more integration tests
+* stubbed api makeTileUrl func for test
+* integration test for zoom component
+* using browserify karma plugin for integration tests
+* new standalone release 1.11.0
+* retry release
+* new standalone release 1.11.0
+
 ### v1.11.0	(2015/9/29 9:3)
 * prepare release
 * retry the travis thing
