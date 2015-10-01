@@ -101,31 +101,19 @@ describe("DjatokaClient", () => {
 
 	it("should reposition the image on mouse drag", function(done) {
 		let {x, y} = store.getState().realViewPort;
-		let xBefore, yBefore;
+		let xBefore = viewComponent.imagePos.x;
+		let yBefore = viewComponent.imagePos.y;
 		let calls = 0;
-		let callExec = false;
-		let error;
-
-		function exec() {
-			viewComponent.onMouseDown({clientX: 100, clientY: 10});
-			viewComponent.onMouseMove({clientX: 80, clientY: 20, preventDefault: function() {}});
-			viewComponent.onMouseUp();
-		}
 
 		frameCallbacks.beforeRender = function() { 
-			if(!callExec) {
-				exec();
-				callExec = true;
-				xBefore = this.imagePos.x;
-				yBefore = this.imagePos.y;
-			} else if(calls === 2) {
+			 if(calls === 2) {
 				try {
 					expect(this.imagePos.x).to.be.below(xBefore);
-					expect(this.imagePos.y).to.be.below(yBefore)
+					expect(this.imagePos.y).to.be.above(yBefore)
+					done();
 				} catch(e) {
 					done(e);
 				}
-				done();
 			}
 		};
 
@@ -143,6 +131,10 @@ describe("DjatokaClient", () => {
 				unsubscribe();
 			}
 		});
+
+		viewComponent.onMouseDown({clientX: 100, clientY: 10});
+		viewComponent.onMouseMove({clientX: 80, clientY: 20, preventDefault: function() {}});
+		viewComponent.onMouseUp();
 
 	});
 });

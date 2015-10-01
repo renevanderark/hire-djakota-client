@@ -21,7 +21,7 @@ class Minimap extends React.Component {
 		};
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
-
+		this.abortAnimationFrame = false;
 		this.imageCtx = null;
 		this.interactionCtx = null;
 		this.resizeDelay = -1;
@@ -33,6 +33,7 @@ class Minimap extends React.Component {
 	}
 
 	componentDidMount() {
+		this.abortAnimationFrame = false;		
 		this.onResize();
 		this.imageCtx = React.findDOMNode(this).children[0].getContext("2d");
 		this.interactionCtx = React.findDOMNode(this).children[1].getContext("2d");
@@ -68,6 +69,7 @@ class Minimap extends React.Component {
 		window.removeEventListener("mouseup", this.mouseupListener);
 		window.addEventListener("touchend", this.mouseupListener);
 		window.removeEventListener("touchmove", this.touchMoveListener);
+		this.abortAnimationFrame = true;
 		cancelAnimationFrame(this.animationFrameListener);
 		this.unsubscribe();
 	}
@@ -118,7 +120,7 @@ class Minimap extends React.Component {
 		);
 		this.interactionCtx.stroke();
 
-		requestAnimationFrame(this.animationFrameListener);
+		if(!this.abortAnimationFrame) {	requestAnimationFrame(this.animationFrameListener); }
 	}
 
 	onResize() {

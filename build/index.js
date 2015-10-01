@@ -1502,6 +1502,7 @@ var DjatokaClient = (function (_React$Component) {
 		this.width = null;
 		this.height = null;
 		this.focalPoint = null;
+		this.abortAnimationFrame = false;
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
 		this.mousemoveListener = this.onMouseMove.bind(this);
@@ -1516,6 +1517,7 @@ var DjatokaClient = (function (_React$Component) {
 		value: function componentDidMount() {
 			var _this = this;
 
+			this.abortAnimationFrame = false;
 			this.commitResize();
 			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext("2d");
 			window.addEventListener("resize", this.resizeListener);
@@ -1547,6 +1549,7 @@ var DjatokaClient = (function (_React$Component) {
 			window.removeEventListener("mousemove", this.mousemoveListener);
 			window.removeEventListener("mouseup", this.mouseupListener);
 			this.unsubscribe();
+			this.abortAnimationFrame = true;
 			(0, _utilRequestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
 		}
 	}, {
@@ -1620,7 +1623,9 @@ var DjatokaClient = (function (_React$Component) {
 			} else if (this.resizeDelay > 0) {
 				this.resizeDelay -= 1;
 			}
-			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			if (!this.abortAnimationFrame) {
+				(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			}
 		}
 	}, {
 		key: "onResize",
@@ -2361,7 +2366,7 @@ var Minimap = (function (_React$Component) {
 		};
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
-
+		this.abortAnimationFrame = false;
 		this.imageCtx = null;
 		this.interactionCtx = null;
 		this.resizeDelay = -1;
@@ -2377,6 +2382,7 @@ var Minimap = (function (_React$Component) {
 		value: function componentDidMount() {
 			var _this = this;
 
+			this.abortAnimationFrame = false;
 			this.onResize();
 			this.imageCtx = _react2["default"].findDOMNode(this).children[0].getContext("2d");
 			this.interactionCtx = _react2["default"].findDOMNode(this).children[1].getContext("2d");
@@ -2412,6 +2418,7 @@ var Minimap = (function (_React$Component) {
 			window.removeEventListener("mouseup", this.mouseupListener);
 			window.addEventListener("touchend", this.mouseupListener);
 			window.removeEventListener("touchmove", this.touchMoveListener);
+			this.abortAnimationFrame = true;
 			(0, _utilRequestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
 			this.unsubscribe();
 		}
@@ -2448,7 +2455,9 @@ var Minimap = (function (_React$Component) {
 			this.interactionCtx.rect(Math.floor(this.state.realViewPort.x * this.state.width), Math.floor(this.state.realViewPort.y * this.state.height), Math.ceil(this.state.realViewPort.w * this.state.width), Math.ceil(this.state.realViewPort.h * this.state.height));
 			this.interactionCtx.stroke();
 
-			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			if (!this.abortAnimationFrame) {
+				(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			}
 		}
 	}, {
 		key: "onResize",
@@ -2775,7 +2784,7 @@ var _componentsFreeMovementButton2 = _interopRequireDefault(_componentsFreeMovem
 
 
 
-var css = Buffer("LmhpcmUtZGphdG9rYS1jbGllbnQsCi5oaXJlLWRqYXRva2EtbWluaW1hcCB7Cgl3aWR0aDogMTAwJTsKCWhlaWdodDogMTAwJTsKfQoKLmhpcmUtZGphdG9rYS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmltYWdlLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtbWluaW1hcCA+IC5pbWFnZSB7Cglwb3NpdGlvbjogYWJzb2x1dGU7Cn0KCi5oaXJlLWRqYXRva2EtY2xpZW50ID4gLmludGVyYWN0aW9uLAouaGlyZS1kamF0b2thLW1pbmltYXAgPiAuaW50ZXJhY3Rpb24gewoJei1pbmRleDogMTsKfQoKLmhpcmUtem9vbS1iYXIgKiB7CiAgICAtbW96LXVzZXItc2VsZWN0OiBub25lOwogICAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTsKICAgIC1tcy11c2VyLXNlbGVjdDogbm9uZTsgCiAgICB1c2VyLXNlbGVjdDogbm9uZTsgCiAgICAtd2Via2l0LXVzZXItZHJhZzogbm9uZTsKICAgIHVzZXItZHJhZzogbm9uZTsKfQouaGlyZS16b29tLWJhciB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7CgltaW4td2lkdGg6IDQwMHB4OwoJbWluLWhlaWdodDogNDRweDsKfQoKLmhpcmUtem9vbS1iYXIgbGFiZWwgewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJd2lkdGg6IDE1JTsKCWhlaWdodDogMTAwJTsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cn0KLmhpcmUtem9vbS1iYXIgbGFiZWwgPiAqIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCWhlaWdodDogMTAwJTsKCWxpbmUtaGVpZ2h0OiAzNHB4Cn0KLmhpcmUtem9vbS1iYXIgc3ZnIHsKCWN1cnNvcjogcG9pbnRlcjsKCWZpbGw6ICNCREE0N0U7CglzdHJva2U6ICNGMUVCRTY7Cgl3aWR0aDogODUlOwp9CgouaGlyZS16b29tLWJhciBzdmcgcGF0aCB7CglzdHJva2Utd2lkdGg6IDZweDsKfQoKLmhpcmUtem9vbS1iYXIgc3ZnIGNpcmNsZSB7CglzdHJva2Utd2lkdGg6IDA7Cn0KCi5oaXJlLWZpbGwtYnV0dG9uLAouaGlyZS1mcmVlLW1vdmVtZW50LWJ1dHRvbiB7CgltYXJnaW46IDA7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwoJYmFja2dyb3VuZDogdHJhbnNwYXJlbnQ7Cglmb250LWZhbWlseTogaW5oZXJpdDsKCWN1cnNvcjogcG9pbnRlcjsKCW91dGxpbmU6IDA7Cgl3aWR0aDogNTBweDsKCWhlaWdodDogMjRweDsKCXBhZGRpbmc6IDAgNnB4OwoJYmFja2dyb3VuZC1jb2xvcjogI0JEQTQ3RTsKCW1hcmdpbi1yaWdodDogNnB4OwoJYm9yZGVyLXJhZGl1czogM3B4OwoJY29sb3I6ICNGMUVCRTY7Cgl2ZXJ0aWNhbC1hbGlnbjogdG9wOwoKfQoKCi5oaXJlLWZpbGwtYnV0dG9uOjotbW96LWZvY3VzLWlubmVyLAouaGlyZS1mcmVlLW1vdmVtZW50LWJ1dHRvbjo6LW1vei1mb2N1cy1pbm5lciB7CglwYWRkaW5nOiAwOwoJYm9yZGVyOiAwOwp9CgouaGlyZS1maWxsLWJ1dHRvbiBzdmcsCi5oaXJlLWZyZWUtbW92ZW1lbnQtYnV0dG9uIHN2ZyB7CglzdHJva2U6ICNGMUVCRTY7CglzdHJva2Utd2lkdGg6IDFweDsKCWZpbGw6ICNGMUVCRTY7CgoJc3Ryb2tlLW9wYWNpdHk6IDE7CgloZWlnaHQ6IDEwMCUKfQoKLmhpcmUtZnJlZS1tb3ZlbWVudC1idXR0b24uYWN0aXZlIHN2ZyB7CglmaWxsOiAjYWZhOwp9","base64");
+var css = Buffer("LmhpcmUtZGphdG9rYS1jbGllbnQsCi5oaXJlLWRqYXRva2EtbWluaW1hcCwKI2hpcmUtZGphdG9rYS1jbGllbnQtYXBwIHsKCXdpZHRoOiAxMDAlOwoJaGVpZ2h0OiAxMDAlOwp9CgouaGlyZS1kamF0b2thLWNsaWVudCA+IC5pbnRlcmFjdGlvbiwKLmhpcmUtZGphdG9rYS1jbGllbnQgPiAuaW1hZ2UsCi5oaXJlLWRqYXRva2EtbWluaW1hcCA+IC5pbnRlcmFjdGlvbiwKLmhpcmUtZGphdG9rYS1taW5pbWFwID4gLmltYWdlIHsKCXBvc2l0aW9uOiBhYnNvbHV0ZTsKfQoKLmhpcmUtZGphdG9rYS1jbGllbnQgPiAuaW50ZXJhY3Rpb24sCi5oaXJlLWRqYXRva2EtbWluaW1hcCA+IC5pbnRlcmFjdGlvbiB7Cgl6LWluZGV4OiAxOwp9CgouaGlyZS16b29tLWJhciAqIHsKICAgIC1tb3otdXNlci1zZWxlY3Q6IG5vbmU7CiAgICAtd2Via2l0LXVzZXItc2VsZWN0OiBub25lOwogICAgLW1zLXVzZXItc2VsZWN0OiBub25lOyAKICAgIHVzZXItc2VsZWN0OiBub25lOyAKICAgIC13ZWJraXQtdXNlci1kcmFnOiBub25lOwogICAgdXNlci1kcmFnOiBub25lOwp9Ci5oaXJlLXpvb20tYmFyIHsKCWRpc3BsYXk6IGlubGluZS1ibG9jazsKCW1pbi13aWR0aDogNDAwcHg7CgltaW4taGVpZ2h0OiA0NHB4Owp9CgouaGlyZS16b29tLWJhciBsYWJlbCB7CglkaXNwbGF5OiBpbmxpbmUtYmxvY2s7Cgl3aWR0aDogMTUlOwoJaGVpZ2h0OiAxMDAlOwoJdmVydGljYWwtYWxpZ246IHRvcDsKfQouaGlyZS16b29tLWJhciBsYWJlbCA+ICogewoJZGlzcGxheTogaW5saW5lLWJsb2NrOwoJaGVpZ2h0OiAxMDAlOwoJbGluZS1oZWlnaHQ6IDM0cHgKfQouaGlyZS16b29tLWJhciBzdmcgewoJY3Vyc29yOiBwb2ludGVyOwoJZmlsbDogI0JEQTQ3RTsKCXN0cm9rZTogI0YxRUJFNjsKCXdpZHRoOiA4NSU7Cn0KCi5oaXJlLXpvb20tYmFyIHN2ZyBwYXRoIHsKCXN0cm9rZS13aWR0aDogNnB4Owp9CgouaGlyZS16b29tLWJhciBzdmcgY2lyY2xlIHsKCXN0cm9rZS13aWR0aDogMDsKfQoKLmhpcmUtZmlsbC1idXR0b24sCi5oaXJlLWZyZWUtbW92ZW1lbnQtYnV0dG9uIHsKCW1hcmdpbjogMDsKCXBhZGRpbmc6IDA7Cglib3JkZXI6IDA7CgliYWNrZ3JvdW5kOiB0cmFuc3BhcmVudDsKCWZvbnQtZmFtaWx5OiBpbmhlcml0OwoJY3Vyc29yOiBwb2ludGVyOwoJb3V0bGluZTogMDsKCXdpZHRoOiA1MHB4OwoJaGVpZ2h0OiAyNHB4OwoJcGFkZGluZzogMCA2cHg7CgliYWNrZ3JvdW5kLWNvbG9yOiAjQkRBNDdFOwoJbWFyZ2luLXJpZ2h0OiA2cHg7Cglib3JkZXItcmFkaXVzOiAzcHg7Cgljb2xvcjogI0YxRUJFNjsKCXZlcnRpY2FsLWFsaWduOiB0b3A7Cgp9CgoKLmhpcmUtZmlsbC1idXR0b246Oi1tb3otZm9jdXMtaW5uZXIsCi5oaXJlLWZyZWUtbW92ZW1lbnQtYnV0dG9uOjotbW96LWZvY3VzLWlubmVyIHsKCXBhZGRpbmc6IDA7Cglib3JkZXI6IDA7Cn0KCi5oaXJlLWZpbGwtYnV0dG9uIHN2ZywKLmhpcmUtZnJlZS1tb3ZlbWVudC1idXR0b24gc3ZnIHsKCXN0cm9rZTogI0YxRUJFNjsKCXN0cm9rZS13aWR0aDogMXB4OwoJZmlsbDogI0YxRUJFNjsKCglzdHJva2Utb3BhY2l0eTogMTsKCWhlaWdodDogMTAwJQp9CgouaGlyZS1mcmVlLW1vdmVtZW50LWJ1dHRvbi5hY3RpdmUgc3ZnIHsKCWZpbGw6ICNhZmE7Cn0=","base64");
 (0, _insertCss2["default"])(css, { prepend: true });
 
 _react2["default"].initializeTouchEvents(true);

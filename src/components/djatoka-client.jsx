@@ -44,6 +44,7 @@ class DjatokaClient extends React.Component {
 		this.width = null;
 		this.height = null;
 		this.focalPoint = null;
+		this.abortAnimationFrame = false;
 		this.resizeListener = this.onResize.bind(this);
 		this.animationFrameListener = this.onAnimationFrame.bind(this);
 		this.mousemoveListener = this.onMouseMove.bind(this);
@@ -54,6 +55,7 @@ class DjatokaClient extends React.Component {
 	}
 
 	componentDidMount() {
+		this.abortAnimationFrame = false;
 		this.commitResize();
 		this.imageCtx = React.findDOMNode(this).children[0].getContext("2d");
 		window.addEventListener("resize", this.resizeListener);
@@ -85,6 +87,7 @@ class DjatokaClient extends React.Component {
 		window.removeEventListener("mousemove", this.mousemoveListener);
 		window.removeEventListener("mouseup", this.mouseupListener);
 		this.unsubscribe();
+		this.abortAnimationFrame = true;
 		cancelAnimationFrame(this.animationFrameListener);
 	}
 
@@ -157,7 +160,7 @@ class DjatokaClient extends React.Component {
 		} else if(this.resizeDelay > 0) {
 			this.resizeDelay -= 1;
 		}
-		requestAnimationFrame(this.animationFrameListener);
+		if(!this.abortAnimationFrame) {	requestAnimationFrame(this.animationFrameListener); }
 	}
 
 	onResize() {
