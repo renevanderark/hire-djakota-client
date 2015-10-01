@@ -1,12 +1,14 @@
 import React from "react/addons";
 import djatokaClientApp from "../../src/standalone.jsx";
-import {viewContainer, zoomContainer, service, store, config, frameCallbacks} from "./setup";
+import {viewContainer, zoomContainer, wfContainer, hfContainer, fzContainer, afContainer, service, store, config, frameCallbacks} from "./setup";
 
 const TILE_SIZE = 512;
 describe("DjatokaClient", () => {
+	const FillButton = djatokaClientApp.FillButton;
 	const Zoom = djatokaClientApp.Zoom;
 	const DjatokaClient = djatokaClientApp.DjatokaClient;
-	let zoomComponent, viewComponent;
+	let zoomComponent, viewComponent, heightFillButton, widthFillButton, fullZoomButton;
+
 	before(function(done) {
 		let calls = 0;
 		this.unsubscribe = store.subscribe(() => {
@@ -15,18 +17,25 @@ describe("DjatokaClient", () => {
 				done();
 			}
 		});
-
+		fullZoomButton = React.render(<FillButton scaleMode="fullZoom" />, fzContainer);
+		widthFillButton = React.render(<FillButton scaleMode="widthFill" />, wfContainer);
+		heightFillButton = React.render(<FillButton scaleMode="heightFill" />, hfContainer);
 		zoomComponent = React.render(<Zoom />, zoomContainer);
 		viewComponent = React.render(<DjatokaClient config={config} scaleMode="fullZoom" service={service} />, viewContainer);
 	});
 
 	after(function(done) {
+		React.unmountComponentAtNode(fzContainer);
+		React.unmountComponentAtNode(wfContainer);
+		React.unmountComponentAtNode(hfContainer);
+		React.unmountComponentAtNode(viewContainer);
 		React.unmountComponentAtNode(zoomContainer);
 		React.unmountComponentAtNode(viewContainer);
 		done();
 	});
 
 	afterEach(function() {
+		React.addons.TestUtils.Simulate.click(React.findDOMNode(fullZoomButton))
 		frameCallbacks.beforeRender = function() { };
 		frameCallbacks.afterRender = function() { };
 		frameCallbacks.onDrawImage = function() { };
@@ -105,7 +114,7 @@ describe("DjatokaClient", () => {
 		let calls = 0;
 
 		frameCallbacks.beforeRender = function() { 
-			 if(calls === 2) {
+			if(calls === 2) {
 				try {
 					expect(this.imagePos.x).to.be.below(xBefore);
 					expect(this.imagePos.y).to.be.above(yBefore)
@@ -141,8 +150,8 @@ describe("DjatokaClient", () => {
 		let scale = viewComponent.scale;
 		let storeNotified = false;
 
-		frameCallbacks.beforeRender = function() { 
-			 if(storeNotified) {
+		frameCallbacks.beforeRender = function() {
+			if(storeNotified) {
 				try {
 					expect(this.scale).to.be.above(scale);
 					done();
@@ -171,8 +180,8 @@ describe("DjatokaClient", () => {
 		let scale = viewComponent.scale;
 		let storeNotified = false;
 
-		frameCallbacks.beforeRender = function() { 
-			 if(storeNotified) {
+		frameCallbacks.beforeRender = function() {
+			if(storeNotified) {
 				try {
 					expect(this.scale).to.be.below(scale);
 					done();
@@ -195,4 +204,95 @@ describe("DjatokaClient", () => {
 
 		viewComponent.onWheel({nativeEvent: {deltaY: 1}, preventDefault: function() {}});
 	});
+
+	it("should scale the image to widthFill when that FillButton is clicked", function(done) {
+		let storeNotified = false;
+		let rerendered = false;
+		let calls = 0;
+
+		frameCallbacks.beforeRender = function() {
+			if(storeNotified) {
+				rerendered = true;
+				try {
+					expect(this.imagePos.x).to.be.most(0);
+					expect(this.imagePos.x).to.be.least(-1);
+					expect(this.width).to.be.least(this.state.width);
+					expect(this.width).to.be.most(this.state.width + 1);
+				} catch(e) {
+					done(e);
+				}
+			}
+			if(storeNotified && rerendered) { done(); }
+		};
+
+		let unsubscribe = store.subscribe(() => {
+			let state = store.getState();
+			storeNotified = true;
+			calls++;
+			if(calls === 1) {
+				try {
+					expect(state.fillMode).to.equal("widthFill");
+				} catch(e) {
+					done(e);
+				}
+			}
+			if(calls === 2) {
+				try {
+					unsubscribe();
+					expect(state.fillMode).to.equal(false);
+				} catch(e) {
+					done(e);
+				}
+			}
+			if(storeNotified && rerendered) { done(); }
+		});
+
+		React.addons.TestUtils.Simulate.click(React.findDOMNode(widthFillButton));
+	});
+
+	it("should scale the image to heightFill when that FillButton is clicked", function(done) {
+		let storeNotified = false;
+		let rerendered = false;
+		let calls = 0;
+
+		frameCallbacks.beforeRender = function() {
+			if(storeNotified) {
+				rerendered = true;
+				try {
+					expect(this.imagePos.y).to.be.most(0);
+					expect(this.imagePos.y).to.be.least(-1);
+					expect(this.height).to.be.least(this.state.height);
+					expect(this.height).to.be.most(this.state.height + 1);
+				} catch(e) {
+					done(e);
+				}
+			}
+			if(storeNotified && rerendered) { done(); }
+		};
+
+		let unsubscribe = store.subscribe(() => {
+			let state = store.getState();
+			storeNotified = true;
+			calls++;
+			if(calls === 1) {
+				try {
+					expect(state.fillMode).to.equal("heightFill");
+				} catch(e) {
+					done(e);
+				}
+			}
+			if(calls === 2) {
+				try {
+					unsubscribe();
+					expect(state.fillMode).to.equal(false);
+				} catch(e) {
+					done(e);
+				}
+			}
+			if(storeNotified && rerendered) { done(); }
+		});
+
+		React.addons.TestUtils.Simulate.click(React.findDOMNode(heightFillButton));
+	});
+
 });
