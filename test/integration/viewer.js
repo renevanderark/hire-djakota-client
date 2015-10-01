@@ -145,6 +145,43 @@ describe("DjatokaClient", () => {
 		viewComponent.onMouseUp();
 	});
 
+	it("should reposition the image on touch move", function(done) {
+		let {x, y} = store.getState().realViewPort;
+		let xBefore = viewComponent.imagePos.x;
+		let yBefore = viewComponent.imagePos.y;
+		let calls = 0;
+
+		frameCallbacks.beforeRender = function() {
+			if(calls === 1) {
+				try {
+					expect(this.imagePos.x).to.be.below(xBefore);
+					expect(this.imagePos.y).to.be.above(yBefore);
+					done();
+				} catch(e) {
+					done(e);
+				}
+			}
+		};
+
+		let unsubscribe = store.subscribe(() => {
+			let state = store.getState().realViewPort;
+			calls++;
+			if(calls === 1) {
+				try {
+					expect(state.x).to.be.above(x);
+					expect(state.y).to.be.below(y);
+					unsubscribe();
+				} catch(e) {
+					unsubscribe();
+					done(e);
+				}
+			}
+		});
+		viewComponent.onTouchStart({touches: [{pageX: 100, pageY: 10}]});
+		viewComponent.onTouchMove({touches: [{pageX: 80, pageY: 20}], preventDefault: function() {}, stopPropagation: function() {}});
+		viewComponent.onTouchEnd();
+	});
+
 	it("should zoom in on the image on mouse wheel", function(done) {
 		let {zoom} = store.getState().realViewPort;
 		let scale = viewComponent.scale;
