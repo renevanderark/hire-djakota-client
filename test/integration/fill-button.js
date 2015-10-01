@@ -50,8 +50,8 @@ describe("FillButton", () => {
 				try {
 					expect(state.realViewPort.h).to.be.above(0.99);
 					expect(state.realViewPort.h).to.be.below(1.01);
+					finalize();
 				} catch(e) { finalize(e); }
-				finalize();
 			}
 		});
 
@@ -76,8 +76,8 @@ describe("FillButton", () => {
 				try {
 					expect(state.realViewPort.w).to.be.above(0.99);
 					expect(state.realViewPort.w).to.be.below(1.01);
+					finalize();
 				} catch(e) { finalize(e) }
-				finalize();
 			}
 		});
 
@@ -102,8 +102,8 @@ describe("FillButton", () => {
 				try {
 					expect(state.realViewPort.zoom).to.be.above(0.99);
 					expect(state.realViewPort.zoom).to.be.below(1.01);
+					finalize();					
 				} catch(e) { finalize(e) }
-				finalize();
 			}
 		});
 
@@ -128,8 +128,8 @@ describe("FillButton", () => {
 				try {
 					expect(state.realViewPort.w).to.be.above(0.99);
 					expect(state.realViewPort.w).to.be.below(1.01);
+					finalize();
 				} catch(e) { finalize(e) }
-				finalize();
 			}
 		});
 

@@ -42,8 +42,9 @@ describe("Zoom", () => {
 			try {
 				expect(state.zoom).to.be.above(0.99);
 				expect(state.zoom).to.be.below(1.01);
+				if(calls === 2) { finalize(); }				
 			} catch(e) { finalize(e); }
-			if(calls === 2) { finalize(); }
+			
 		});
 		zoomComponent.onMouseDown({pageX: 178, pageY: 10});
 	});
@@ -62,8 +63,8 @@ describe("Zoom", () => {
 			try {
 				expect(state.zoom).to.be.above(1.0);
 				expect(state.zoom).to.be.below(1.3);
+				if(calls === 2) { finalize(); }
 			} catch(e) { finalize(e); }
-			if(calls === 2) { finalize(); }
 		});
 
 		zoomComponent.onTouchStart({touches: [{pageX: 200, pageY: 10}], preventDefault: function() {}})
@@ -86,8 +87,8 @@ describe("Zoom", () => {
 				try {
 					expect(state.zoom).to.be.above(0.99);
 					expect(state.zoom).to.be.below(1.01);
+					finalize();
 				} catch(e) { finalize(e); }
-				finalize();
 			}
 		});
 		zoomComponent.onMouseDown({pageX: 10, pageY: 10});
@@ -112,8 +113,8 @@ describe("Zoom", () => {
 				try {
 					expect(state.zoom).to.be.above(0.99);
 					expect(state.zoom).to.be.below(1.01);
+					finalize();
 				} catch(e) { finalize(e); }
-				finalize();
 			}
 		});
 		zoomComponent.onTouchStart({touches: [{pageX: 10, pageY: 10}], preventDefault: function() {}})
@@ -141,8 +142,11 @@ describe("Zoom", () => {
 			}
 
 			if(calls === 7) {
-				try { expect(state.zoom).to.be.below(lastZoom); } catch(e) { finalize(e); }
-				finalize();
+				try { 
+					expect(state.zoom).to.be.below(lastZoom);
+					finalize();
+				} catch(e) { finalize(e); }
+				
 			}
 		});
 
@@ -169,10 +173,10 @@ describe("Zoom", () => {
 					expect(parseInt(newCirclePosition)).to.be.above(parseInt(initialCirclePosition));
 					expect(parseInt(newZoomLabelText)).to.be.above(parseInt(initialZoomLabelText));
 					expect(store.getState().realViewPort.zoom).to.be.above(initalZoom);
-				} catch(e) { 
-					finalize(e); 
+					finalize();
+				} catch(e) {
+					finalize(e);
 				}
-				finalize();
 			}
 		});
 

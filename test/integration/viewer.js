@@ -17,8 +17,7 @@ describe("DjatokaClient", () => {
 		});
 
 		zoomComponent = React.render(<Zoom />, zoomContainer);
-		viewComponent = React.render(<DjatokaClient scaleMode="fullZoom" config={config} service={service} />, viewContainer);
-
+		viewComponent = React.render(<DjatokaClient config={config} scaleMode="fullZoom" service={service} />, viewContainer);
 	});
 
 	after(function(done) {
@@ -77,10 +76,10 @@ describe("DjatokaClient", () => {
 				try {
 					expect(this.frameBuffer.length).to.equal(0);
 					expect(tilesDrawn).to.equal(lastLength);
+					done();
 				} catch(e) {
 					done(e);
 				}
-				done();
 			}
 		};
 		viewComponent.loadImage();
@@ -124,17 +123,76 @@ describe("DjatokaClient", () => {
 				try {
 					expect(state.x).to.be.above(x);
 					expect(state.y).to.be.below(y);
+					unsubscribe();
 				} catch(e) {
 					unsubscribe();
 					done(e);
 				}
-				unsubscribe();
 			}
 		});
 
 		viewComponent.onMouseDown({clientX: 100, clientY: 10});
 		viewComponent.onMouseMove({clientX: 80, clientY: 20, preventDefault: function() {}});
 		viewComponent.onMouseUp();
+	});
 
+	it("should zoom in on the image on mouse wheel", function(done) {
+		let {zoom} = store.getState().realViewPort;
+		let scale = viewComponent.scale;
+		let storeNotified = false;
+
+		frameCallbacks.beforeRender = function() { 
+			 if(storeNotified) {
+				try {
+					expect(this.scale).to.be.above(scale);
+					done();
+				} catch(e) {
+					done(e);
+				}
+			}
+		};
+		let unsubscribe = store.subscribe(() => {
+			let state = store.getState().realViewPort;
+			try {
+				storeNotified = true;
+				expect(state.zoom).to.be.above(zoom);
+				unsubscribe();
+			} catch(e) {
+				unsubscribe();
+				done(e);
+			}
+		});
+
+		viewComponent.onWheel({nativeEvent: {deltaY: -1}, preventDefault: function() {}});
+	});
+
+	it("should zoom out of the image on mouse wheel", function(done) {
+		let {zoom} = store.getState().realViewPort;
+		let scale = viewComponent.scale;
+		let storeNotified = false;
+
+		frameCallbacks.beforeRender = function() { 
+			 if(storeNotified) {
+				try {
+					expect(this.scale).to.be.below(scale);
+					done();
+				} catch(e) {
+					done(e);
+				}
+			}
+		};
+		let unsubscribe = store.subscribe(() => {
+			let state = store.getState().realViewPort;
+			try {
+				storeNotified = true;
+				expect(state.zoom).to.be.below(zoom);
+				unsubscribe();
+			} catch(e) {
+				unsubscribe();
+				done(e);
+			}
+		});
+
+		viewComponent.onWheel({nativeEvent: {deltaY: 1}, preventDefault: function() {}});
 	});
 });
