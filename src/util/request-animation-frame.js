@@ -29,7 +29,7 @@ export let requestAnimationFrame = 'function' === typeof global.requestAnimation
         (cb) => global.webkitRequestAnimationFrame(cb) :
     'function' === typeof global.mozRequestAnimationFrame ?
         (cb) => global.mozRequestAnimationFrame(cb) :
-    undefined;
+        (cb) => window.setTimeout(cb, 1000 / 60);
 
 export let cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ?
         (cb) => global.cancelAnimationFrame(cb) :
@@ -39,4 +39,4 @@ export let cancelAnimationFrame = 'function' === typeof global.cancelAnimationFr
         (cb) => global.webkitCancelRequestAnimationFrame(cb) :
     'function' === typeof global.mozCancelAnimationFrame ?
         (cb) => global.mozCancelAnimationFrame(cb) :
-    undefined;
+        () => { return; };

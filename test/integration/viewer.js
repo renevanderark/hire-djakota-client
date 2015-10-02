@@ -332,4 +332,13 @@ describe("DjatokaClient", () => {
 		React.addons.TestUtils.Simulate.click(React.findDOMNode(heightFillButton));
 	});
 
+	it("should zoom in on pinch out");
+	it("should zoom out on pinch in");
+	it("should zoom in around the cursor position of the mouse");
+	it("should zoom out around the cursor position of the mouse");
+	it("should stay within the bounds of the canvas when free movement is off");
+	it("should be able to cross the bounds of the canvas when free movement is on");
+	it("should respond to a viewport/window resize");
+	it("should center the image on initial render (trigger by resize)");
+	it("should respond to a minimap reposition (move to minimap tests)");
 });

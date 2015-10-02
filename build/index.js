@@ -1508,8 +1508,9 @@ var DjatokaClient = (function (_React$Component) {
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.frameBuffer = [];
-		this.repaintDelay = -1;
 		this.touchmap = { startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0 };
+		this.requestAnimationFrame = _utilRequestAnimationFrame.requestAnimationFrame;
+		this.cancelAnimationFrame = _utilRequestAnimationFrame.cancelAnimationFrame;
 	}
 
 	_createClass(DjatokaClient, [{
@@ -1527,7 +1528,7 @@ var DjatokaClient = (function (_React$Component) {
 			this.unsubscribe = _apiStore2["default"].subscribe(function () {
 				return _this.setState(_apiStore2["default"].getState(), _this.receiveNewState.bind(_this));
 			});
-			(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+			this.requestAnimationFrame(this.animationFrameListener);
 		}
 	}, {
 		key: "componentWillReceiveProps",
@@ -1550,7 +1551,7 @@ var DjatokaClient = (function (_React$Component) {
 			window.removeEventListener("mouseup", this.mouseupListener);
 			this.unsubscribe();
 			this.abortAnimationFrame = true;
-			(0, _utilRequestAnimationFrame.cancelAnimationFrame)(this.animationFrameListener);
+			this.cancelAnimationFrame(this.animationFrameListener);
 		}
 	}, {
 		key: "notifyRealImagePos",
@@ -1624,7 +1625,7 @@ var DjatokaClient = (function (_React$Component) {
 				this.resizeDelay -= 1;
 			}
 			if (!this.abortAnimationFrame) {
-				(0, _utilRequestAnimationFrame.requestAnimationFrame)(this.animationFrameListener);
+				this.requestAnimationFrame(this.animationFrameListener);
 			}
 		}
 	}, {
@@ -2832,7 +2833,9 @@ var requestAnimationFrame = 'function' === typeof global.requestAnimationFrame ?
     return global.webkitRequestAnimationFrame(cb);
 } : 'function' === typeof global.mozRequestAnimationFrame ? function (cb) {
     return global.mozRequestAnimationFrame(cb);
-} : undefined;
+} : function (cb) {
+    return window.setTimeout(cb, 1000 / 60);
+};
 
 exports.requestAnimationFrame = requestAnimationFrame;
 var cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ? function (cb) {
@@ -2843,7 +2846,9 @@ var cancelAnimationFrame = 'function' === typeof global.cancelAnimationFrame ? f
     return global.webkitCancelRequestAnimationFrame(cb);
 } : 'function' === typeof global.mozCancelAnimationFrame ? function (cb) {
     return global.mozCancelAnimationFrame(cb);
-} : undefined;
+} : function () {
+    return;
+};
 exports.cancelAnimationFrame = cancelAnimationFrame;
 
 },{}]},{},[28])(28)

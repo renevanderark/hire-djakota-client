@@ -48,6 +48,7 @@
     "nodemon": "^1.5.1",
     "react": "^0.13.3",
     "sinon": "^1.16.1",
+    "skin-deep": "^0.6.1",
     "uglify-js": "^2.4.24",
     "watchify": "^3.3.1"
   },

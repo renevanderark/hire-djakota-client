@@ -50,8 +50,9 @@ class DjatokaClient extends React.Component {
 		this.mousemoveListener = this.onMouseMove.bind(this);
 		this.mouseupListener = this.onMouseUp.bind(this);
 		this.frameBuffer = [];
-		this.repaintDelay = -1;
 		this.touchmap = {startPos: false, positions: [], tapStart: 0, lastTap: 0, pinchDelta: 0, pinchDistance: 0};
+		this.requestAnimationFrame = requestAnimationFrame;
+		this.cancelAnimationFrame = cancelAnimationFrame;
 	}
 
 	componentDidMount() {
@@ -65,7 +66,7 @@ class DjatokaClient extends React.Component {
 		this.unsubscribe = store.subscribe(() =>
 			this.setState(store.getState(), this.receiveNewState.bind(this))
 		);
-		requestAnimationFrame(this.animationFrameListener);
+		this.requestAnimationFrame(this.animationFrameListener);
 	}
 
 
@@ -88,7 +89,7 @@ class DjatokaClient extends React.Component {
 		window.removeEventListener("mouseup", this.mouseupListener);
 		this.unsubscribe();
 		this.abortAnimationFrame = true;
-		cancelAnimationFrame(this.animationFrameListener);
+		this.cancelAnimationFrame(this.animationFrameListener);
 	}
 
 
@@ -160,7 +161,7 @@ class DjatokaClient extends React.Component {
 		} else if(this.resizeDelay > 0) {
 			this.resizeDelay -= 1;
 		}
-		if(!this.abortAnimationFrame) {	requestAnimationFrame(this.animationFrameListener); }
+		if(!this.abortAnimationFrame) {	this.requestAnimationFrame(this.animationFrameListener); }
 	}
 
 	onResize() {
