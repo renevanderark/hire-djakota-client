@@ -100,7 +100,7 @@ describe("DjatokaClient", function() {
 		DjatokaClient.prototype.onWheel.restore();
 	});
 
-	it("should call commitResize, store a reference to the canvas context and add event listeners to the window with componentDidMount", function() {
+	it("should call commitResize, store a reference to the canvas context, subscribe to the store and add event listeners to the window with componentDidMount", function() {
 		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
 		const viewer = tree.getMountedInstance();
 		let registeredListeners = [];
@@ -121,9 +121,19 @@ describe("DjatokaClient", function() {
 			};
 		});
 
-
 		sinon.stub(viewer, "requestAnimationFrame", function(listener) {
 			expect(listener).toEqual("animationFrameListener");
+		});
+
+		sinon.stub(viewer, "receiveNewState");
+
+		sinon.stub(viewer, "setState", function(stateObj, cb) {
+			expect(stateObj).toEqual({realViewPort: { x: 0, y: 0, w: 0, h: 0, zoom: 0, reposition: false }, mousewheel: null, fillMode: null, freeMovement: false });
+			cb();
+		});
+
+		sinon.stub(store, "subscribe", function(cb) {
+			cb();
 		});
 
 		viewer.componentDidMount();
@@ -134,9 +144,15 @@ describe("DjatokaClient", function() {
 		sinon.assert.calledOnce(viewer.commitResize);
 		sinon.assert.calledOnce(React.findDOMNode);
 		sinon.assert.calledOnce(viewer.requestAnimationFrame);
+		sinon.assert.calledOnce(viewer.setState);
+		sinon.assert.calledOnce(store.subscribe);
+		sinon.assert.calledOnce(viewer.receiveNewState);
 		viewer.commitResize.restore();
-		React.findDOMNode.restore();
 		viewer.requestAnimationFrame.restore();
+		viewer.setState.restore();
+		viewer.receiveNewState.restore();
+		React.findDOMNode.restore();
+		store.subscribe.restore();
 
 		delete global.window.addEventListener;
 	});
@@ -233,7 +249,82 @@ describe("DjatokaClient", function() {
 		store.dispatch.restore();
 	});
 
-	it("should receiveNewState()");
+	it("should reposition the viewport in receiveNewState, state.realViewPort.reposition", function() {
+		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
+		const viewer = tree.getMountedInstance();
+		viewer.state = store.getState();
+		viewer.state.realViewPort.reposition = true;
+		viewer.state.realViewPort.x = .1;
+		viewer.state.realViewPort.y = .2;
+		viewer.level = 5;
+		viewer.scale = 1;
+		sinon.stub(viewer.api, "getRealImagePos", function(pos, s, lvl) {
+			expect(pos).toEqual({x: 0, y: 0});
+			expect(s).toEqual(1);
+			expect(lvl).toEqual(5);
+			return { x: 10, y: 10, w: 100, h: 100 };
+		});
+		sinon.stub(viewer, "loadImage", function(obj) { expect(obj).toEqual({level: 5, scale: 1}); });
+		sinon.stub(viewer, "correctBounds");
+
+		viewer.receiveNewState();
+
+		sinon.assert.calledOnce(viewer.api.getRealImagePos);
+		sinon.assert.calledOnce(viewer.loadImage);
+		sinon.assert.calledOnce(viewer.correctBounds);
+		expect(viewer.api.getRealImagePos.calledBefore(viewer.correctBounds)).toEqual(true);
+		expect(viewer.correctBounds.calledBefore(viewer.loadImage)).toEqual(true);
+		viewer.api.getRealImagePos.restore();
+		viewer.loadImage.restore();
+		viewer.correctBounds.restore();
+		expect(viewer.imagePos).toEqual({x: -10, y: -20});
+	});
+
+	it("should apply zoom with receiveNewState when state.realViewPort.applyZoom", function() {
+		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
+		const viewer = tree.getMountedInstance();
+		viewer.state = store.getState();
+		viewer.focalPoint = "not null";
+		viewer.state.realViewPort.applyZoom = true;
+		viewer.state.realViewPort.zoom = ":zoom:";
+		sinon.stub(viewer, "zoom");
+		sinon.stub(viewer.api, "zoomTo", function(zoom, cb) {
+			expect(zoom).toEqual(":zoom:");
+			cb();
+		});
+
+		viewer.receiveNewState();
+
+		sinon.assert.calledOnce(viewer.api.zoomTo);
+		sinon.assert.calledOnce(viewer.zoom);
+		expect(viewer.api.zoomTo.calledBefore(viewer.zoom)).toEqual(true);
+		expect(viewer.focalPoint).toEqual(null);
+		viewer.api.zoomTo.restore();
+		viewer.zoom.restore();
+	});
+
+	it("should trigger zoomBy and dispatch sendMouseWheel(false) with receiveNewState when state.mousewheel");
+
+/*
+		if(this.state.mousewheel) {
+			this.focalPoint = null;
+			store.dispatch(sendMouseWheel(false));
+			this.api.zoomBy(this.determineZoomFactor(this.state.mousewheel.deltaY), this.scale, this.level, this.zoom.bind(this));
+		}
+*/
+
+
+	it("should set the fillMode and dispatch setFill(false) with receiveNewState when state.fillMode");
+/*
+		if(this.state.fillMode) {
+			store.dispatch(setFill(false));
+			this.imagePos.x = 0;
+			this.imagePos.y = 0;
+			this.loadImage({scaleMode: this.state.fillMode});
+		}
+*/
+
+
 	it("should onAnimationFrame()");
 	it("should onResize()");
 	it("should commitResize()");
