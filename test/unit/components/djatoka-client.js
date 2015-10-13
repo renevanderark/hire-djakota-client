@@ -137,7 +137,92 @@ describe("DjatokaClient", function() {
 		React.findDOMNode.restore();
 		viewer.requestAnimationFrame.restore();
 
-		delete(global.window.addEventListener);
+		delete global.window.addEventListener;
 	});
 
+	it("should remove event listeners unsubscribe from store, and abort the animation frame listener with componentWillUnmount", function() {
+		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
+		const viewer = tree.getMountedInstance();
+		let removedListeners = [];
+		let unsubscribed = false;
+		let canceledAnimationFrame = false;
+
+		viewer.animationFrameListener = "animationFrameListener";
+		viewer.resizeListener = "resizeListener";
+		viewer.mousemoveListener = "mousemoveListener";
+		viewer.mouseupListener = "mouseupListener";
+		viewer.unsubscribe = function() { unsubscribed = true; };
+		viewer.cancelAnimationFrame = function() { canceledAnimationFrame = true; };
+
+		global.window.removeEventListener = function(name, func) {
+			removedListeners.push([name, func]);
+		};
+
+		expect(viewer.abortAnimationFrame).toEqual(false);
+		viewer.componentWillUnmount();
+		expect(viewer.abortAnimationFrame).toEqual(true);
+		expect(removedListeners[0]).toEqual(["resize", "resizeListener"]);
+		expect(removedListeners[1]).toEqual(["mousemove", "mousemoveListener"]);
+		expect(removedListeners[2]).toEqual(["mouseup", "mouseupListener"]);
+		expect(unsubscribed).toEqual(true);
+		expect(canceledAnimationFrame).toEqual(true);
+
+		delete global.window.removeEventListener;
+	});
+
+
+	it("should reinitialize the Api and canvas when componentWillReceiveProps is called with a different config.identifier", function() {
+		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
+		const viewer = tree.getMountedInstance();
+		const newConfig = {...config, identifier: ":newid:"};
+		sinon.stub(viewer, "commitResize");
+
+		expect(viewer.api.config.identifier).toEqual(config.identifier);
+		viewer.componentWillReceiveProps({config: newConfig, service: service});
+
+		sinon.assert.calledOnce(viewer.commitResize);
+		expect(viewer.api.config.identifier).toEqual(":newid:");
+
+		viewer.commitResize.restore();
+	});
+
+	it("should npt reinitialize the Api and canvas when componentWillReceiveProps is called with the same config.identifier", function() {
+		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
+		const viewer = tree.getMountedInstance();
+		const newConfig = {...config};
+		sinon.stub(viewer, "commitResize");
+		viewer.componentWillReceiveProps({config: newConfig, service: service});
+		sinon.assert.notCalled(viewer.commitResize);
+		viewer.commitResize.restore();
+	});
+
+
+	it("should only update the DOM with shouldComponentUpdate when viewport dimensions change, or id prop changes", function() {
+		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
+		const viewer = tree.getMountedInstance();
+		const newConfig = {...config, identifier: ":newid:"};
+		console.log(viewer.state.width, viewer.state.height);
+		expect(viewer.shouldComponentUpdate({config: config}, {width: null, height: null})).toEqual(false);
+		expect(viewer.shouldComponentUpdate({config: config}, {width: 1, height: null})).toEqual(true);
+		expect(viewer.shouldComponentUpdate({config: config}, {width: null, height: 1})).toEqual(true);
+		expect(viewer.shouldComponentUpdate({config: newConfig}, {width: null, height: null})).toEqual(true);
+
+	});
+
+
+	it("should notifyRealImagePos()");
+	it("should receiveNewState()");
+	it("should onAnimationFrame()");
+	it("should onResize()");
+	it("should commitResize()");
+	it("should loadImage(opts = {scaleMode: this.props.scaleMode})");
+	it("should setScale(s, l)");
+	it("should setDimensions(w, h)");
+	it("should center(w, h)");
+	it("should correctBounds()");
+	it("should onDimensions(s, l, w, h)");
+	it("should zoom(s, l, w, h)");
+	it("should determineZoomFactor(delta)");
+	it("should onWheel(ev)");
+	it("should render()");
 });
