@@ -1,5 +1,6 @@
 import DjatokaClient from "../../../src/components/djatoka-client";
 import Api from "../../../src/api/api";
+import store from "../../../src/api/store";
 import expect from "expect";
 import sinon from "sinon";
 import React from "react/addons";
@@ -186,7 +187,7 @@ describe("DjatokaClient", function() {
 		viewer.commitResize.restore();
 	});
 
-	it("should npt reinitialize the Api and canvas when componentWillReceiveProps is called with the same config.identifier", function() {
+	it("should not reinitialize the Api and canvas when componentWillReceiveProps is called with the same config.identifier", function() {
 		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
 		const viewer = tree.getMountedInstance();
 		const newConfig = {...config};
@@ -201,7 +202,6 @@ describe("DjatokaClient", function() {
 		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
 		const viewer = tree.getMountedInstance();
 		const newConfig = {...config, identifier: ":newid:"};
-		console.log(viewer.state.width, viewer.state.height);
 		expect(viewer.shouldComponentUpdate({config: config}, {width: null, height: null})).toEqual(false);
 		expect(viewer.shouldComponentUpdate({config: config}, {width: 1, height: null})).toEqual(true);
 		expect(viewer.shouldComponentUpdate({config: config}, {width: null, height: 1})).toEqual(true);
@@ -210,7 +210,29 @@ describe("DjatokaClient", function() {
 	});
 
 
-	it("should notifyRealImagePos()");
+	it("should dispatch viewport state to the store with notifyRealImagePos; apply* flags should always be false to prevent infinite callback loops", function() {
+		const tree = sd.shallowRender(<DjatokaClient config={config} service={service} />);
+		const viewer = tree.getMountedInstance();
+		viewer.state.width = 50;
+		viewer.state.height = 50;
+
+		sinon.stub(viewer.api, "getRealScale", function() { return ":scale:"; });
+		sinon.stub(viewer.api, "getRealImagePos", function() { return { x: 10, y: 10, w: 100, h: 100 }; });
+		sinon.stub(store, "dispatch", function(dispatchData) {
+			expect(dispatchData).toEqual({
+				type: "SET_REAL_VIEWPORT",
+				realViewPort: { x: -0.1, y: -0.1, w: 0.5, h: 0.5, zoom: ":scale:", reposition: false, applyZoom: false }
+			});
+		});
+		viewer.notifyRealImagePos();
+		sinon.assert.calledOnce(viewer.api.getRealScale);
+		sinon.assert.calledOnce(viewer.api.getRealImagePos);
+		sinon.assert.calledOnce(store.dispatch);
+		viewer.api.getRealScale.restore();
+		viewer.api.getRealImagePos.restore();
+		store.dispatch.restore();
+	});
+
 	it("should receiveNewState()");
 	it("should onAnimationFrame()");
 	it("should onResize()");
